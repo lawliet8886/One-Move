@@ -30,7 +30,7 @@ data class GameUiState(
     val creatures: List<Creature> = emptyList()
 )
 
-/** Frame-paced simulation; a backgrounded app or an open level picker never advances the game. */
+/** Frame-paced simulation; background, level-picker and idle states consume no simulation frames. */
 class OneMoveViewModel(application: Application) : AndroidViewModel(application) {
     private val progressRepo = GameProgressRepository(application.applicationContext)
     private val haptics = HapticManager(application.applicationContext)
@@ -60,11 +60,14 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
             requestFrame()
         }
     }
-
     init { loadLevel(1) }
-
     private fun requestFrame() {
-        if (foreground && !callbackPending) { callbackPending = true; choreographer.postFrameCallback(frameCallback) }
+        val w = physicsWorld
+        val animating = w.state == SimulationState.RUNNING || (w.state != SimulationState.READY && w.simulationTime-w.terminalTime < 2.5f)
+        if (foreground && animating && !_uiState.value.showLevelSelectSheet && !callbackPending) {
+            callbackPending = true
+            choreographer.postFrameCallback(frameCallback)
+        }
     }
     fun setForegroundActive(active: Boolean) {
         foreground = active
@@ -109,14 +112,14 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         }.filter { it.second <= 70f }.minByOrNull { it.second }
         nearest?.let { pullPin(it.first.id) }
     }
-    fun pullPin(pinId: PinId) { if (physicsWorld.pullPin(pinId)) { lastFrame=0L; publish() } }
+    fun pullPin(pinId: PinId) { if (physicsWorld.pullPin(pinId)) { lastFrame=0L; publish(); requestFrame() } }
     fun resetGame() {
         HomeNestRenderer.reset(); physicsWorld.reset(); lastFrame=0L
         progressRepo.recordRetry(_uiState.value.currentLevelNumber)
         publish()
     }
     fun openLevelSelect() { lastFrame=0L; _uiState.update { it.copy(showLevelSelectSheet=true) } }
-    fun closeLevelSelect() { lastFrame=0L; _uiState.update { it.copy(showLevelSelectSheet=false) } }
+    fun closeLevelSelect() { lastFrame=0L; _uiState.update { it.copy(showLevelSelectSheet=false) }; requestFrame() }
     fun toggleDebugBounds() { _uiState.update { it.copy(showDebugBounds=!it.showDebugBounds) } }
     override fun onCleared() { setForegroundActive(false); super.onCleared() }
 }
