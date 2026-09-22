@@ -1,0 +1,6 @@
+{
+  "name": "ONE MOVE",
+  "description": "A tactical physics puzzle game where you have only one move to pull the right pin and save all the creatures.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,13 @@
+Event,SimTimeSec,Entity,PosX,PosY,VelX,VelY,SeesawAngleDeg,Details
+PIN_C_SELECTED,0.000,PIN_C,155.00,330.00,0.00,0.00,18.33,"PIN C pulled, gold barrier unlocks wrecker chute"
+WRECKER_RELEASED,0.000,HEAVY_BALL,150.00,230.00,0.00,0.00,18.33,"Heavy Iron Wrecker begins acceleration down steep chute"
+WRECKER_SEESAW_COLLISION,1.024,HEAVY_BALL,373.98,663.49,538.15,935.66,18.33,"Iron Wrecker impacts seesaw left arm transferring downward momentum"
+CREATURE_GATE_ACTIVATED,1.072,CREATURE_GATE,640.00,310.00,0.00,0.00,-15.41,"Mechanical latch tripped by seesaw rotation; gate tilts open"
+PIP_GATE_EXIT,1.216,PIP,700.00,295.09,0.00,240.19,18.79,"Pip drops onto sweeping slide"
+MOCHI_GATE_EXIT,1.216,MOCHI,765.00,295.09,0.00,240.19,18.79,"Mochi drops onto sweeping slide"
+BLOBBO_GATE_EXIT,1.216,BLOBBO,830.00,295.09,0.00,240.19,18.79,"Blobbo drops onto sweeping slide"
+SPRING_TRIGGERED,2.912,SPRING_BUMPER,190.00,1140.00,0.00,0.00,-16.51,"Spring bumper compresses and delivers upward-right launch impulse"
+PIP_GOAL_ENTRY,4.064,PIP,771.72,1256.04,-8.67,125.01,-16.51,"Pip successfully enters glowing nest"
+BLOBBO_GOAL_ENTRY,4.400,BLOBBO,899.83,1232.36,-7.34,245.66,-16.51,"Blobbo successfully enters glowing nest"
+MOCHI_GOAL_ENTRY,5.152,MOCHI,887.72,1228.61,-11.68,219.90,-16.51,"Mochi successfully enters glowing nest"
+SUCCESS,5.536,PHYSICS_WORLD,860.00,1360.00,0.00,0.00,-16.51,"All 3 creatures confirmed settled in goal zone; victory celebration triggered"

@@ -1,0 +1,13 @@
+LevelNumber,LevelName,CorrectPin,MeasuredCorrectChainDurationSec,MeasuredFastestWrongOutcomeSec,MeasuredLongestWrongOutcomeSec,NumberOfPins,PrimaryMechanics,NewConceptIntroduced,TimeoutOccurred,Deterministic
+1,"FIRST MOVE",PIN_A,1.90,0.85,0.85,2,"Static Platforms, Gravity Slide, Home Nest","One Move decision & Toy-box physics",false,true
+2,"BOUNCE",PIN_B,3.94,0.90,0.90,3,"Spring Bumper, Curved Chute, Launch Trajectory","Spring Bumper physics & launch arc",false,true
+3,"BLOCKED",PIN_C,3.02,0.85,3.12,3,"Rolling Boulder, Bottleneck Geometry, Passage Clearance","Obstruction avoidance & kinetic hazards",false,true
+4,"THE LEVER",PIN_C,5.86,1.25,3.58,3,"Heavy Wrecker, Seesaw Lever, Mechanical Latch Gate, Spring Bumper","Multi-step mechanical chain reaction & leverage",false,true
+5,"WRONG WAY",PIN_C,3.89,0.85,0.85,3,"Curved Banking Rail, Hazard Pit, Trajectory Reading","Counter-intuitive route reasoning & bypass loops",false,true
+6,"DOUBLE DUTY",PIN_A,5.38,1.25,1.25,3,"Seesaw Lever as Bridge & Latch Trigger, Heavy Wrecker","Dual-purpose mechanics & bridging chasms",false,true
+7,"SPLIT SECOND",PIN_A,3.22,0.98,0.98,3,"Divider Wedge, Staggered Multi-Track Physics, Spring Bumper, Converging Goal","Multi-character route divergence & staggered rescue",false,true
+8,"THE DECOY",PIN_B,3.89,0.90,0.90,3,"Dual Spring Bumpers, Launch Angle Prediction, Trap Cage","Decoy mechanics & spring angle evaluation",false,true
+9,"CHAIN REACTION",PIN_A,4.67,5.46,7.01,3,"Heavy Ball Momentum Transfer, Rolling Stone, Seesaw Lever, Spring Launch","Multi-body chain reactions & momentum cascading",false,true
+10,"LOOK AGAIN",PIN_B,3.89,0.90,0.90,3,"Banked Momentum Loop, Dead-End Trap Detection, Spring Launch","Momentum-dependent gap traversal & track inspection",false,true
+11,"THREE LITTLE HEROES",PIN_A,4.54,0.90,0.90,3,"3-Tier Synchronized Divider, Character Staggering, Spring Bumper, Converging Goal","Tri-path synchronized convergence & character personality focus",false,true
+12,"PERFECT MACHINE",PIN_C,5.18,1.25,1.25,4,"Grand Finale Master Chain: Wrecker Ball, Seesaw Bridge, Obstacle Perch, Latch Gate, Receiving Ramp, Golden Nest","Culmination of momentum, kinetic deflection, and multi-stage bridge mechanics",false,true

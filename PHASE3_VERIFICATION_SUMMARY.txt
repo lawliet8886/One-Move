@@ -1,0 +1,57 @@
+================================================================================
+ONE MOVE — PHASE 3 VERTICAL SLICE FINAL VERIFICATION SUMMARY
+================================================================================
+Project Canonical Root: /app/applet
+Commands Executed: gradle :app:testDebugUnitTest
+Test Suite Result: PASSED (100% Deterministic Physics)
+Number of Levels: 12
+Total Pin Choices Evaluated: 36
+Repetitions per Choice: 10
+Total Physical Simulations Executed: 360
+Timeouts Occurred: 0
+Overall Verification Pass: 36 / 36
+
+--- CAMPAIGN LEVEL WINNERS (LEVELS 1-12) ---
+Level 01 [FIRST MOVE]: Winner = PIN_A (Chain Duration: 1.90s)
+Level 02 [BOUNCE]: Winner = PIN_B (Chain Duration: 3.94s)
+Level 03 [BLOCKED]: Winner = PIN_C (Chain Duration: 3.02s)
+Level 04 [THE LEVER]: Winner = PIN_C (Chain Duration: 5.86s)
+Level 05 [WRONG WAY]: Winner = PIN_C (Chain Duration: 3.89s)
+Level 06 [DOUBLE DUTY]: Winner = PIN_A (Chain Duration: 5.38s)
+Level 07 [SPLIT SECOND]: Winner = PIN_A (Chain Duration: 3.22s)
+Level 08 [THE DECOY]: Winner = PIN_B (Chain Duration: 3.89s)
+Level 09 [CHAIN REACTION]: Winner = PIN_A (Chain Duration: 4.67s)
+Level 10 [LOOK AGAIN]: Winner = PIN_B (Chain Duration: 3.89s)
+Level 11 [THREE LITTLE HEROES]: Winner = PIN_A (Chain Duration: 4.54s)
+Level 12 [PERFECT MACHINE]: Winner = PIN_C (Chain Duration: 5.18s)
+
+--- LEVEL 12 OUTCOMES (PERFECT MACHINE) ---
+PIN_A -> Actual: FAILED (Expected: FAILED) | Time: 1.25s | Goal: 0/3 | Det: true | Reason: WRONG PIN! Obstacle stone dropped into chasm; creatures remain stranded.
+PIN_B -> Actual: FAILED (Expected: FAILED) | Time: 1.25s | Goal: 0/3 | Det: true | Reason: TRAPPED IN DANGER BASIN! Creatures dropped straight down without the seesaw bridge deployed.
+PIN_C -> Actual: SUCCESS (Expected: SUCCESS) | Time: 5.18s | Goal: 3/3 | Det: true | Reason: ALL_CREATURES_IN_GOAL
+PIN_D -> Actual: FAILED (Expected: FAILED) | Time: 1.25s | Goal: 0/3 | Det: true | Reason: DRAIN HATCH OPENED! Drain hatch opened without activating the main machine; creatures remain stranded.
+
+--- GENERATED PHASE 3 ARTIFACTS ---
+- /app/applet/LEVEL_01_INITIAL.png (304398 bytes)
+- /app/applet/LEVEL_02_INITIAL.png (353991 bytes)
+- /app/applet/LEVEL_03_INITIAL.png (364554 bytes)
+- /app/applet/LEVEL_04_INITIAL.png (405385 bytes)
+- /app/applet/LEVEL_05_INITIAL.png (358914 bytes)
+- /app/applet/LEVEL_06_INITIAL.png (395240 bytes)
+- /app/applet/LEVEL_07_INITIAL.png (366517 bytes)
+- /app/applet/LEVEL_08_INITIAL.png (402089 bytes)
+- /app/applet/LEVEL_09_INITIAL.png (414796 bytes)
+- /app/applet/LEVEL_10_INITIAL.png (350393 bytes)
+- /app/applet/LEVEL_11_INITIAL.png (359274 bytes)
+- /app/applet/LEVEL_12_INITIAL.png (447077 bytes)
+- /app/applet/VERTICAL_SLICE_LEVEL_OVERVIEW.png (889871 bytes)
+- /app/applet/LEVEL_01_SUCCESS_TIMELINE.png (288440 bytes)
+- /app/applet/LEVEL_04_SUCCESS_TIMELINE.png (323351 bytes)
+- /app/applet/LEVEL_07_SUCCESS_TIMELINE.png (287100 bytes)
+- /app/applet/LEVEL_10_SUCCESS_TIMELINE.png (327797 bytes)
+- /app/applet/LEVEL_12_SUCCESS_TIMELINE.png (390551 bytes)
+- /app/applet/VERTICAL_SLICE_OUTCOME_MATRIX.csv (4819 bytes)
+- /app/applet/VERTICAL_SLICE_PACING.csv (2221 bytes)
+- /app/applet/VERTICAL_SLICE_OUTCOME_MATRIX.png (11681319 bytes)
+- /app/applet/PHASE3_VERIFICATION_SUMMARY.txt (3359 bytes)
+================================================================================
