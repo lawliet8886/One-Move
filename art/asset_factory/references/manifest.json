@@ -1,0 +1,37 @@
+{
+  "kind": "Exact crops from existing project atlas, not new generated art",
+  "source": "app/src/main/assets/mascots/atlas.webp",
+  "source_sha256": "5567c8e5ed09aedef83c3d14653e72ace56ec48df775dc7c0825288ab996efb8",
+  "references": [
+    {
+      "file": "pip_current.png",
+      "sha256": "ef588060063f9b81756f58bd653cfcc9d894f7319a9907926aa8035837a4f6a4",
+      "source_rect": [
+        0,
+        0,
+        192,
+        192
+      ]
+    },
+    {
+      "file": "mochi_current.png",
+      "sha256": "1f35f39451d15c4a1862ba51753a4afb5771851039fb7dc33513edffcaf6a3dc",
+      "source_rect": [
+        0,
+        192,
+        192,
+        192
+      ]
+    },
+    {
+      "file": "blobbo_current.png",
+      "sha256": "681bfa2af9fc1b9dca25c685a5dbfcb576ad3f52640d431087bb21f82d49e7be",
+      "source_rect": [
+        0,
+        384,
+        192,
+        192
+      ]
+    }
+  ]
+}

@@ -1,0 +1,656 @@
+{
+  "source_base_commit": "7cdecfa11f731d56872ef177b1a30bb14c70e4b9",
+  "local_blender": "5.2.0 LTS",
+  "cli_preflight": {
+    "checked_utc": "2026-09-22T16:07:55.006357+00:00",
+    "cli_version": "0.5.1",
+    "studio_reported_approx_balance": 4000,
+    "studio_reported_expiry": "2026-10-01",
+    "api_balance": null,
+    "credits_spent_by_this_preflight": 0,
+    "checks": [
+      {
+        "command": "doctor",
+        "exit_code": 1,
+        "output": "{\"ok\":false,\"checks\":[{\"name\":\"node\",\"ok\":true,\"detail\":\"v24.14.0 (need >= 20)\",\"critical\":true},{\"name\":\"api key\",\"ok\":false,\"detail\":\"missing \u2014 run \\\"tripo login\\\"\",\"critical\":true},{\"name\":\"api reachability\",\"ok\":false,\"detail\":\"skipped (no key) \u00b7 would use https://openapi.tripo3d.ai (region ov)\",\"critical\":false},{\"name\":\"llm (tripo ai conversation mode)\",\"ok\":true,\"detail\":\"not configured \u2014 wizard mode only (this is fine)\",\"critical\":false},{\"name\":\"terminal\",\"ok\":true,\"detail\":\"non-TTY (headless mode)\",\"critical\":false},{\"name\":\"language\",\"ok\":true,\"detail\":\"auto\",\"critical\":false}]}"
+      },
+      {
+        "command": "balance",
+        "exit_code": 3,
+        "output": "{\"error\":\"no API key configured\",\"exit_code\":3,\"suggestion\":\"run \\\"tripo login\\\" to configure an API key\"}\n\n\u001b[31m\u2717 no API key configured\u001b[39m\n\u001b[2m  \u2192 run \"tripo login\" to configure an API key\n\u001b[22m"
+      }
+    ]
+  },
+  "offline_smoke": {
+    "status": "PASS",
+    "kind": "OFFLINE FIXTURE ONLY; NOT ANDROID OR FINAL ART",
+    "credits_spent": 0,
+    "glb_actions": [
+      "OneMove_fixture"
+    ],
+    "fbx_actions": [
+      "Pip_Rig|Pip_Rig|OneMove_fixture"
+    ],
+    "fbx_animation_verified": true,
+    "glb_rigged_clips_verified": [
+      "idle",
+      "jump",
+      "fall",
+      "happy"
+    ],
+    "glb_frames": 8,
+    "fbx_frames": 8,
+    "front_frames": 1,
+    "atlas_tests": 9,
+    "android_asset_integration": false
+  },
+  "script_sha256": {
+    "blender_bake.py": "33913463377e3fe904eb8d649c803a0153f35b59bf3d810457289d7314ef6ceb",
+    "make_fixture.py": "3d1403b28da34b9bb06f2fe38c0fe9563b514846f4d4fd066d6c038d7e2c8156",
+    "pack_atlas.py": "e48c0764953add01fdddb95fe472b2fbd989f7a63d2e6da11dc31e858b4f032a",
+    "smoke_factory.py": "396a8b9b4a5b01a5946d225bd1d9560ecb5145c5c80a1451f75f21997780a1ec",
+    "test_factory.py": "0be2aa7b02f68b2d276db60a1d4f62183b6e149172446f7797a3767415d180a9"
+  },
+  "atlases": {
+    "glb": {
+      "schema_version": 1,
+      "asset_id": "pip-local-compatibility-fixture",
+      "version": "0.1.0",
+      "kind": "OFFLINE ART CANDIDATE; NOT ANDROID GAMEPLAY",
+      "approved_for_runtime": false,
+      "source": {
+        "objects": [
+          {
+            "name": "Pip_Rig",
+            "type": "ARMATURE"
+          },
+          {
+            "name": "button_nose",
+            "type": "MESH"
+          },
+          {
+            "name": "Cream face bib",
+            "type": "MESH"
+          },
+          {
+            "name": "ear_lining",
+            "type": "MESH"
+          },
+          {
+            "name": "ear_lining.001",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_cream",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_cream.001",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_glint",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_glint.001",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_ink",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_ink.001",
+            "type": "MESH"
+          },
+          {
+            "name": "Inset plush foot",
+            "type": "MESH"
+          },
+          {
+            "name": "Inset plush foot.001",
+            "type": "MESH"
+          },
+          {
+            "name": "Little arm",
+            "type": "MESH"
+          },
+          {
+            "name": "Little arm.001",
+            "type": "MESH"
+          },
+          {
+            "name": "pip physical body",
+            "type": "MESH"
+          },
+          {
+            "name": "pip_ear",
+            "type": "MESH"
+          },
+          {
+            "name": "pip_ear.001",
+            "type": "MESH"
+          },
+          {
+            "name": "smile",
+            "type": "MESH"
+          },
+          {
+            "name": "soft_blush",
+            "type": "MESH"
+          },
+          {
+            "name": "soft_blush.001",
+            "type": "MESH"
+          },
+          {
+            "name": "Icosphere",
+            "type": "MESH"
+          }
+        ],
+        "actions": [
+          "OneMove_fixture"
+        ],
+        "vertices": 18296,
+        "polygons": 32288,
+        "source_file": "pip-fixture.glb",
+        "source_sha256": "89daa390c8944ec70d29b5250501d500cc7b2b50a315cd827c97d5b73f49f977",
+        "blender": "5.2.0 LTS"
+      },
+      "provenance": {
+        "origin": "existing-original-Blender-Pip-helpers; local test rig",
+        "source_script": "tools/art/render_mascots.py",
+        "reference": "app/src/main/assets/mascots/atlas.webp",
+        "prompt": null,
+        "wallet": "none",
+        "credits_spent": 0,
+        "license": "existing project original art",
+        "used_in_game": [],
+        "note": "Two pose samples per clip verify the pipeline only; not final character animation."
+      },
+      "recipe_sha256": "ee15594263d06343897ed2d0407a3a3af51388ddef5a14275e1a794aae879b22",
+      "atlas_file": "atlas.webp",
+      "atlas_sha256": "e316f3d3fc6b33361f8180ae8c82472f33762d32c2367f9bd2179d337bd5649f",
+      "atlas_width": 1024,
+      "atlas_height": 128,
+      "decoded_bytes_rgba": 524288,
+      "cell_size": 128,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "framing": 3.6,
+      "body_radius_pixels": 35.55555555555556,
+      "clips": {
+        "idle": [
+          {
+            "index": 0,
+            "rect": [
+              0,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              128,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              27,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ],
+        "jump": [
+          {
+            "index": 0,
+            "rect": [
+              256,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              384,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              28,
+              16,
+              98,
+              99
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ],
+        "fall": [
+          {
+            "index": 0,
+            "rect": [
+              512,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              640,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              27,
+              15,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ],
+        "happy": [
+          {
+            "index": 0,
+            "rect": [
+              768,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              896,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              27,
+              15,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ]
+      },
+      "runtime_mapping": "side_px = physical_radius_px * framing; center on physical body; never translate physics"
+    },
+    "fbx": {
+      "schema_version": 1,
+      "asset_id": "pip-local-compatibility-fixture",
+      "version": "0.1.0",
+      "kind": "OFFLINE ART CANDIDATE; NOT ANDROID GAMEPLAY",
+      "approved_for_runtime": false,
+      "source": {
+        "objects": [
+          {
+            "name": "Pip_Rig",
+            "type": "ARMATURE"
+          },
+          {
+            "name": "Cream face bib",
+            "type": "MESH"
+          },
+          {
+            "name": "Little arm",
+            "type": "MESH"
+          },
+          {
+            "name": "ear_lining",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_glint",
+            "type": "MESH"
+          },
+          {
+            "name": "pip physical body",
+            "type": "MESH"
+          },
+          {
+            "name": "smile",
+            "type": "MESH"
+          },
+          {
+            "name": "Little arm.001",
+            "type": "MESH"
+          },
+          {
+            "name": "ear_lining.001",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_glint.001",
+            "type": "MESH"
+          },
+          {
+            "name": "pip_ear",
+            "type": "MESH"
+          },
+          {
+            "name": "soft_blush",
+            "type": "MESH"
+          },
+          {
+            "name": "Inset plush foot",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_cream",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_ink",
+            "type": "MESH"
+          },
+          {
+            "name": "pip_ear.001",
+            "type": "MESH"
+          },
+          {
+            "name": "soft_blush.001",
+            "type": "MESH"
+          },
+          {
+            "name": "Inset plush foot.001",
+            "type": "MESH"
+          },
+          {
+            "name": "button_nose",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_cream.001",
+            "type": "MESH"
+          },
+          {
+            "name": "eye_ink.001",
+            "type": "MESH"
+          }
+        ],
+        "actions": [
+          "Pip_Rig|Pip_Rig|OneMove_fixture"
+        ],
+        "vertices": 16154,
+        "polygons": 16786,
+        "source_file": "pip-fixture.fbx",
+        "source_sha256": "3ef8854398db814f1929585042922aea9463016a10a09c4eaccc88c1f40c0699",
+        "blender": "5.2.0 LTS"
+      },
+      "provenance": {
+        "origin": "existing-original-Blender-Pip-helpers; local test rig",
+        "source_script": "tools/art/render_mascots.py",
+        "reference": "app/src/main/assets/mascots/atlas.webp",
+        "prompt": null,
+        "wallet": "none",
+        "credits_spent": 0,
+        "license": "existing project original art",
+        "used_in_game": [],
+        "note": "Two pose samples per clip verify the pipeline only; not final character animation."
+      },
+      "recipe_sha256": "ab90064e74a80117a35fc1efbac539c6fb9d72e410f24cdb9000e5f6f959c0ca",
+      "atlas_file": "atlas.webp",
+      "atlas_sha256": "3ff3c61f2fe872d02b3a400506dedad5672ce1aaa7f8f6fa725a28d304aaca81",
+      "atlas_width": 1024,
+      "atlas_height": 128,
+      "decoded_bytes_rgba": 524288,
+      "cell_size": 128,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "framing": 3.6,
+      "body_radius_pixels": 35.55555555555556,
+      "clips": {
+        "idle": [
+          {
+            "index": 0,
+            "rect": [
+              0,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              128,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ],
+        "jump": [
+          {
+            "index": 0,
+            "rect": [
+              256,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              384,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              28,
+              16,
+              98,
+              99
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ],
+        "fall": [
+          {
+            "index": 0,
+            "rect": [
+              512,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              640,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              27,
+              15,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ],
+        "happy": [
+          {
+            "index": 0,
+            "rect": [
+              768,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              26,
+              14,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          },
+          {
+            "index": 1,
+            "rect": [
+              896,
+              0,
+              128,
+              128
+            ],
+            "duration_ms": 83.3333,
+            "alpha_bounds": [
+              27,
+              15,
+              99,
+              100
+            ],
+            "pivot_px": [
+              64.0,
+              64.0
+            ]
+          }
+        ]
+      },
+      "runtime_mapping": "side_px = physical_radius_px * framing; center on physical body; never translate physics"
+    }
+  }
+}

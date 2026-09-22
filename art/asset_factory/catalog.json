@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "factory_branch": "chatgpt/tripo-asset-prep",
+  "android_branch": "chatgpt/android-lab",
+  "status": "preparation_only_no_runtime_integration",
+  "billing": {
+    "generation_authorized_now": false, "credits_spent_this_session": 0,
+    "cli_product": "Tripo API", "cli_version": "0.5.1", "api_balance": null,
+    "api_balance_status": "AUTH_MISSING_exit_3_not_zero",
+    "studio_balance_reported_approx": 4000, "studio_expiry_reported": "2026-10-01",
+    "studio_balance_independently_verified": false,
+    "studio_credits_usable_by_api": false,
+    "billing_source": "https://www.tripo3d.ai/help/api-plugins/tripo-studiotripo-api"
+  },
+  "record_template": {
+    "asset_id": "replace", "version": "0.1.0", "origin": null,
+    "reference_files_and_hashes": [], "prompt_file": null, "model_version": null,
+    "source_3d_file": null, "source_sha256": null, "license_evidence": null,
+    "credit_ledger": [], "renders_and_atlases": [], "app_usage_paths": [],
+    "approval": "not_reviewed", "physics_anchor_reviewed": false,
+    "android_evidence_commit": null, "android_screenshot_or_video": null
+  },
+  "pilot": {
+    "asset_id": "pip", "reference": "references/pip_current.png",
+    "prompt": "PIP_PILOT.md", "origin": "awaiting_Studio_generation",
+    "source_3d_file": null, "credits_spent": 0, "stage": "reference_and_local_pipeline_ready",
+    "approved_for_runtime": false
+  },
+  "family_queue": [
+    {"id":"mochi","strategy":"same camera/material family; round mint body and separate sprout"},
+    {"id":"blobbo","strategy":"same camera/material family; rose body and round ears"},
+    {"id":"wrecker","strategy":"one brass/iron weight; visual radius follows actual heavy-body radius"},
+    {"id":"spring","strategy":"Blender parametric coil, consistent compression states; preserve physics normal"},
+    {"id":"seesaw","strategy":"shared beam, axle and bolt; pivot exactly at actual physical fulcrum"},
+    {"id":"pins","strategy":"reusable handle/endcap plus stretchable shaft; unchanged hit targets"},
+    {"id":"gates","strategy":"closed/open layers driven only by actual gate state"},
+    {"id":"stones","strategy":"one reusable rounded source; visual and collision radius calibrated"},
+    {"id":"rails","strategy":"tileable strip/endcaps along actual collision segment, no perspective drift"},
+    {"id":"scenery","strategy":"chapter-specific noninteractive margin props; no fake support or obscured hazards"}
+  ],
+  "forbidden_now": ["Tripo generation","paid retopo/texture/rig/animation","topup","tripo ai","automatic runtime asset replacement"],
+  "local_fixture": {
+    "recipe":"pip_fixture.recipe.json","source_helpers":"tools/art/render_mascots.py",
+    "credits_spent":0,"purpose":"GLB/FBX/import/rig/camera/alpha/atlas compatibility only",
+    "final_character_animation":false,"android_gameplay_evidence":false
+  }
+}

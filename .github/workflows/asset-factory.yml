@@ -1,0 +1,37 @@
+name: Offline Asset Factory
+on:
+  push:
+    branches: [chatgpt/tripo-asset-prep]
+    paths: ['tools/art_factory/**', 'art/asset_factory/**', '.github/workflows/asset-factory.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: asset-factory-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  offline-fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Install offline rendering tools only
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-pil
+      - name: Test GLB FBX rig bake and lossless atlases
+        run: |
+          git rev-parse HEAD > factory-commit.txt
+          /usr/bin/python3 tools/art_factory/smoke_factory.py --blender blender --out factory-evidence
+      - name: Upload explicitly labelled offline fixture evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-move-offline-asset-factory
+          path: |
+            factory-commit.txt
+            factory-evidence/**
+          retention-days: 14
+          if-no-files-found: error
