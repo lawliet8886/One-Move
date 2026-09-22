@@ -2,46 +2,125 @@
   "schema_version": 1,
   "factory_branch": "chatgpt/tripo-asset-prep",
   "android_branch": "chatgpt/android-lab",
-  "status": "preparation_only_no_runtime_integration",
+  "status": "studio_pilot_generated_exported_under_visual_review",
   "billing": {
-    "generation_authorized_now": false, "credits_spent_this_session": 0,
-    "cli_product": "Tripo API", "cli_version": "0.5.1", "api_balance": null,
-    "api_balance_status": "AUTH_MISSING_exit_3_not_zero",
-    "studio_balance_reported_approx": 4000, "studio_expiry_reported": "2026-10-01",
-    "studio_balance_independently_verified": false,
+    "generation_authorized_now": false,
+    "credits_spent_this_session": 55,
+    "cli_product": "Tripo API",
+    "cli_version": "0.5.1",
+    "api_balance": 0,
+    "api_balance_status": "authenticated_API_wallet_observed_zero",
+    "studio_balance_reported_approx": 4000,
+    "studio_expiry_reported": "2026-10-01",
+    "studio_balance_independently_verified": true,
     "studio_credits_usable_by_api": false,
-    "billing_source": "https://www.tripo3d.ai/help/api-plugins/tripo-studiotripo-api"
+    "billing_source": "https://www.tripo3d.ai/help/api-plugins/tripo-studiotripo-api",
+    "studio_balance_before_pilot": 3915,
+    "studio_balance_after_pilot": 3860
   },
   "record_template": {
-    "asset_id": "replace", "version": "0.1.0", "origin": null,
-    "reference_files_and_hashes": [], "prompt_file": null, "model_version": null,
-    "source_3d_file": null, "source_sha256": null, "license_evidence": null,
-    "credit_ledger": [], "renders_and_atlases": [], "app_usage_paths": [],
-    "approval": "not_reviewed", "physics_anchor_reviewed": false,
-    "android_evidence_commit": null, "android_screenshot_or_video": null
+    "asset_id": "replace",
+    "version": "0.1.0",
+    "origin": null,
+    "reference_files_and_hashes": [],
+    "prompt_file": null,
+    "model_version": null,
+    "source_3d_file": null,
+    "source_sha256": null,
+    "license_evidence": null,
+    "credit_ledger": [],
+    "renders_and_atlases": [],
+    "app_usage_paths": [],
+    "approval": "not_reviewed",
+    "physics_anchor_reviewed": false,
+    "android_evidence_commit": null,
+    "android_screenshot_or_video": null
   },
   "pilot": {
-    "asset_id": "pip", "reference": "references/pip_current.png",
-    "prompt": "PIP_PILOT.md", "origin": "awaiting_Studio_generation",
-    "source_3d_file": null, "credits_spent": 0, "stage": "reference_and_local_pipeline_ready",
-    "approved_for_runtime": false
+    "asset_id": "pip",
+    "reference": "references/pip_current.png",
+    "prompt": "PIP_PILOT.md",
+    "origin": "Tripo Studio v3.1 maximum quality",
+    "source_3d_file": ".local-lab/tripo-bridge-state/assets/pip-20260922-55-v2/pip-studio-v1.glb",
+    "credits_spent": 55,
+    "stage": "generated_exported_reduced_reviewed_not_runtime_approved",
+    "approved_for_runtime": false,
+    "source_sha256": "3305e28f497983b30ab71f75eb707f843358ad269be72af7008b8a8f5f47951e",
+    "credit_ledger": [
+      {
+        "operation": "one image-to-3D generation",
+        "quote": 55,
+        "before": 3915,
+        "after": 3860,
+        "export_additional_cost": 0
+      }
+    ],
+    "source_faces": 1884560,
+    "offline_reduced_faces": 65000,
+    "source_animation_count": 0,
+    "renders": [
+      "front.png",
+      "three_quarter.png",
+      "back.png"
+    ],
+    "render_directory": ".local-lab/pip-studio-review-20260922-1710",
+    "review": "Identity retained but projecting muzzle/body proportions and lack of expressions need work. Do not replace current runtime atlas yet."
   },
   "family_queue": [
-    {"id":"mochi","strategy":"same camera/material family; round mint body and separate sprout"},
-    {"id":"blobbo","strategy":"same camera/material family; rose body and round ears"},
-    {"id":"wrecker","strategy":"one brass/iron weight; visual radius follows actual heavy-body radius"},
-    {"id":"spring","strategy":"Blender parametric coil, consistent compression states; preserve physics normal"},
-    {"id":"seesaw","strategy":"shared beam, axle and bolt; pivot exactly at actual physical fulcrum"},
-    {"id":"pins","strategy":"reusable handle/endcap plus stretchable shaft; unchanged hit targets"},
-    {"id":"gates","strategy":"closed/open layers driven only by actual gate state"},
-    {"id":"stones","strategy":"one reusable rounded source; visual and collision radius calibrated"},
-    {"id":"rails","strategy":"tileable strip/endcaps along actual collision segment, no perspective drift"},
-    {"id":"scenery","strategy":"chapter-specific noninteractive margin props; no fake support or obscured hazards"}
+    {
+      "id": "mochi",
+      "strategy": "same camera/material family; round mint body and separate sprout"
+    },
+    {
+      "id": "blobbo",
+      "strategy": "same camera/material family; rose body and round ears"
+    },
+    {
+      "id": "wrecker",
+      "strategy": "one brass/iron weight; visual radius follows actual heavy-body radius"
+    },
+    {
+      "id": "spring",
+      "strategy": "Blender parametric coil, consistent compression states; preserve physics normal"
+    },
+    {
+      "id": "seesaw",
+      "strategy": "shared beam, axle and bolt; pivot exactly at actual physical fulcrum"
+    },
+    {
+      "id": "pins",
+      "strategy": "reusable handle/endcap plus stretchable shaft; unchanged hit targets"
+    },
+    {
+      "id": "gates",
+      "strategy": "closed/open layers driven only by actual gate state"
+    },
+    {
+      "id": "stones",
+      "strategy": "one reusable rounded source; visual and collision radius calibrated"
+    },
+    {
+      "id": "rails",
+      "strategy": "tileable strip/endcaps along actual collision segment, no perspective drift"
+    },
+    {
+      "id": "scenery",
+      "strategy": "chapter-specific noninteractive margin props; no fake support or obscured hazards"
+    }
   ],
-  "forbidden_now": ["Tripo generation","paid retopo/texture/rig/animation","topup","tripo ai","automatic runtime asset replacement"],
+  "forbidden_now": [
+    "Tripo generation",
+    "paid retopo/texture/rig/animation",
+    "topup",
+    "tripo ai",
+    "automatic runtime asset replacement"
+  ],
   "local_fixture": {
-    "recipe":"pip_fixture.recipe.json","source_helpers":"tools/art/render_mascots.py",
-    "credits_spent":0,"purpose":"GLB/FBX/import/rig/camera/alpha/atlas compatibility only",
-    "final_character_animation":false,"android_gameplay_evidence":false
+    "recipe": "pip_fixture.recipe.json",
+    "source_helpers": "tools/art/render_mascots.py",
+    "credits_spent": 0,
+    "purpose": "GLB/FBX/import/rig/camera/alpha/atlas compatibility only",
+    "final_character_animation": false,
+    "android_gameplay_evidence": false
   }
 }

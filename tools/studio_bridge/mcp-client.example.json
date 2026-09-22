@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "onemove-tripo-studio": {
+      "command": "C:\\Users\\biel_\\OneMove-Lab\\.tools\\studio-mcp-2.2\\Scripts\\python.exe",
+      "args": [
+        "C:\\Users\\biel_\\OneMove-Lab\\.local-lab\\bridge-src-20260922-1650\\tools\\studio_bridge\\mcp_server.py"
+      ]
+    }
+  }
+}

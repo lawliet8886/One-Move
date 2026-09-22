@@ -1,0 +1,43 @@
+name: Studio Bridge Contracts
+on:
+  push:
+    branches: [chatgpt/tripo-asset-prep]
+    paths: ['tools/studio_bridge/**', '.github/workflows/studio-bridge.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: studio-bridge-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  offline-spending-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Validate syntax and one-use spending guards without a browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir bridge-reports
+          git rev-parse HEAD > bridge-reports/commit.txt
+          python3 -m compileall -q tools/studio_bridge
+          python3 tools/studio_bridge/test_guard.py 2>&1 | tee bridge-reports/guard-tests.txt
+          echo 'OFFLINE GUARDS ONLY; no Studio/API/model generation/browser credentials used.' > bridge-reports/scope.txt
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-move-studio-bridge-contracts
+          path: |
+            bridge-reports/
+            tools/studio_bridge/*.py
+            tools/studio_bridge/*.md
+            tools/studio_bridge/*.json
+            tools/studio_bridge/*.txt
+            tools/studio_bridge/*.ps1
+            art/asset_factory/catalog.json
+          retention-days: 14
+          if-no-files-found: error

@@ -1,0 +1,22 @@
+# Verified Studio bridge, Pip candidate and Android raster — 22 September 2026
+
+## Actual Studio operation
+The dedicated Edge Studio session showed3915 credits. A55-credit quote for the reviewed Pip image was revalidated. One generation completed and the displayed wallet became3860. Current4K GLB export left the wallet unchanged. The generated GLB is58,644,720 bytes,1,884,560 triangles,962,888 vertices,one material,three textures,no rig/animations. SHA2563305e28f497983b30ab71f75eb707f843358ad269be72af7008b8a8f5f47951e. No API credits, model API, top-up or Codex used.
+
+Offline Blender created an editable65,000-face derivative, rendered front/three-quarter/back and produced a labelled comparison against the existing Pip at small sizes. Original GLB is untouched. Review decision: NOT approved for runtime. The new muzzle/face projection and body silhouette differ, and there are no expressive states or rig; replacing the complete current atlas with this static candidate would not be a demonstrated visual improvement. Preview noise is partly low-sample rendering, not proof of defective textures. The58MB raw source is not put into the Android APK.
+
+## Actual custom MCP
+The local STDIO server uses official Python MCP SDK2.2.0 with Playwright1.61.0. Eight task-specific tools expose status, quote, actual screenshot, bounded inspection, ledger lookup, one-use approved generation, exact completed-model navigation and existing-model GLB download. A real MCP client listed tools and called them. Tests confirmed duplicate operation ids never click again and absent approvals are rejected;13 offline guard tests passed.
+
+Observed local warm status calls ranged26.23–288.95ms across home and loaded model sessions; initial connections897.03–6262.68ms. These are individual measured round trips, not a controlled speedup benchmark or SLA. The persistent console keeps the MCP/Playwright session instead of rerunning hundreds of selector round trips. It accepts only named MCP tools, no arbitrary shell/evaluation. ChatGPT still reaches this adapter via Desktop Commander; it is not an official Tripo API or secretly installed ChatGPT/Codex plugin.
+
+SQLite operations are reserved before paid input. The first mouse attempt stopped before input dispatch; after log/wallet/form inspection its zero-charge record was retained as failed. A single focused native Enter then generated Pip. Screenshot timeouts use the normal CDP capture endpoint. Missing/changed price/reference/settings/wallet, expired approval and unresolved operations stop spending. No cookies/passwords/tokens were read or copied. When two tabs appeared, or the pinned tab later closed, the bridge refused to pick another silently; an exact observed Studio target was explicitly rebound. No personal tabs were closed by this adapter.
+
+## Actual Android optimization
+Separate Android commitc233e8b84557cd33928da61ec6658001d74ff684, run35779743834, all3jobs SUCCESS. Native-graphics tests compare cached paper/hazard pixels to direct rendering at widths250,578,1056; mean channel errors0.43275,0.21503,0 out of255 respectively. Exact raster allocations334000,1782552,5947392 bytes, versus former7680000. Cache-hit reuse and level/hazard invalidation passed.
+
+Actual200%-font Android test recorded boardRect(31,301–609,1072),289x385.5dp, cachedBytes1782552. That is76.7897% less memory for THIS background bitmap, not for the whole app. All8native methods passed, including12known-solution routes,17wrong choices, retry, rapid touches, HOME/return, Back, compact and200%font. Downloaded native evidence is taggedc233e8b:8real MP4 and122PNG files. Examined screenshots and sampled actual video frames from Flying Key, large-font and campaign. These are scripted tests plus visual review, not blind interactive play.
+
+Cloud software-emulator hardware case still reports100%jank and median200ms. Do not claim a phone FPS improvement. Solver, levels, progress and collision/input geometry are unchanged by this raster change. Four remaining funnel-like levels1/4/7/12, richer character animation and physical-phone performance remain open.
+
+Android artifacts: APK10717833172; native10718131443; smoke10717833331; physics10717073427. APK SHA2565e9fbd3eeb8eae51864fe5d04df9363bbb1003891075df043b1cf4388446121b. Studio/raw3D/profile/ledger files remain local and separate from runtime source. Main, original dirty checkout and ScanFlow emulator are untouched; the existing recurring One Move Lab automation remains paused.

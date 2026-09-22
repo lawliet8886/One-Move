@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-22",
+  "kind": "MEASURED LOCAL BRIDGE AND OFFLINE ART; NOT ANDROID GAMEPLAY",
+  "mcp_sdk": "2.2.0",
+  "playwright": "1.61.0",
+  "transport": "stdio",
+  "mcp_tools": [
+    "studio_status",
+    "studio_quote",
+    "studio_snapshot",
+    "studio_inspect",
+    "studio_operation",
+    "studio_submit_approved_pip",
+    "studio_open_completed_model",
+    "studio_download_existing_glb"
+  ],
+  "guard_tests_passed": 13,
+  "real_mcp_client_test_passed": true,
+  "console_status_cold_ms": 897.03,
+  "console_status_warm_ms": 26.23,
+  "console_idempotency_no_reclick_ms": 26.13,
+  "studio_wallet_before": 3915,
+  "studio_wallet_after": 3860,
+  "credits_spent": 55,
+  "paid_pilot_count": 1,
+  "runtime_pilot_approved": false,
+  "raw_source_bytes": 58644720,
+  "raw_source_faces": 1884560,
+  "preview_faces": 65000,
+  "reference_sha256": "ef588060063f9b81756f58bd653cfcc9d894f7319a9907926aa8035837a4f6a4",
+  "raw_source_sha256": "3305e28f497983b30ab71f75eb707f843358ad269be72af7008b8a8f5f47951e",
+  "caveat": "Latency is from observed local calls, not a guarantee. New Pip has no facial expressions/rig and is not installed in Android."
+}
