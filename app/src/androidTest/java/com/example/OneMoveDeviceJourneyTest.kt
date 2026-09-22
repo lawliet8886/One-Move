@@ -62,6 +62,19 @@ class OneMoveDeviceJourneyTest {
             capture("level_${number.toString().padStart(2,'0')}_01_motion")
             SystemClock.sleep(500)
             capture("level_${number.toString().padStart(2,'0')}_02_motion")
+            if (number == 9) {
+                val instrumentation = InstrumentationRegistry.getInstrumentation()
+                val deadline = SystemClock.uptimeMillis() + 6_000L
+                var latched = false
+                while (!latched && SystemClock.uptimeMillis() < deadline) {
+                    instrumentation.runOnMainSync {
+                        latched = model.physicsWorld.pressurePlates.single().isLatched
+                    }
+                    if (!latched) SystemClock.sleep(20)
+                }
+                assertTrue("The weight never pressed the real switch", latched)
+                capture("level_09_02_switch_latched")
+            }
             node("success_overlay",12_000L)
             capture("level_${number.toString().padStart(2,'0')}_03_success")
             File(output,"journey.tsv").appendText("$number\t${level.solutionPinId}\tSUCCESS\t${SystemClock.elapsedRealtime()}\n")
@@ -88,12 +101,16 @@ class OneMoveDeviceJourneyTest {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val cases = listOf(
             Triple(2, PinId.PIN_A, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(3, PinId.PIN_A, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(3, PinId.PIN_B, "PATH_BLOCKED"),
             Triple(5, PinId.PIN_A, "PATH_BLOCKED"),
             Triple(5, PinId.PIN_B, "PATH_BLOCKED"),
             Triple(6, PinId.PIN_B, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
             Triple(6, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
             Triple(8, PinId.PIN_A, "HIT_BY_HEAVY_OBJECT"),
-            Triple(8, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN")
+            Triple(8, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(9, PinId.PIN_B, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(9, PinId.PIN_C, "PATH_BLOCKED")
         )
         for ((number, pinId, expectedReason) in cases) {
             instrumentation.runOnMainSync { model.loadLevel(number) }

@@ -18,4 +18,8 @@ class PhysicsContractTest {
     @Test fun counterweightMustBeNecessaryAndStable() {
         CounterweightContractCases.run()
     }
+
+    @Test fun weightSwitchAndReturnBridgesMustBeCausalAndStable() {
+        WeightSwitchContractCases.run()
+    }
 }

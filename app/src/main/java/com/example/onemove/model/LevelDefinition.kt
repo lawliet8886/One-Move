@@ -16,7 +16,8 @@ data class LevelDefinition(
     val goalZone: GoalZone = GoalZone(Vector2D(600f, 1400f)),
     val primaryMechanics: String = "Tactical Pin Pull",
     val newConceptIntroduced: String = "Basic Mechanics",
-    val solutionPinId: PinId = PinId.PIN_A
+    val solutionPinId: PinId = PinId.PIN_A,
+    val pressurePlates: List<PressurePlate> = emptyList()
 ) {
     val levelNumber: Int get() = number
     val title: String get() = name

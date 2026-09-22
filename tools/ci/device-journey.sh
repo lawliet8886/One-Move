@@ -80,7 +80,7 @@ run_case() {
 }
 run_case lifecycle backgroundPauseDoesNotAdvanceTheSimulation 60 lifecycle.mp4
 run_case campaign all12WinningPinsCompleteCampaignThroughRealUi 170 one-move-device-journey.mp4
-run_case wrong_choices causalPrototypeWrongChoicesFailForVisiblePhysicalReasonsAndRetryCleanly 90 wrong-choices.mp4
+run_case wrong_choices causalPrototypeWrongChoicesFailForVisiblePhysicalReasonsAndRetryCleanly 150 wrong-choices.mp4
 run_case retry wrongPinFailsAndRetryRestoresReadyState 45 retry.mp4
 # These settings apply ONLY to the disposable emulator and are restored by collect.
 ORIGINAL_FONT=$(adb -e shell settings get system font_scale | tr -d '\r')
@@ -109,4 +109,4 @@ if [[ "$FAILURES" -ne 0 ]]; then
     printf 'FAIL: %s failing checks. Read result.tsv and individual instrumentation logs; no full QA approval.\n' "$FAILURES" > device_artifacts/result.txt
     exit 1
 fi
-printf 'PASS: five native methods, 12 visible phase completions, seven causal wrong choices, retry, lifecycle and compact-screen/1.3x-font controls; five actual recordings. Review footage before visual approval.\n' > device_artifacts/result.txt
+printf 'PASS: five native methods, 12 visible phase completions, eleven causal wrong choices, retry, lifecycle and compact-screen/1.3x-font controls; five actual recordings. Review footage before visual approval.\n' > device_artifacts/result.txt

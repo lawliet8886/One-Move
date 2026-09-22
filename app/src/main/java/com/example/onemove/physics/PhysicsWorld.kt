@@ -33,6 +33,7 @@ class PhysicsWorld(initialLevel: LevelDefinition, private val hapticManager: Hap
     val heavyBalls = mutableListOf<HeavyBall>()
     val rollingStones = mutableListOf<RollingStone>()
     val creatureGates = mutableListOf<CreatureGate>()
+    val pressurePlates = mutableListOf<PressurePlate>()
     var goalZone = initialLevel.goalZone
     val particles = mutableListOf<Particle>()
     val heavyBall: HeavyBall? get() = heavyBalls.firstOrNull()
@@ -89,6 +90,9 @@ class PhysicsWorld(initialLevel: LevelDefinition, private val hapticManager: Hap
         heavyBalls.clear(); heavyBalls.addAll(currentLevel.heavyBalls.map { it.copy() })
         rollingStones.clear(); rollingStones.addAll(currentLevel.rollingStones.map { it.copy() })
         creatureGates.clear(); creatureGates.addAll(currentLevel.creatureGates.map { it.copy() })
+        pressurePlates.clear(); pressurePlates.addAll(currentLevel.pressurePlates.map {
+            it.copy(contactTime = 0f, isLatched = false)
+        })
     }
 
     fun pullPin(pinId: PinId): Boolean {
@@ -146,7 +150,17 @@ class PhysicsWorld(initialLevel: LevelDefinition, private val hapticManager: Hap
         val rails = mutableListOf<Rail>()
         for (p in platforms) rails.add(Rail(p.start, p.end, p.thickness, if (p.isBouncy) 0.62f else 0.04f))
         for (p in pins) if (!p.isRemoved) rails.add(Rail(p.start, p.end, p.thickness))
+        for (plate in pressurePlates) rails.add(Rail(
+            plate.center - Vector2D(plate.width * 0.5f, 0f),
+            plate.center + Vector2D(plate.width * 0.5f, 0f), plate.thickness))
         for (g in creatureGates) {
+            val platesReady = g.requiredPlateIds.isNotEmpty() && g.requiredPlateIds.all { id ->
+                pressurePlates.any { it.id == id && it.isLatched }
+            }
+            if (platesReady && !g.isOpen) {
+                g.isOpen = true
+                event("gate_opened", g.requiredPlateIds.joinToString("+"))
+            }
             // Gate motion is a physical linkage, never an answer-key check.
             if (g.releasePinId != null && pins.any { it.id == g.releasePinId && it.isRemoved }) g.isOpen = true
             g.openProgress = (g.openProgress + (if (g.isOpen) 2.5f else -2.5f) * dt).coerceIn(0f, 1f)
@@ -171,6 +185,7 @@ class PhysicsWorld(initialLevel: LevelDefinition, private val hapticManager: Hap
             for (b in bodies) for (r in rails) resolveRail(b, r)
             for (i in bodies.indices) for (j in i + 1 until bodies.size) resolvePair(bodies[i], bodies[j])
         }
+        updatePressurePlates(bodies, dt)
         for ((index, body) in bodies.withIndex()) {
             if (body.invMass == 0f) continue
             applySprings(body, index)
@@ -208,6 +223,24 @@ class PhysicsWorld(initialLevel: LevelDefinition, private val hapticManager: Hap
         if (quietTime > 1.25f && simulationTime > 1.5f) fail("PATH_BLOCKED")
         // Explicit bounded timeout, reported distinctly from a physical hazard.
         if (simulationTime >= 8f) fail("SIMULATION_TIMEOUT")
+    }
+
+    private fun updatePressurePlates(bodies: List<Body>, dt: Float) {
+        for (plate in pressurePlates) {
+            if (plate.isLatched) continue
+            val supported = bodies.any { body ->
+                body.invMass > 0f && 1f / body.invMass >= plate.minimumMass &&
+                    abs(body.p.x - plate.center.x) <= plate.width * 0.5f &&
+                    abs(body.p.y + body.r + plate.thickness * 0.5f - plate.center.y) <= 1.5f &&
+                    abs(body.v.y) < 80f
+            }
+            plate.contactTime = if (supported) plate.contactTime + dt else 0f
+            if (plate.contactTime >= plate.holdSeconds) {
+                plate.isLatched = true
+                event("plate_latched", plate.id)
+                burst(plate.center, Color(0xFF34D399), ParticleType.SPARK, 8)
+            }
+        }
     }
 
     private fun resolveRail(b: Body, rail: Rail) {

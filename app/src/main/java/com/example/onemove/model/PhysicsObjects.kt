@@ -128,5 +128,6 @@ data class CreatureGate(
     val thickness: Float = 16f,
     var openProgress: Float = 0f,
     var isOpen: Boolean = false,
-    val releasePinId: PinId? = null
+    val releasePinId: PinId? = null,
+    val requiredPlateIds: List<String> = emptyList()
 )

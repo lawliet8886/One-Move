@@ -10,12 +10,14 @@ object ToyBoxRenderer {
         // instead of allocating and redrawing hundreds of shapes every active frame.
         WorkshopBackdropCache.draw(drawScope,world)
 
+        WeightSwitchRenderer.draw(drawScope, world)
         val rescuedCount = world.creatures.count { it.isInsideGoal }
         WorkshopRenderer.nest(drawScope, world.goalZone, rescuedCount)
         for (platform in world.platforms) WorkshopRenderer.platform(drawScope, platform)
         for (bumper in world.springBumpers) SpringBumperRenderer.drawSpringBumper(drawScope, bumper)
         for (seesaw in world.seesaws) MechanicalJointRenderer.drawSeesawAssembly(drawScope, seesaw)
-        for (gate in world.creatureGates) MechanicalJointRenderer.drawCreatureGate(drawScope, gate)
+        for (gate in world.creatureGates) if (gate.requiredPlateIds.isEmpty())
+            MechanicalJointRenderer.drawCreatureGate(drawScope, gate)
         for (stone in world.rollingStones) WreckerAndStoneRenderer.drawRollingStone(drawScope, stone)
         for (ball in world.heavyBalls) WreckerAndStoneRenderer.drawHeavyWreckerBall(drawScope, ball)
         val isReady = world.state == SimulationState.READY
