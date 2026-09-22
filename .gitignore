@@ -1,0 +1,16 @@
+# Local-only lab files, SDK paths and build outputs.
+.local-lab/
+.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
+
+# Credentials must never be committed.
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+
+# Existing tracked cache files are not removed by this ignore rule.
