@@ -32,7 +32,13 @@ for fmt in ('glb','fbx'):
             '--out',out/f'inspect-{fmt}','--inspect-only'],f'import-{fmt}')
     formats[fmt]=json.loads((out/f'inspect-{fmt}'/'inspection.json').read_text(encoding='utf-8'))
     if formats[fmt]['vertices'] < 1: raise AssertionError('No geometry imported')
-recipe=root/'art/asset_factory/pip_fixture.recipe.json'
+recipe_template=root/'art/asset_factory/pip_fixture.recipe.json'
+# Controlled fixture only: Blender versions append the rig name differently.
+# Production recipes still require an explicitly reviewed object/action binding.
+if len(formats['glb']['actions']) != 1: raise AssertionError('GLB fixture lost its single action')
+glb_recipe=json.loads(recipe_template.read_text(encoding='utf-8'))
+glb_recipe['bindings'][0]['action']=formats['glb']['actions'][0]
+recipe=out/'glb.recipe.json'; recipe.write_text(json.dumps(glb_recipe),encoding='utf-8')
 blender('blender_bake.py',['--source',out/'fixture/pip-fixture.glb','--recipe',recipe,
         '--out',out/'bake-glb'],'rigged-glb-bake')
 bake=json.loads((out/'bake-glb/bake.json').read_text(encoding='utf-8'))
