@@ -110,7 +110,10 @@ class OneMoveDeviceJourneyTest {
             Triple(8, PinId.PIN_A, "HIT_BY_HEAVY_OBJECT"),
             Triple(8, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
             Triple(9, PinId.PIN_B, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
-            Triple(9, PinId.PIN_C, "PATH_BLOCKED")
+            Triple(9, PinId.PIN_C, "PATH_BLOCKED"),
+            Triple(10, PinId.PIN_A, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(10, PinId.PIN_C, "PATH_BLOCKED"),
+            Triple(10, PinId.PIN_D, "CREATURE_TRAPPED_IN_DANGER_BASIN")
         )
         for ((number, pinId, expectedReason) in cases) {
             instrumentation.runOnMainSync { model.loadLevel(number) }

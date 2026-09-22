@@ -57,27 +57,36 @@ private fun RescuePortraits(state: GameUiState, size: Dp) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun RescueHud(state: GameUiState, levels: () -> Unit, reset: () -> Unit) {
+    val largeFont = LocalDensity.current.fontScale >= 1.6f
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("ONE MOVE  /  ${state.currentLevelNumber.toString().padStart(2, '0')}", color = Color(0xFFE9BD79), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text(state.currentLevel.name, color = Color(0xFFFFEDCB), fontSize = 23.sp, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("level_title"))
+                Text(if (largeFont) "${state.currentLevelNumber.toString().padStart(2, '0')} / ${state.totalLevels}"
+                    else "ONE MOVE  /  ${state.currentLevelNumber.toString().padStart(2, '0')}",
+                    color = Color(0xFFE9BD79), fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                if (!largeFont) Text(state.currentLevel.name, color = Color(0xFFFFEDCB), fontSize = 23.sp, lineHeight = 28.sp,
+                    fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.testTag("level_title"))
             }
             IconButton(levels, Modifier.testTag("level_select_button")) { Icon(Icons.AutoMirrored.Filled.List, "Level Select", tint = Color(0xFFE2E8F0)) }
             IconButton(reset, Modifier.testTag("reset_button")) { Icon(Icons.Default.Refresh, "Instant Reset", tint = Color(0xFFFBBF24)) }
         }
+        // Give the scaled title its own full-width row; never clamp the user's fontScale.
+        if (largeFont) Text(state.currentLevel.name, color = Color(0xFFFFEDCB), fontSize = 18.sp, lineHeight = 22.sp,
+            fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth().testTag("level_title"))
         Spacer(Modifier.height(8.dp))
-        // Reflow, rather than shrinking the user's font or squeezing portraits off screen.
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(color = if (state.moveCountLeft > 0) Color(0xFF115E59) else Color(0xFF1E293B),
                 shape = RoundedCornerShape(24.dp), modifier = Modifier.testTag("move_counter_pill")) {
-                Text(if (state.moveCountLeft > 0) "1 MOVE LEFT" else "0 MOVES", color = Color.White,
-                    fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp))
+                Text(if (state.moveCountLeft > 0) { if (largeFont) "1 MOVE" else "1 MOVE LEFT" } else "0 MOVES",
+                    color = Color.White, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp))
             }
             Box(Modifier.heightIn(min = 36.dp), contentAlignment = Alignment.Center) { RescuePortraits(state, 24.dp) }
-            Box(Modifier.heightIn(min = 36.dp), contentAlignment = Alignment.Center) {
-                Text("${state.completedLevels.size}/${state.totalLevels}", color = Color(0xFFABC3B8), fontSize = 12.sp)
+            // Completion count remains available in the selector, not a third HUD row at 200%.
+            if (!largeFont) Box(Modifier.heightIn(min = 36.dp), contentAlignment = Alignment.Center) {
+                Text("${state.completedLevels.size}/${state.totalLevels}", color = Color(0xFFABC3B8), fontSize = 12.sp, lineHeight = 16.sp)
             }
         }
     }
@@ -110,18 +119,18 @@ internal fun RescueResultPanel(state: GameUiState, reset: () -> Unit, next: () -
                 // Only the explanation scrolls. Retry/Next remains anchored and reachable.
                 Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(if (success) "${state.creatures.count { it.isInsideGoal }} / ${state.creatures.size}" else "ONE MORE TRY",
-                        color = accent, fontSize = 26.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                        color = accent, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(8.dp))
                     Surface(color = Color(0xFF102E29), shape = RoundedCornerShape(22.dp)) {
                         Box(Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) { RescuePortraits(state, 54.dp) }
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(if (success && final) "ALL 12 LEVELS RESCUED!" else if (success) "SANCTUARY REACHED!" else "A DIFFERENT WAY",
-                        color = Color(0xFFFFEDCB), fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        color = Color(0xFFFFEDCB), fontSize = 20.sp, lineHeight = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(10.dp))
                     Text(if (success && final) "Pip, Mochi and Blobbo are home. Revisit a favourite level."
                         else if (success) "Three friends. One clever move."
-                        else rescueReason(state.failureReason), color = Color(0xFFCBD5E1), fontSize = 14.sp, textAlign = TextAlign.Center)
+                        else rescueReason(state.failureReason), color = Color(0xFFCBD5E1), fontSize = 14.sp, lineHeight = 20.sp, textAlign = TextAlign.Center)
                 }
                 Spacer(Modifier.height(16.dp))
                 Button(onClick = if (success) next else reset,
@@ -137,18 +146,19 @@ internal fun RescueResultPanel(state: GameUiState, reset: () -> Unit, next: () -
 
 @Composable
 internal fun RescueLevelSelect(state: GameUiState, select: (Int) -> Unit, close: () -> Unit) {
-    val columns = if (LocalDensity.current.fontScale >= 1.6f) 2 else 3
+    val largeFont = LocalDensity.current.fontScale >= 1.6f
+    val columns = if (largeFont) 2 else 3
     BoxWithConstraints(Modifier.fillMaxSize().background(Color(0xEE0A0F1D)).clickable(onClick = close), contentAlignment = Alignment.Center) {
         Surface(color = Color(0xFF1B3E37), shape = RoundedCornerShape(24.dp),
             modifier = Modifier.padding(16.dp).widthIn(max = 480.dp).fillMaxWidth()
                 .heightIn(max = (maxHeight - 32.dp).coerceAtLeast(160.dp)).clickable { }.testTag("level_select_sheet")) {
             Column(Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("YOUR LITTLE ADVENTURE", color = Color(0xFFFFEDCB), fontSize = 17.sp, fontWeight = FontWeight.Bold,
+                    Text(if (largeFont) "LEVELS" else "YOUR LITTLE ADVENTURE", color = Color(0xFFFFEDCB), fontSize = 17.sp, lineHeight = 21.sp, fontWeight = FontWeight.Bold,
                         maxLines = 2, modifier = Modifier.weight(1f))
                     IconButton(close, Modifier.testTag("close_levels_button")) { Icon(Icons.Default.Close, "Close levels", tint = Color.White) }
                 }
-                Text("${state.completedLevels.size} of ${state.totalLevels} sanctuaries reached", color = Color(0xFFABC3B8), fontSize = 13.sp)
+                Text(if (largeFont) "${state.completedLevels.size}/${state.totalLevels} rescued" else "${state.completedLevels.size} of ${state.totalLevels} sanctuaries reached", color = Color(0xFFABC3B8), fontSize = 13.sp, lineHeight = 18.sp)
                 Spacer(Modifier.height(14.dp))
                 LazyVerticalGrid(GridCells.Fixed(columns), modifier = Modifier.weight(1f, fill = false).heightIn(max = 400.dp).testTag("level_grid"),
                     horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -166,9 +176,9 @@ internal fun RescueLevelSelect(state: GameUiState, select: (Int) -> Unit, close:
                             .testTag("level_${level.number}").semantics { stateDescription = if (current) "Current level, $status" else status }
                             .padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(level.number.toString().padStart(2, '0'), color = if (unlocked) Color(0xFFFFEDCB) else Color(0xFFABC3B8),
-                                fontSize = 21.sp, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold)
-                            Text(level.name, color = Color(0xFFE1EADB), fontSize = 11.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            Text(status, color = if (complete) Color(0xFF89EAC5) else Color(0xFFCBD5E1), fontSize = 10.sp)
+                                fontSize = 21.sp, lineHeight = 25.sp, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold)
+                            Text(level.name, color = Color(0xFFE1EADB), fontSize = 11.sp, lineHeight = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(status, color = if (complete) Color(0xFF89EAC5) else Color(0xFFCBD5E1), fontSize = 10.sp, lineHeight = 13.sp)
                         }
                     }
                 }

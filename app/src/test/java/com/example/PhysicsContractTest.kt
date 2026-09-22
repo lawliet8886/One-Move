@@ -22,4 +22,7 @@ class PhysicsContractTest {
     @Test fun weightSwitchAndReturnBridgesMustBeCausalAndStable() {
         WeightSwitchContractCases.run()
     }
+    @Test fun returnFlightMustNeedTheSpringBridgeGuardAndFloor() {
+        ReturnFlightContractCases.run()
+    }
 }

@@ -114,4 +114,4 @@ if [[ "$FAILURES" -ne 0 ]]; then
     printf 'FAIL: %s failing checks. Read result.tsv and individual instrumentation logs; no full QA approval.\n' "$FAILURES" > device_artifacts/result.txt
     exit 1
 fi
-printf 'PASS: seven native methods; 12 phase completions; eleven causal wrong choices; retry; lifecycle; Back navigation; 1.3x and 2.0x font controls; repeated touches; seven actual recordings. Scripted tests, not free exploration. Review footage before visual approval.\n' > device_artifacts/result.txt
+printf 'PASS: seven native methods; 12 phase completions; fourteen causal wrong choices; retry; lifecycle; Back navigation; 1.3x and 2.0x font controls; repeated touches; seven actual recordings. Scripted tests, not free exploration. Review footage before visual approval.\n' > device_artifacts/result.txt

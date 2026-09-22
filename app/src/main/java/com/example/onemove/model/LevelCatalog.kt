@@ -74,7 +74,7 @@ object LevelCatalog {
     fun createLevel07() = board(7, "Iron Wrecker", PinId.PIN_A, 3, 650f, 480f, heavy = true)
     fun createLevel08() = PuzzlePrototypes.shield()
     fun createLevel09() = WeightSwitchLevel.create()
-    fun createLevel10() = board(10, "Four Decisions", PinId.PIN_B, 4, 380f, 810f, gate = true, heavy = true)
+    fun createLevel10() = ReturnFlightLevel.create()
     fun createLevel11() = board(11, "Across the Abyss", PinId.PIN_A, 4, 850f, 370f, heavy = true, seesaw = true)
     fun createLevel12() = board(12, "The Grand Machine", PinId.PIN_C, 4, 360f, 800f, gate = true, stone = true, seesaw = true)
 
