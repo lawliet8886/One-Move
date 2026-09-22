@@ -1,5 +1,8 @@
 package com.example
 
+import androidx.lifecycle.ViewModelProvider
+import com.example.onemove.ui.OneMoveViewModel
+import com.example.onemove.physics.SimulationState
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -23,7 +26,7 @@ class OneMoveCompactDeviceTest {
     private val output=File(instrumentation.targetContext.getExternalFilesDir(null),"qa").apply{mkdirs()}
 
     @Test fun controlsRemainVisibleOnSmallScreen() {
-        ActivityScenario.launch(MainActivity::class.java).use {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             assertEquals("Compact width was not configured",720,device.displayWidth)
             assertEquals("Compact height was not configured",1280,device.displayHeight)
             assertTrue("Large font was not applied",instrumentation.targetContext.resources.configuration.fontScale>=1.29f)
@@ -40,7 +43,19 @@ class OneMoveCompactDeviceTest {
             node("failure_overlay",12_000L)
             capture("compact_01_failure")
             node("retry_button").click()
-            assertTrue(device.wait(Until.hasObject(By.text("1 MOVE LEFT")),5_000L))
+            // The short-height HUD says "1 PULL"; require the one-move label
+            // inside the visible counter, not an unrelated/global text match.
+            val counter=node("move_counter_pill")
+            val oneMoveVisible=counter.text in setOf("1 PULL","1 MOVE LEFT") ||
+                counter.findObject(By.text("1 PULL"))!=null ||
+                counter.findObject(By.text("1 MOVE LEFT"))!=null
+            assertTrue("Retry did not visibly restore one move",oneMoveVisible)
+            scenario.onActivity { activity ->
+                val model=ViewModelProvider(activity)[OneMoveViewModel::class.java]
+                assertEquals(SimulationState.READY,model.physicsWorld.state)
+                assertEquals(1,model.uiState.value.moveCountLeft)
+                assertTrue("Retry left a removed pin",model.physicsWorld.pins.none{it.isRemoved})
+            }
             assertFalse(device.hasObject(By.res("failure_overlay")))
             tap(PinId.PIN_A)
             node("success_overlay",12_000L)
