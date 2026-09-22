@@ -4,8 +4,8 @@ import com.example.onemove.ui.theme.OneMoveVisualTheme
 
 /** Physical recovery campaign: each board has a continuous, collision-tested route.
  * solutionPinId is documentation for QA only; PhysicsWorld never reads it.
- * All decorative mechanisms in the prior export were empty lists. These boards
- * use real support pins, guide rails and, where declared, gates and heavy bodies.
+ * Distinct bridge, spring, counterweight and shield puzzles replace recovery boards.
+ * The remaining recovery funnels are not a completed difficulty curve.
  */
 object LevelCatalog {
     private val colors = listOf(OneMoveVisualTheme.Pins.pinA, OneMoveVisualTheme.Pins.pinB,
@@ -29,7 +29,6 @@ object LevelCatalog {
                 handlePosition = Vector2D(startX - 200f, supportY))
             else {
                 val n = decoy++
-                // Independent supports hold side machinery, never a hidden answer flag.
                 val left = if (startX >= 600f) 80f else 925f
                 val y = 360f + n * 200f
                 Pin(id, id.name.takeLast(1), "Side mechanism support",
@@ -71,7 +70,7 @@ object LevelCatalog {
     fun createLevel03() = board(3, "Left Turn", PinId.PIN_C, 3, 780f, 430f)
     fun createLevel04() = board(4, "Sanctuary Gateway", PinId.PIN_C, 3, 600f, 600f, 660f, gate = true)
     fun createLevel05() = PuzzlePrototypes.springGap()
-    fun createLevel06() = board(6, "Seesaw Sidecar", PinId.PIN_A, 3, 430f, 720f, seesaw = true, stone = true)
+    fun createLevel06() = CounterweightLevel.create()
     fun createLevel07() = board(7, "Iron Wrecker", PinId.PIN_A, 3, 650f, 480f, heavy = true)
     fun createLevel08() = PuzzlePrototypes.shield()
     fun createLevel09() = board(9, "Creature Gate", PinId.PIN_A, 3, 450f, 720f, gate = true)

@@ -1,0 +1,163 @@
+{
+  "kind": "Original offline-rendered game art; NOT Android gameplay evidence",
+  "source_commit": "78c361dd6c18838f649dbda8a5f2567575fd2bb7",
+  "blender": "4.0.2",
+  "body_radius": 1.0,
+  "orthographic_framing": 3.6,
+  "sprites": [
+    {
+      "file": "hero_pip_neutral.png",
+      "sha256": "9d41352e1b5386d89c5074d32c1fe0611cb6c0ae4927e91a0c1c14f73a5b38ba",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_pip_happy.png",
+      "sha256": "ee1b9653aef6eef975a568a4bbb4b5a7ac76f4a2848e898c3443d6d6bfb6072b",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_pip_surprised.png",
+      "sha256": "514122fd0a658f9b842c7b8e35ac3c489276170505d3940a4ce78992c4b92a12",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_pip_dizzy.png",
+      "sha256": "61ae64e585f315d9a0fb585434615ab62c132ea0c53949d08a37df665c016a71",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_mochi_neutral.png",
+      "sha256": "c77bd635cfbdd78d4841be17e41b6c919d2236c67b96a6194e74edac78090a54",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_mochi_happy.png",
+      "sha256": "bab5c412b9da2a7b292fb35bd008b7f20c2c89f136d960dfad9a062578a63841",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_mochi_surprised.png",
+      "sha256": "97cd4e0005b33754f553a9125179fcbe0bfe92436ab1ff67800b5a248d7ef1c1",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_mochi_dizzy.png",
+      "sha256": "f0e4a53eca49b725d01c49b2f73cad08f2c1c140672b6acc782a498ded74f1ff",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_blobbo_neutral.png",
+      "sha256": "ce0ebd1d8339cf212245f498ff8f08bf6a086ceb571810113762c45a82672d20",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_blobbo_happy.png",
+      "sha256": "fc2c7d0b819630a00a353ffe9175d9daa859abe3f739667c78dde56da5727101",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_blobbo_surprised.png",
+      "sha256": "55a1499664eda631e2247367810f4ed853b05d7e50a6154fae86f54eb9fc2ed0",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    },
+    {
+      "file": "hero_blobbo_dizzy.png",
+      "sha256": "12d65527f5ff2453629dca900c688de78860aa322f5abce44bb8e507e62b9e3e",
+      "width": 384,
+      "height": 384,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "body_radius_pixels": 106.66666666666666
+    }
+  ],
+  "source_run": 35732939923,
+  "source_artifact": 10695833011,
+  "source_manifest_sha256": "654da59825e78d8f4e9e6018c2973f26fdf05ce17a4eb0c3cd79354109933533",
+  "atlas_sha256": "5567c8e5ed09aedef83c3d14653e72ace56ec48df775dc7c0825288ab996efb8",
+  "atlas_size": [
+    768,
+    576
+  ],
+  "cell_size": 192,
+  "rows": [
+    "pip",
+    "mochi",
+    "blobbo"
+  ],
+  "columns": [
+    "neutral",
+    "happy",
+    "surprised",
+    "dizzy"
+  ],
+  "physical_body_radius_per_cell": 0.2777777777777778,
+  "review": "Visual review of all twelve original Blender renders before import. Not gameplay evidence."
+}

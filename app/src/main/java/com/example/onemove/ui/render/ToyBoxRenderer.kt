@@ -1,63 +1,26 @@
 package com.example.onemove.ui.render
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import com.example.onemove.model.LevelDefinition
 import com.example.onemove.physics.PhysicsWorld
 import com.example.onemove.physics.SimulationState
 
 object ToyBoxRenderer {
-
     fun renderToyBox(drawScope: DrawScope, world: PhysicsWorld) {
-        // 1. Background chassis
-        WorkshopRenderer.background(drawScope, world.currentLevel.number, LevelDefinition.WORLD_WIDTH, LevelDefinition.WORLD_HEIGHT)
+        // Static decorative background and hazards are rasterized once per layout,
+        // instead of allocating and redrawing hundreds of shapes every active frame.
+        WorkshopBackdropCache.draw(drawScope,world)
 
-        // 2. Danger pits
-        for (pit in world.dangerPits) {
-            WorkshopRenderer.danger(drawScope, pit)
-        }
-
-        // 3. Home nest / Goal zone
         val rescuedCount = world.creatures.count { it.isInsideGoal }
         WorkshopRenderer.nest(drawScope, world.goalZone, rescuedCount)
-
-        // 4. Platforms & rails
-        for (platform in world.platforms) {
-            WorkshopRenderer.platform(drawScope, platform)
-        }
-
-        // 5. Spring bumpers
-        for (bumper in world.springBumpers) {
-            SpringBumperRenderer.drawSpringBumper(drawScope, bumper)
-        }
-
-        // 6. Mechanical assemblies (Seesaws & Gates)
-        for (seesaw in world.seesaws) {
-            MechanicalJointRenderer.drawSeesawAssembly(drawScope, seesaw)
-        }
-        for (gate in world.creatureGates) {
-            MechanicalJointRenderer.drawCreatureGate(drawScope, gate)
-        }
-
-        // 7. Heavy objects (Iron Wreckers & Granite Stones)
-        for (stone in world.rollingStones) {
-            WreckerAndStoneRenderer.drawRollingStone(drawScope, stone)
-        }
-        for (ball in world.heavyBalls) {
-            WreckerAndStoneRenderer.drawHeavyWreckerBall(drawScope, ball)
-        }
-
-        // 8. Pins
+        for (platform in world.platforms) WorkshopRenderer.platform(drawScope, platform)
+        for (bumper in world.springBumpers) SpringBumperRenderer.drawSpringBumper(drawScope, bumper)
+        for (seesaw in world.seesaws) MechanicalJointRenderer.drawSeesawAssembly(drawScope, seesaw)
+        for (gate in world.creatureGates) MechanicalJointRenderer.drawCreatureGate(drawScope, gate)
+        for (stone in world.rollingStones) WreckerAndStoneRenderer.drawRollingStone(drawScope, stone)
+        for (ball in world.heavyBalls) WreckerAndStoneRenderer.drawHeavyWreckerBall(drawScope, ball)
         val isReady = world.state == SimulationState.READY
-        for (pin in world.pins) {
-            PinRenderer.drawPin(drawScope, pin, isReady = isReady)
-        }
-
-        // 9. Creatures
-        for (creature in world.creatures) {
-            HeroCreatureRenderer.drawCreature(drawScope, creature)
-        }
-
-        // 10. Particles
+        for (pin in world.pins) PinRenderer.drawPin(drawScope, pin, isReady = isReady)
+        for (creature in world.creatures) HeroCreatureRenderer.drawCreature(drawScope, creature)
         KineticParticleRenderer.drawParticles(drawScope, world.particles)
     }
 }

@@ -14,4 +14,8 @@ class PhysicsContractTest {
     @Test fun puzzleChoicesMustHaveIndependentPhysicalCauses() {
         LevelDesignContractCases.run()
     }
+
+    @Test fun counterweightMustBeNecessaryAndStable() {
+        CounterweightContractCases.run()
+    }
 }

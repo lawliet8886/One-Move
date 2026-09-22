@@ -11,11 +11,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import com.example.onemove.model.*
 
-/** Plush miniature mascots. The main body still matches the physical circle exactly. */
+/** Bundled plush sprites in Android; vector fallback for isolated preview tests. */
 object HeroCreatureRenderer {
     fun drawCreature(scope: DrawScope, creature: Creature) = drawCreature(scope,creature,Offset(creature.position.x,creature.position.y))
     fun drawCreature(scope: DrawScope, creature: Creature, renderPos: Vector2D) = drawCreature(scope,creature,Offset(renderPos.x,renderPos.y))
     fun drawCreature(scope: DrawScope, creature: Creature, center: Offset) = with(scope) {
+        if(SpriteMascotRenderer.draw(scope,creature,center)) return@with
         val r=creature.radius
         val base=when(creature.id) {
             CreatureId.PIP -> Color(0xFFE9A242)
@@ -52,7 +53,6 @@ object HeroCreatureRenderer {
         }
         drawCircle(Brush.radialGradient(listOf(lerp(base,cream,0.43f),base,dark),center+Offset(-r*0.37f,-r*0.45f),r*1.65f),r,center)
         drawCircle(dark,r,center,style=Stroke(r*0.045f))
-        // Paired cheek patches and an inset muzzle distinguish each small silhouette.
         if(creature.id==CreatureId.PIP) for(side in listOf(-1f,1f)) {
             val mask=Path().apply {
                 moveTo(center.x+side*r*0.83f,center.y-r*0.15f)
