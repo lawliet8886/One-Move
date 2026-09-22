@@ -117,3 +117,75 @@ jobs:
             app/qa_artifacts/**
             qa_artifacts/**
           if-no-files-found: ignore
+
+  device-journey:
+    needs: physics-regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.3.1"
+
+      - name: Enable KVM
+        shell: bash
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Play One Move on a real Android emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: |
+            set +e
+            mkdir -p device_artifacts
+
+            gradle :app:assembleDebug :app:assembleDebugAndroidTest --stacktrace --no-daemon
+            BUILD_STATUS=$?
+            if [ "$BUILD_STATUS" -ne 0 ]; then
+              exit "$BUILD_STATUS"
+            fi
+
+            adb logcat -c
+            adb shell screenrecord --bit-rate 6000000 --time-limit 180 /sdcard/one-move-device-journey.mp4 >/dev/null 2>&1 &
+            RECORDER_PID=$!
+
+            gradle :app:connectedDebugAndroidTest --stacktrace --no-daemon
+            TEST_STATUS=$?
+
+            adb exec-out screencap -p > device_artifacts/final-screen.png || true
+            adb shell pkill -INT screenrecord || true
+            wait "$RECORDER_PID" || true
+            adb pull /sdcard/one-move-device-journey.mp4 device_artifacts/one-move-device-journey.mp4 || true
+            adb logcat -d > device_artifacts/logcat.txt || true
+
+            exit "$TEST_STATUS"
+
+      - name: Upload real-device evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-move-device-journey
+          path: |
+            device_artifacts/**
+            app/build/reports/androidTests/**
+            app/build/outputs/androidTest-results/**
+          if-no-files-found: ignore
