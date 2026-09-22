@@ -34,9 +34,10 @@ object GrandMachineLevel {
             rail(80f,470f,80f,965f), rail(290f,470f,290f,965f),
             // Rolling-key ramp and a harmless parking floor when its catcher is removed.
             rail(330f,570f,680f,820f), rail(790f,1050f,1080f,1050f),
-            // Creature approach and final chute.
-            rail(1080f,770f,1080f,1120f),
-            rail(1080f,1120f,1045f,1260f),
+            // Creature approach and a real funnel that lands INSIDE the sanctuary walls.
+            rail(1080f,770f,1080f,1000f),
+            rail(690f,1015f,755f,1220f),
+            rail(1135f,1015f,1045f,1220f),
             rail(755f,1220f,755f,1465f), rail(1045f,1220f,1045f,1465f)
         ),
         heavyBalls=listOf(HeavyBall(Vector2D(180f,350f))),

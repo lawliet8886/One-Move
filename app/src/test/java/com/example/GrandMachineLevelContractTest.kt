@@ -22,7 +22,7 @@ class GrandMachineLevelContractTest {
         for(pin in level.pins.map { it.id }) {
             val world=run(level,pin)
             if(pin==PinId.PIN_C) {
-                assertEquals(SimulationState.SUCCESS,world.state)
+                assertEquals("C must win physically; reason=${world.failureReason}; plates=${world.pressurePlates.map { it.id to it.isLatched }}; gate=${world.creatureGates.single().isOpen}; creatures=${world.creatures.map { it.id to it.position }}; events=${world.events.map { it.kind+":"+it.objectId }}", SimulationState.SUCCESS,world.state)
                 assertTrue(world.pressurePlates.all { it.isLatched })
                 assertTrue(world.creatureGates.single().isOpen)
                 assertTrue(world.events.count { it.kind=="plate_latched" }>=2)
