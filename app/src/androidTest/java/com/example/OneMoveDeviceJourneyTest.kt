@@ -72,6 +72,45 @@ class OneMoveDeviceJourneyTest {
         capture("retry_ready")
     }
 
+    @Test fun causalPrototypeWrongChoicesFailForVisiblePhysicalReasonsAndRetryCleanly() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val cases = listOf(
+            Triple(2, PinId.PIN_A, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(5, PinId.PIN_A, "PATH_BLOCKED"),
+            Triple(5, PinId.PIN_B, "PATH_BLOCKED"),
+            Triple(8, PinId.PIN_A, "HIT_BY_HEAVY_OBJECT"),
+            Triple(8, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN")
+        )
+
+        for ((number, pinId, expectedReason) in cases) {
+            instrumentation.runOnMainSync { model.loadLevel(number) }
+            val level = LevelCatalog.getLevel(number)
+            assertTrue("Missing prototype level title $number", device.wait(Until.hasObject(By.text(level.name)), 5_000L))
+            assertFalse("Prototype level $number opened with a stale failure card", device.hasObject(By.res("failure_overlay")))
+            capture("level_${number.toString().padStart(2,'0')}_wrong_${pinId.name}_00_ready")
+
+            tapPin(number, pinId)
+            node("failure_overlay", 12_000L)
+            instrumentation.runOnMainSync {
+                assertEquals("Wrong choice must end in a real failed simulation", SimulationState.FAILED, model.physicsWorld.state)
+                assertEquals("Unexpected physical failure reason for level $number / $pinId", expectedReason, model.physicsWorld.failureReason)
+                assertEquals("A failed route must not rescue any friend", 0, model.physicsWorld.creatures.count { it.isInsideGoal })
+            }
+            capture("level_${number.toString().padStart(2,'0')}_wrong_${pinId.name}_01_failure")
+
+            node("retry_button").click()
+            assertTrue("Retry did not restore the move", device.wait(Until.hasObject(By.text("1 MOVE LEFT")), 5_000L))
+            node("game_board_canvas")
+            instrumentation.runOnMainSync {
+                assertEquals(SimulationState.READY, model.physicsWorld.state)
+                assertEquals(number, model.uiState.value.currentLevelNumber)
+                assertTrue("Retry retained a failure reason", model.physicsWorld.failureReason.isEmpty())
+            }
+            assertFalse("Retry retained the prototype failure card", device.hasObject(By.res("failure_overlay")))
+            capture("level_${number.toString().padStart(2,'0')}_wrong_${pinId.name}_02_retry")
+        }
+    }
+
     @Test fun backgroundPauseDoesNotAdvanceTheSimulation() {
         val instrumentation=InstrumentationRegistry.getInstrumentation()
         tapPin(1,PinId.PIN_A)
