@@ -9,38 +9,20 @@ import com.example.onemove.model.Particle
 import com.example.onemove.model.ParticleType
 
 object KineticParticleRenderer {
-
-    fun drawParticles(drawScope: DrawScope, particles: List<Particle>) {
-        with(drawScope) {
-            for (p in particles) {
-                if (!p.isAlive) continue
-                val alpha = p.alpha.coerceIn(0f, 1f)
-                val c = p.color.copy(alpha = alpha)
-                val pos = Offset(p.position.x, p.position.y)
-
-                when (p.type) {
-                    ParticleType.CONFETTI -> {
-                        withTransform({
-                            translate(pos.x, pos.y)
-                            rotate(p.rotation)
-                        }) {
-                            drawRect(
-                                color = c,
-                                topLeft = Offset(-p.size * 0.5f, -p.size * 0.25f),
-                                size = Size(p.size, p.size * 0.5f)
-                            )
-                        }
+    fun drawParticles(scope:DrawScope,particles:List<Particle>) {
+        with(scope) {
+            for(p in particles) {
+                if(!p.isAlive) continue
+                val alpha=p.alpha.coerceIn(0f,1f)
+                val c=p.color.copy(alpha=alpha)
+                val pos=Offset(p.position.x,p.position.y)
+                when(p.type) {
+                    ParticleType.CONFETTI -> withTransform({translate(pos.x,pos.y);rotate(p.rotation,pivot=Offset.Zero)}) {
+                        drawRect(c,Offset(-p.size*.5f,-p.size*.25f),Size(p.size,p.size*.5f))
                     }
-                    ParticleType.SPARK -> {
-                        drawCircle(color = c, radius = p.size * 0.5f, center = pos)
-                        drawCircle(color = Color.White.copy(alpha = alpha), radius = p.size * 0.25f, center = pos)
-                    }
-                    ParticleType.DUST, ParticleType.SMOKE -> {
-                        drawCircle(color = c, radius = p.size * (1.5f - p.progress * 0.5f), center = pos)
-                    }
-                    ParticleType.GOAL_SPARKLE, ParticleType.HEART, ParticleType.POP -> {
-                        drawCircle(color = c, radius = p.size * 0.5f, center = pos)
-                    }
+                    ParticleType.SPARK -> {drawCircle(c,p.size*.5f,pos);drawCircle(Color.White.copy(alpha=alpha),p.size*.25f,pos)}
+                    ParticleType.DUST,ParticleType.SMOKE -> drawCircle(c,p.size*(1.5f-p.progress*.5f),pos)
+                    else -> drawCircle(c,p.size*.5f,pos)
                 }
             }
         }

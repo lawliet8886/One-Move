@@ -1,0 +1,92 @@
+name: One Move Android Lab
+on:
+  push:
+    branches: [main, chatgpt/android-lab-20260922]
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - 'gradlew*'
+      - '*.gradle.kts'
+      - 'gradle.properties'
+      - 'tools/run-device-lab.sh'
+      - 'tools/record-device.py'
+      - '.github/workflows/android-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-and-play:
+    name: Android API ${{ matrix.api }}
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [35, 36]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: false
+      - name: Verify portable wrapper and record environment
+        run: |
+          mkdir -p lab-evidence
+          git rev-parse HEAD > lab-evidence/commit.txt
+          java -version 2> lab-evidence/java.txt
+          echo 'b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13  gradle/wrapper/gradle-wrapper.jar' | sha256sum -c -
+          ./gradlew --version > lab-evidence/gradle.txt
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Compile game and instrumentation APKs
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug :app:assembleDebugAndroidTest 2>&1 | tee lab-evidence/build.log
+      - name: Run active JVM regression suite
+        timeout-minutes: 8
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace --console=plain :app:testDebugUnitTest --tests com.example.GameRegressionTestSuite 2>&1 | tee lab-evidence/tests.log
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Real Android gameplay, recordings and random-input stress
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          ram-size: 2048M
+          cores: 2
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: bash tools/run-device-lab.sh
+      - name: Preserve actual test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-move-lab-api${{ matrix.api }}-${{ github.run_number }}
+          retention-days: 14
+          path: |
+            lab-evidence/
+            app/build/outputs/apk/
+            app/build/reports/
+            app/build/test-results/
+            app/build/outputs/androidTest-results/
+            gradlew
+            gradlew.bat
+            gradle/wrapper/

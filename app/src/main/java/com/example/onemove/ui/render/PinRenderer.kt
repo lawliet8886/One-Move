@@ -1,123 +1,46 @@
 package com.example.onemove.ui.render
 
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.nativeCanvas
 import com.example.onemove.model.Pin
-import com.example.onemove.model.PinId
-import com.example.onemove.ui.theme.OneMoveVisualTheme
 
+/** Large lettered handles supplement the accessible footer controls; color is never the only cue. */
 object PinRenderer {
-
-    fun drawPin(drawScope: DrawScope, pin: Pin, isReady: Boolean = true) {
-        if (pin.isRemoved) return
+    private val label = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign=Paint.Align.CENTER
+        typeface=Typeface.create(Typeface.DEFAULT,Typeface.BOLD)
+        textSize=29f
+    }
+    fun drawPin(drawScope:DrawScope,pin:Pin,isReady:Boolean=true) {
+        if(pin.isRemoved && pin.pullProgress>=1f) return
+        val progress=if(pin.isRemoved) pin.pullProgress.coerceIn(0f,1f) else 0f
+        val ease=1f-(1f-progress)*(1f-progress)
+        val alpha=1f-progress
         with(drawScope) {
-            val start = Offset(pin.start.x, pin.start.y)
-            val end = Offset(pin.end.x, pin.end.y)
-            val handle = Offset(pin.handlePosition.x, pin.handlePosition.y)
-
-            // 1. Drop shadow for pin shaft
-            drawLine(
-                color = Color(0x55000000),
-                start = start + Offset(0f, 6f),
-                end = end + Offset(0f, 6f),
-                strokeWidth = pin.thickness,
-                cap = StrokeCap.Round
-            )
-
-            // 2. Pin shaft body
-            drawLine(
-                color = OneMoveVisualTheme.Pins.pinShaft,
-                start = start,
-                end = end,
-                strokeWidth = pin.thickness,
-                cap = StrokeCap.Round
-            )
-
-            // Pin shaft colored accent stripe
-            drawLine(
-                color = pin.color,
-                start = start,
-                end = end,
-                strokeWidth = pin.thickness * 0.45f,
-                cap = StrokeCap.Round
-            )
-
-            // Specular edge
-            drawLine(
-                color = Color(0xFFE2E8F0),
-                start = start - Offset(0f, pin.thickness * 0.2f),
-                end = end - Offset(0f, pin.thickness * 0.2f),
-                strokeWidth = 2f,
-                cap = StrokeCap.Round
-            )
-
-            // 3. Tactile Pull Ring Handle
-            drawCircle(
-                color = Color(0x66000000),
-                radius = 26f,
-                center = handle + Offset(0f, 6f)
-            )
-            drawCircle(
-                color = OneMoveVisualTheme.Pins.satinBrassRing,
-                radius = 26f,
-                center = handle
-            )
-            drawCircle(
-                color = Color(0xFF78350F),
-                radius = 26f,
-                center = handle,
-                style = Stroke(width = 3.5f)
-            )
-            drawCircle(
-                color = Color(0xFF1E293B),
-                radius = 16f,
-                center = handle
-            )
-
-            // 4. Distinct Tactical Geometric Emblems:
-            // PIN A: Diamond
-            // PIN B: Square
-            // PIN C: Circle
-            // PIN D: Triangle
-            val emblemColor = pin.color
-            when (pin.id) {
-                PinId.PIN_A -> {
-                    // Diamond
-                    val path = Path().apply {
-                        moveTo(handle.x, handle.y - 9f)
-                        lineTo(handle.x + 9f, handle.y)
-                        lineTo(handle.x, handle.y + 9f)
-                        lineTo(handle.x - 9f, handle.y)
-                        close()
-                    }
-                    drawPath(path, emblemColor)
-                }
-                PinId.PIN_B -> {
-                    // Square
-                    drawRect(
-                        color = emblemColor,
-                        topLeft = Offset(handle.x - 7f, handle.y - 7f),
-                        size = androidx.compose.ui.geometry.Size(14f, 14f)
-                    )
-                }
-                PinId.PIN_C -> {
-                    // Circle
-                    drawCircle(color = emblemColor, radius = 7.5f, center = handle)
-                }
-                PinId.PIN_D -> {
-                    // Triangle
-                    val path = Path().apply {
-                        moveTo(handle.x, handle.y - 9f)
-                        lineTo(handle.x + 8f, handle.y + 7f)
-                        lineTo(handle.x - 8f, handle.y + 7f)
-                        close()
-                    }
-                    drawPath(path, emblemColor)
-                }
+            withTransform({translate(pin.pullDirection.x*ease*(pin.length+90f),pin.pullDirection.y*ease*(pin.length+90f))}) {
+                val start=Offset(pin.start.x,pin.start.y)
+                val end=Offset(pin.end.x,pin.end.y)
+                val handle=Offset(pin.handlePosition.x,pin.handlePosition.y)
+                drawLine(Color(0x88000000).copy(alpha=.45f*alpha),start+Offset(0f,7f),end+Offset(0f,7f),pin.thickness+3f,StrokeCap.Round)
+                drawLine(Color(0xFF94A3B8).copy(alpha=alpha),start,end,pin.thickness,StrokeCap.Round)
+                drawLine(pin.color.copy(alpha=alpha),start,end,pin.thickness*.5f,StrokeCap.Round)
+                drawLine(Color.White.copy(alpha=.75f*alpha),start-Offset(0f,pin.thickness*.22f),end-Offset(0f,pin.thickness*.22f),2f,StrokeCap.Round)
+                if(isReady) drawCircle(pin.color.copy(alpha=.13f),radius=48f,center=handle)
+                drawCircle(Color(0x88000000).copy(alpha=.45f*alpha),36f,handle+Offset(0f,6f))
+                drawCircle(Brush.radialGradient(listOf(Color(0xFFFFEDBB).copy(alpha=alpha),pin.color.copy(alpha=alpha),Color(0xFF925E27).copy(alpha=alpha)),handle-Offset(10f,12f),62f),36f,handle)
+                drawCircle(Color(0xFFFDE9BD).copy(alpha=.8f*alpha),36f,handle,style=Stroke(2.5f))
+                drawCircle(Color(0xFF0F2035).copy(alpha=alpha),24f,handle)
+                label.color=android.graphics.Color.argb((alpha*255).toInt(),245,245,238)
+                drawIntoCanvas{it.nativeCanvas.drawText(pin.name,handle.x,handle.y-(label.ascent()+label.descent())*.5f,label)}
             }
         }
     }
