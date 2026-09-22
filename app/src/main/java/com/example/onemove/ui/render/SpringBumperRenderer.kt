@@ -13,7 +13,8 @@ object SpringBumperRenderer {
     fun drawSpringBumper(drawScope: DrawScope, bumper: SpringBumper) {
         with(drawScope) {
             val pos = Offset(bumper.position.x, bumper.position.y)
-            val dir = Offset(bumper.direction.x, bumper.direction.y)
+            val normal = bumper.direction.normalized()
+            val dir = Offset(normal.x, normal.y)
             val perp = Offset(-dir.y, dir.x)
             val w = bumper.width
             val currentH = bumper.restHeight * (1f - bumper.compression.coerceIn(0f, 0.9f))
@@ -73,6 +74,15 @@ object SpringBumperRenderer {
                 strokeWidth = 4f,
                 cap = StrokeCap.Round
             )
+
+            // The launch direction must be legible before committing the one move.
+            // Uses the same normalized direction as the physical impulse.
+            val arrowBase = headCenter + dir * 32f
+            val arrowTip = arrowBase + dir * 58f
+            val arrowColor = Color(0xFFBAE6FD)
+            drawLine(arrowColor, arrowBase, arrowTip, 5f, cap = StrokeCap.Round)
+            drawLine(arrowColor, arrowTip, arrowTip - dir * 19f + perp * 14f, 5f, cap = StrokeCap.Round)
+            drawLine(arrowColor, arrowTip, arrowTip - dir * 19f - perp * 14f, 5f, cap = StrokeCap.Round)
         }
     }
 }

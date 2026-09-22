@@ -67,13 +67,13 @@ object LevelCatalog {
     }
 
     fun createLevel01() = board(1, "First Drop", PinId.PIN_A, 2, 600f, 600f)
-    fun createLevel02() = board(2, "Right of Way", PinId.PIN_B, 2, 420f, 760f)
+    fun createLevel02() = PuzzlePrototypes.bridge()
     fun createLevel03() = board(3, "Left Turn", PinId.PIN_C, 3, 780f, 430f)
     fun createLevel04() = board(4, "Sanctuary Gateway", PinId.PIN_C, 3, 600f, 600f, 660f, gate = true)
-    fun createLevel05() = board(5, "Long Way Home", PinId.PIN_C, 3, 350f, 800f)
+    fun createLevel05() = PuzzlePrototypes.springGap()
     fun createLevel06() = board(6, "Seesaw Sidecar", PinId.PIN_A, 3, 430f, 720f, seesaw = true, stone = true)
     fun createLevel07() = board(7, "Iron Wrecker", PinId.PIN_A, 3, 650f, 480f, heavy = true)
-    fun createLevel08() = board(8, "Granite Roll", PinId.PIN_B, 3, 760f, 420f, stone = true)
+    fun createLevel08() = PuzzlePrototypes.shield()
     fun createLevel09() = board(9, "Creature Gate", PinId.PIN_A, 3, 450f, 720f, gate = true)
     fun createLevel10() = board(10, "Four Decisions", PinId.PIN_B, 4, 380f, 810f, gate = true, heavy = true)
     fun createLevel11() = board(11, "Across the Abyss", PinId.PIN_A, 4, 850f, 370f, heavy = true, seesaw = true)
