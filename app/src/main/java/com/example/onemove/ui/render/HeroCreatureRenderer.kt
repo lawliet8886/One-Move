@@ -2,200 +2,62 @@ package com.example.onemove.ui.render
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import com.example.onemove.model.Creature
-import com.example.onemove.model.CreatureExpression
-import com.example.onemove.model.CreatureId
-import com.example.onemove.model.Vector2D
-import com.example.onemove.ui.theme.OneMoveVisualTheme
+import com.example.onemove.model.*
 
+/** Procedural mascots: body radii match collision radii; ears and highlights are decorative. */
 object HeroCreatureRenderer {
-
-    fun drawCreature(drawScope: DrawScope, creature: Creature) {
-        drawCreature(drawScope, creature, Offset(creature.position.x, creature.position.y))
-    }
-
-    fun drawCreature(drawScope: DrawScope, creature: Creature, renderPos: Vector2D) {
-        drawCreature(drawScope, creature, Offset(renderPos.x, renderPos.y))
-    }
-
-    fun drawCreature(drawScope: DrawScope, creature: Creature, center: Offset) {
-        with(drawScope) {
-            val rad = creature.radius * 1.15f
-
-            // 1. Ground Drop Shadow
-            drawOval(
-                color = Color(0x55000000),
-                topLeft = Offset(center.x - rad * 0.9f, center.y + rad * 0.65f),
-                size = Size(rad * 1.8f, rad * 0.45f)
-            )
-
-            // 2. Creature Body by Mascot ID
-            when (creature.id) {
-                CreatureId.PIP -> {
-                    // Amber cat with pointed ears
-                    // Ears
-                    val earLeft = Path().apply {
-                        moveTo(center.x - rad * 0.7f, center.y - rad * 0.4f)
-                        lineTo(center.x - rad * 0.85f, center.y - rad * 1.1f)
-                        lineTo(center.x - rad * 0.25f, center.y - rad * 0.75f)
-                        close()
-                    }
-                    val earRight = Path().apply {
-                        moveTo(center.x + rad * 0.7f, center.y - rad * 0.4f)
-                        lineTo(center.x + rad * 0.85f, center.y - rad * 1.1f)
-                        lineTo(center.x + rad * 0.25f, center.y - rad * 0.75f)
-                        close()
-                    }
-                    drawPath(earLeft, OneMoveVisualTheme.Creatures.pipBody)
-                    drawPath(earRight, OneMoveVisualTheme.Creatures.pipBody)
-
-                    // Inner pink ear flaps
-                    val innerEarLeft = Path().apply {
-                        moveTo(center.x - rad * 0.65f, center.y - rad * 0.5f)
-                        lineTo(center.x - rad * 0.78f, center.y - rad * 0.95f)
-                        lineTo(center.x - rad * 0.35f, center.y - rad * 0.75f)
-                        close()
-                    }
-                    drawPath(innerEarLeft, Color(0xFFF472B6))
-
-                    // Round Body
-                    drawCircle(OneMoveVisualTheme.Creatures.pipBody, radius = rad, center = center)
-                    drawCircle(Color(0xFFB45309), radius = rad, center = center, style = Stroke(width = 2.5f))
-
-                    // Cream belly
-                    drawOval(
-                        color = Color(0xFFFEF3C7),
-                        topLeft = Offset(center.x - rad * 0.55f, center.y),
-                        size = Size(rad * 1.1f, rad * 0.85f)
-                    )
-                }
-
-                CreatureId.MOCHI -> {
-                    // Mint jelly with bobbly antennae
-                    val antPath = Path().apply {
-                        moveTo(center.x, center.y - rad * 0.85f)
-                        lineTo(center.x, center.y - rad * 1.25f)
-                    }
-                    drawPath(antPath, Color(0xFF047857), style = Stroke(width = 3.5f))
-                    drawCircle(Color(0xFF34D399), radius = 6.5f, center = Offset(center.x, center.y - rad * 1.25f))
-
-                    // Body
-                    drawCircle(OneMoveVisualTheme.Creatures.mochiBody, radius = rad, center = center)
-                    drawCircle(Color(0xFF065F46), radius = rad, center = center, style = Stroke(width = 2.5f))
-
-                    // Freckles
-                    drawCircle(Color(0xFF047857), radius = 2f, center = Offset(center.x - rad * 0.45f, center.y + rad * 0.1f))
-                    drawCircle(Color(0xFF047857), radius = 2f, center = Offset(center.x + rad * 0.45f, center.y + rad * 0.1f))
-                }
-
-                CreatureId.BLOBBO -> {
-                    // Coral bean with head sprout
-                    val sproutPath = Path().apply {
-                        moveTo(center.x, center.y - rad * 0.9f)
-                        cubicTo(center.x - 12f, center.y - rad * 1.2f, center.x - 8f, center.y - rad * 1.35f, center.x - 16f, center.y - rad * 1.3f)
-                    }
-                    drawPath(sproutPath, Color(0xFF10B981), style = Stroke(width = 3f))
-
-                    drawCircle(OneMoveVisualTheme.Creatures.blobboBody, radius = rad, center = center)
-                    drawCircle(Color(0xFFBE123C), radius = rad, center = center, style = Stroke(width = 2.5f))
-
-                    // Golden cheek blush
-                    drawCircle(Color(0xFFFBBF24), radius = 4f, center = Offset(center.x - rad * 0.55f, center.y + rad * 0.15f))
-                    drawCircle(Color(0xFFFBBF24), radius = 4f, center = Offset(center.x + rad * 0.55f, center.y + rad * 0.15f))
-                }
+    fun drawCreature(scope:DrawScope,c:Creature)=drawCreature(scope,c,Offset(c.position.x,c.position.y))
+    fun drawCreature(scope:DrawScope,c:Creature,p:Vector2D)=drawCreature(scope,c,Offset(p.x,p.y))
+    fun drawCreature(scope:DrawScope,c:Creature,center:Offset) {
+        with(scope) {
+            val r=c.radius
+            val colors=when(c.id) {
+                CreatureId.PIP->listOf(Color(0xFFFFEBAD),Color(0xFFFBBF24),Color(0xFFD97706))
+                CreatureId.MOCHI->listOf(Color(0xFFC9FFE8),Color(0xFF52DDA8),Color(0xFF059669))
+                CreatureId.BLOBBO->listOf(Color(0xFFFFD4E0),Color(0xFFFB7185),Color(0xFFDB2777))
             }
-
-            // 3. Facial Expression
-            drawFace(this, center, rad, creature.expression)
-        }
-    }
-
-    private fun drawFace(drawScope: DrawScope, center: Offset, rad: Float, expression: CreatureExpression) {
-        with(drawScope) {
-            val eyeOffsetY = -rad * 0.15f
-            val eyeSpacing = rad * 0.35f
-
-            when (expression) {
-                CreatureExpression.HAPPY -> {
-                    // Arched happy eyes
-                    drawArc(
-                        color = Color(0xFF0F172A),
-                        startAngle = 180f,
-                        sweepAngle = 180f,
-                        useCenter = false,
-                        topLeft = Offset(center.x - eyeSpacing - 6f, center.y + eyeOffsetY - 4f),
-                        size = Size(12f, 8f),
-                        style = Stroke(width = 2.5f)
-                    )
-                    drawArc(
-                        color = Color(0xFF0F172A),
-                        startAngle = 180f,
-                        sweepAngle = 180f,
-                        useCenter = false,
-                        topLeft = Offset(center.x + eyeSpacing - 6f, center.y + eyeOffsetY - 4f),
-                        size = Size(12f, 8f),
-                        style = Stroke(width = 2.5f)
-                    )
-                    // Smile
-                    drawArc(
-                        color = Color(0xFF0F172A),
-                        startAngle = 0f,
-                        sweepAngle = 180f,
-                        useCenter = false,
-                        topLeft = Offset(center.x - 7f, center.y + rad * 0.15f),
-                        size = Size(14f, 10f),
-                        style = Stroke(width = 2.5f)
-                    )
-                }
-
-                CreatureExpression.SCARED, CreatureExpression.PANIC -> {
-                    // Wide open eyes
-                    drawCircle(Color.White, radius = 7f, center = Offset(center.x - eyeSpacing, center.y + eyeOffsetY))
-                    drawCircle(Color.White, radius = 7f, center = Offset(center.x + eyeSpacing, center.y + eyeOffsetY))
-                    drawCircle(Color(0xFF0F172A), radius = 3.5f, center = Offset(center.x - eyeSpacing, center.y + eyeOffsetY))
-                    drawCircle(Color(0xFF0F172A), radius = 3.5f, center = Offset(center.x + eyeSpacing, center.y + eyeOffsetY))
-                    // O-mouth
-                    drawOval(
-                        color = Color(0xFF0F172A),
-                        topLeft = Offset(center.x - 5f, center.y + rad * 0.15f),
-                        size = Size(10f, 14f)
-                    )
-                }
-
-                CreatureExpression.DIZZY -> {
-                    // Spiral or X eyes
-                    val ex1 = center.x - eyeSpacing
-                    val ex2 = center.x + eyeSpacing
-                    val ey = center.y + eyeOffsetY
-                    drawLine(Color(0xFF0F172A), Offset(ex1 - 4f, ey - 4f), Offset(ex1 + 4f, ey + 4f), strokeWidth = 2.5f)
-                    drawLine(Color(0xFF0F172A), Offset(ex1 - 4f, ey + 4f), Offset(ex1 + 4f, ey - 4f), strokeWidth = 2.5f)
-                    drawLine(Color(0xFF0F172A), Offset(ex2 - 4f, ey - 4f), Offset(ex2 + 4f, ey + 4f), strokeWidth = 2.5f)
-                    drawLine(Color(0xFF0F172A), Offset(ex2 - 4f, ey + 4f), Offset(ex2 + 4f, ey - 4f), strokeWidth = 2.5f)
-                }
-
-                else -> {
-                    // Normal eyes
-                    drawCircle(Color(0xFF0F172A), radius = 4f, center = Offset(center.x - eyeSpacing, center.y + eyeOffsetY))
-                    drawCircle(Color(0xFF0F172A), radius = 4f, center = Offset(center.x + eyeSpacing, center.y + eyeOffsetY))
-                    // Eye highlights
-                    drawCircle(Color.White, radius = 1.5f, center = Offset(center.x - eyeSpacing - 1.5f, center.y + eyeOffsetY - 1.5f))
-                    drawCircle(Color.White, radius = 1.5f, center = Offset(center.x + eyeSpacing - 1.5f, center.y + eyeOffsetY - 1.5f))
-                    // Small smile
-                    drawArc(
-                        color = Color(0xFF0F172A),
-                        startAngle = 0f,
-                        sweepAngle = 180f,
-                        useCenter = false,
-                        topLeft = Offset(center.x - 5f, center.y + rad * 0.12f),
-                        size = Size(10f, 6f),
-                        style = Stroke(width = 2f)
-                    )
-                }
+            drawOval(Color(0x66000000),center+Offset(-r*.88f,r*.7f),Size(r*1.76f,r*.38f))
+            if(c.id==CreatureId.PIP) for(side in listOf(-1f,1f)) {
+                val ear=Path().apply{moveTo(center.x+side*r*.18f,center.y-r*.65f);lineTo(center.x+side*r*.76f,center.y-r*1.17f);lineTo(center.x+side*r*.8f,center.y-r*.3f);close()}
+                drawPath(ear,colors[1]);drawPath(ear,colors[2],style=Stroke(2f))
+                drawLine(Color(0xFFFDA4AF),center+Offset(side*r*.63f,-r*.91f),center+Offset(side*r*.66f,-r*.58f),4f,StrokeCap.Round)
             }
+            if(c.id==CreatureId.MOCHI) {
+                drawLine(colors[2],center+Offset(0f,-r*.8f),center+Offset(r*.1f,-r*1.25f),4f,StrokeCap.Round)
+                drawCircle(colors[0],r*.13f,center+Offset(r*.1f,-r*1.25f))
+            }
+            if(c.id==CreatureId.BLOBBO) {
+                drawLine(Color(0xFF059669),center+Offset(0f,-r*.8f),center+Offset(0f,-r*1.2f),3f,StrokeCap.Round)
+                drawOval(Color(0xFF6EE7B7),center+Offset(0f,-r*1.32f),Size(r*.42f,r*.2f))
+            }
+            drawCircle(Brush.radialGradient(colors,center-Offset(r*.35f,r*.45f),r*1.6f),r,center)
+            drawCircle(colors[2],r,center,style=Stroke(2f))
+            drawOval(colors[0].copy(alpha=.55f),center+Offset(-r*.54f,r*.12f),Size(r*1.08f,r*.65f))
+            drawOval(Color.White.copy(alpha=.28f),center+Offset(-r*.56f,-r*.72f),Size(r*.64f,r*.2f))
+            val eyes=Color(0xFF14243B)
+            val happy=c.expression==CreatureExpression.HAPPY
+            val dizzy=c.expression==CreatureExpression.DIZZY
+            val startled=c.expression in listOf(CreatureExpression.PANIC,CreatureExpression.SCARED,CreatureExpression.SURPRISED)
+            for(side in listOf(-1f,1f)) {
+                val e=center+Offset(side*r*.34f,-r*.15f)
+                if(happy) drawArc(eyes,190f,160f,false,e-Offset(r*.13f,r*.06f),Size(r*.26f,r*.2f),style=Stroke(3f,cap=StrokeCap.Round))
+                else if(dizzy) {
+                    drawLine(eyes,e-Offset(4f,4f),e+Offset(4f,4f),2.5f,StrokeCap.Round)
+                    drawLine(eyes,e-Offset(4f,-4f),e+Offset(4f,-4f),2.5f,StrokeCap.Round)
+                } else {
+                    drawOval(eyes,e-Offset(r*.11f,r*.15f),Size(r*.22f,r*.3f))
+                    drawCircle(Color.White,r*.045f,e-Offset(r*.03f,r*.06f))
+                }
+                drawOval(Color(0xFFFDA4AF).copy(alpha=.65f),center+Offset(side*r*.55f-r*.09f,r*.1f),Size(r*.18f,r*.1f))
+            }
+            if(startled) drawOval(eyes,center+Offset(-r*.09f,r*.13f),Size(r*.18f,r*.24f))
+            else drawArc(eyes,0f,180f,false,center+Offset(-r*.13f,r*.13f),Size(r*.26f,r*.16f),style=Stroke(2.5f,cap=StrokeCap.Round))
         }
     }
 }

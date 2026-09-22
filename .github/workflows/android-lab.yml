@@ -1,21 +1,17 @@
 name: One Move Android Lab
-
 on:
   push:
     branches: [chatgpt/android-lab-20260922]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: android-lab-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
-  baseline:
+  verify-and-play:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v6
         with:
@@ -30,15 +26,14 @@ jobs:
           gradle-version: '9.3.1'
           cache-provider: basic
           cache-read-only: false
-      - name: Record exact revision and environment
+      - name: Record revision and environment
         run: |
           mkdir -p lab-evidence
           git rev-parse HEAD > lab-evidence/commit.txt
           java -version 2> lab-evidence/java.txt
           gradle --version > lab-evidence/gradle.txt
-      - name: Install required Android SDK packages
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
-      - name: Restore missing wrapper using an isolated empty Gradle project
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Restore official wrapper
         run: |
           mkdir -p "$RUNNER_TEMP/wrapper-bootstrap"
           touch "$RUNNER_TEMP/wrapper-bootstrap/settings.gradle"
@@ -47,28 +42,46 @@ jobs:
           cp "$RUNNER_TEMP/wrapper-bootstrap/gradlew.bat" .
           cp "$RUNNER_TEMP/wrapper-bootstrap/gradle/wrapper/gradle-wrapper.jar" gradle/wrapper/
           chmod +x gradlew
-      - name: Compile APK
+      - name: Compile game and instrumentation APKs
         shell: bash
         run: |
           set -o pipefail
-          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug 2>&1 | tee lab-evidence/build.log
-      - name: Execute existing tests
+          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug :app:assembleDebugAndroidTest 2>&1 | tee lab-evidence/build.log
+      - name: Run physics and regression tests
+        timeout-minutes: 8
         shell: bash
         run: |
           set -o pipefail
-          ./gradlew --no-daemon --stacktrace --console=plain :app:testDebugUnitTest 2>&1 | tee lab-evidence/tests.log
-      - name: Preserve APK, reports, logs and wrapper
+          ./gradlew --no-daemon --stacktrace --console=plain :app:testDebugUnitTest --tests com.example.GameRegressionTestSuite 2>&1 | tee lab-evidence/tests.log
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Real Android gameplay and screen recordings
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          ram-size: 2048M
+          cores: 2
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: bash tools/run-device-lab.sh
+      - name: Preserve actual test evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: one-move-baseline-${{ github.run_number }}
+          name: one-move-lab-${{ github.run_number }}
           retention-days: 14
-          include-hidden-files: false
           path: |
             lab-evidence/
-            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/
             app/build/reports/
             app/build/test-results/
+            app/build/outputs/androidTest-results/
             gradlew
             gradlew.bat
             gradle/wrapper/

@@ -1,188 +1,103 @@
 package com.example.onemove.model
 
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import com.example.onemove.ui.theme.OneMoveVisualTheme
 
+/** Twelve handcrafted physical layouts. Expected answers are test metadata only. */
 object LevelCatalog {
+    private fun v(x: Float, y: Float) = Vector2D(x, y)
+    private fun rail(x1: Float, y1: Float, x2: Float, y2: Float) = Platform(v(x1,y1), v(x2,y2), 20f)
+    private val colors = listOf(OneMoveVisualTheme.Pins.pinA, OneMoveVisualTheme.Pins.pinB, OneMoveVisualTheme.Pins.pinC, OneMoveVisualTheme.Pins.pinD)
 
-    fun createLevel01(): LevelDefinition {
-        val creatures = listOf(
-            Creature(CreatureId.PIP, Vector2D(540f, 280f), radius = 32f),
-            Creature(CreatureId.MOCHI, Vector2D(600f, 280f), radius = 34f),
-            Creature(CreatureId.BLOBBO, Vector2D(660f, 280f), radius = 36f)
-        )
-        val pins = listOf(
-            Pin(PinId.PIN_A, "A", "Safe Ramp Release", Vector2D(460f, 380f), Vector2D(740f, 380f), Vector2D(-1f, 0f), 280f, 16f, OneMoveVisualTheme.Pins.pinA, Vector2D(410f, 380f)),
-            Pin(PinId.PIN_B, "B", "Danger Chute Release", Vector2D(460f, 620f), Vector2D(740f, 620f), Vector2D(1f, 0f), 280f, 16f, OneMoveVisualTheme.Pins.pinB, Vector2D(790f, 620f))
-        )
-        val platforms = listOf(
-            Platform(Vector2D(420f, 380f), Vector2D(460f, 380f)),
-            Platform(Vector2D(740f, 380f), Vector2D(780f, 380f)),
-            Platform(Vector2D(350f, 800f), Vector2D(650f, 1100f)),
-            Platform(Vector2D(850f, 800f), Vector2D(550f, 1100f))
-        )
-        val dangerPits = listOf(
-            DangerPit(Rect(700f, 900f, 980f, 1150f))
-        )
-        val goalZone = GoalZone(Vector2D(600f, 1350f), radius = 130f)
-        return LevelDefinition(
-            number = 1,
-            name = "First Drop",
-            initialCreatures = creatures,
-            pins = pins,
-            platforms = platforms,
-            dangerPits = dangerPits,
-            goalZone = goalZone,
-            primaryMechanics = "Tactical Pin Release",
-            newConceptIntroduced = "Basic Gravity & Sanctuary Goal",
-            solutionPinId = PinId.PIN_A
-        )
-    }
-
-    fun createLevel02(): LevelDefinition {
-        return createSimpleLevel(2, "Dual Chute", PinId.PIN_B, 2)
-    }
-
-    fun createLevel03(): LevelDefinition {
-        return createSimpleLevel(3, "Triple Trap", PinId.PIN_C, 3)
-    }
-
-    fun createLevel04(): LevelDefinition {
-        val creatures = listOf(
-            Creature(CreatureId.PIP, Vector2D(500f, 260f), radius = 32f),
-            Creature(CreatureId.MOCHI, Vector2D(580f, 260f), radius = 34f),
-            Creature(CreatureId.BLOBBO, Vector2D(660f, 260f), radius = 36f)
-        )
-        val pins = listOf(
-            Pin(PinId.PIN_A, "A", "Spike Diverter", Vector2D(320f, 440f), Vector2D(540f, 440f), Vector2D(-1f, 0f), 220f, 16f, OneMoveVisualTheme.Pins.pinA, Vector2D(280f, 440f)),
-            Pin(PinId.PIN_B, "B", "Basin Trapdoor", Vector2D(660f, 440f), Vector2D(880f, 440f), Vector2D(1f, 0f), 220f, 16f, OneMoveVisualTheme.Pins.pinB, Vector2D(920f, 440f)),
-            Pin(PinId.PIN_C, "C", "Sanctuary Chute", Vector2D(480f, 680f), Vector2D(720f, 680f), Vector2D(-1f, 0f), 240f, 16f, OneMoveVisualTheme.Pins.pinC, Vector2D(440f, 680f))
-        )
-        val platforms = listOf(
-            Platform(Vector2D(280f, 440f), Vector2D(320f, 440f)),
-            Platform(Vector2D(880f, 440f), Vector2D(920f, 440f)),
-            Platform(Vector2D(360f, 750f), Vector2D(580f, 980f)),
-            Platform(Vector2D(840f, 750f), Vector2D(620f, 980f))
-        )
-        val dangerPits = listOf(
-            DangerPit(Rect(720f, 950f, 1000f, 1180f))
-        )
-        val goalZone = GoalZone(Vector2D(600f, 1340f), radius = 135f)
-        return LevelDefinition(
-            number = 4,
-            name = "Sanctuary Gateway",
-            initialCreatures = creatures,
-            pins = pins,
-            platforms = platforms,
-            dangerPits = dangerPits,
-            goalZone = goalZone,
-            primaryMechanics = "Chute Alignment & Safe Drop",
-            newConceptIntroduced = "Triple Mascot Sequential Docking",
-            solutionPinId = PinId.PIN_C
-        )
-    }
-
-    fun createLevel05(): LevelDefinition {
-        return createSimpleLevel(5, "Spring Launcher", PinId.PIN_C, 3)
-    }
-
-    fun createLevel06(): LevelDefinition {
-        return createSimpleLevel(6, "Seesaw Fulcrum", PinId.PIN_A, 3)
-    }
-
-    fun createLevel07(): LevelDefinition {
-        return createSimpleLevel(7, "Iron Wrecker", PinId.PIN_A, 3)
-    }
-
-    fun createLevel08(): LevelDefinition {
-        return createSimpleLevel(8, "Granite Roll", PinId.PIN_B, 3)
-    }
-
-    fun createLevel09(): LevelDefinition {
-        return createSimpleLevel(9, "Creature Gate", PinId.PIN_A, 3)
-    }
-
-    fun createLevel10(): LevelDefinition {
-        return createSimpleLevel(10, "Bumper Cascade", PinId.PIN_B, 4)
-    }
-
-    fun createLevel11(): LevelDefinition {
-        return createSimpleLevel(11, "Danger Maze", PinId.PIN_A, 4)
-    }
-
-    fun createLevel12(): LevelDefinition {
-        return createSimpleLevel(12, "The Grand Machine", PinId.PIN_C, 4)
-    }
-
-    private fun createSimpleLevel(num: Int, name: String, winner: PinId, pinCount: Int): LevelDefinition {
-        val creatures = listOf(
-            Creature(CreatureId.PIP, Vector2D(500f, 260f), radius = 32f),
-            Creature(CreatureId.MOCHI, Vector2D(580f, 260f), radius = 34f),
-            Creature(CreatureId.BLOBBO, Vector2D(660f, 260f), radius = 36f)
-        )
-        val allPinIds = listOf(PinId.PIN_A, PinId.PIN_B, PinId.PIN_C, PinId.PIN_D)
-        val colors = listOf(
-            OneMoveVisualTheme.Pins.pinA,
-            OneMoveVisualTheme.Pins.pinB,
-            OneMoveVisualTheme.Pins.pinC,
-            OneMoveVisualTheme.Pins.pinD
-        )
-        val pins = (0 until pinCount).map { i ->
-            val pid = allPinIds[i]
-            val y = 400f + i * 160f
-            Pin(
-                id = pid,
-                name = pid.name.takeLast(1),
-                description = "Tactical Pin ${pid.name.takeLast(1)}",
-                start = Vector2D(460f, y),
-                end = Vector2D(740f, y),
-                pullDirection = if (i % 2 == 0) Vector2D(-1f, 0f) else Vector2D(1f, 0f),
-                length = 280f,
-                thickness = 16f,
-                color = colors[i],
-                handlePosition = if (i % 2 == 0) Vector2D(410f, y) else Vector2D(790f, y)
-            )
-        }
-        val platforms = listOf(
-            Platform(Vector2D(360f, 750f), Vector2D(580f, 1050f)),
-            Platform(Vector2D(840f, 750f), Vector2D(620f, 1050f))
-        )
-        val dangerPits = listOf(
-            DangerPit(Rect(700f, 950f, 980f, 1180f))
-        )
-        val goalZone = GoalZone(Vector2D(600f, 1340f), radius = 135f)
-        return LevelDefinition(
-            number = num,
-            name = name,
-            initialCreatures = creatures,
-            pins = pins,
-            platforms = platforms,
-            dangerPits = dangerPits,
-            goalZone = goalZone,
-            primaryMechanics = "Kinetic Physics",
-            newConceptIntroduced = "Mechanics Progression",
-            solutionPinId = winner
-        )
-    }
-
-    val ALL_LEVELS: List<LevelDefinition> = listOf(
-        createLevel01(),
-        createLevel02(),
-        createLevel03(),
-        createLevel04(),
-        createLevel05(),
-        createLevel06(),
-        createLevel07(),
-        createLevel08(),
-        createLevel09(),
-        createLevel10(),
-        createLevel11(),
-        createLevel12()
+    private fun makePin(id: PinId, left: Float, right: Float, y: Float, outwardRight: Boolean = false): Pin = Pin(
+        id = id, name = id.name.takeLast(1), description = "Puxe para retirar esta trava",
+        start = v(left,y), end = v(right,y), thickness = 20f, length = right-left,
+        pullDirection = v(if (outwardRight) 1f else -1f,0f), color = colors[id.ordinal],
+        handlePosition = v(if (outwardRight) right + 42f else left - 42f,y)
     )
 
-    fun getLevel(number: Int): LevelDefinition {
-        val idx = (number - 1).coerceIn(0, ALL_LEVELS.size - 1)
-        return ALL_LEVELS[idx]
+    private fun bowl(goalX: Float): List<Platform> = listOf(
+        rail((goalX - 440f).coerceAtLeast(80f), 1040f, goalX - 115f, 1300f),
+        rail((goalX + 440f).coerceAtMost(1120f), 1040f, goalX + 115f, 1300f),
+        rail(goalX - 180f,1450f,goalX + 180f,1450f),
+        rail(goalX - 180f,1380f,goalX - 180f,1450f),
+        rail(goalX + 180f,1380f,goalX + 180f,1450f)
+    )
+
+    private fun level(number: Int, name: String, answer: PinId, count: Int, spawnX: Float = 600f, goalX: Float = 600f,
+                      tracks: List<Platform> = emptyList(), springs: List<SpringBumper> = emptyList(),
+                      levers: List<SeesawLever> = emptyList(), balls: List<HeavyBall> = emptyList(),
+                      stones: List<RollingStone> = emptyList(), gate: Boolean = false, hint: String): LevelDefinition {
+        val ids = PinId.values().take(count)
+        var decoy = 0
+        val pins = ids.map { id ->
+            if (id == answer) {
+                if (gate) makePin(id, 795f, 960f, 760f, true)
+                else makePin(id,spawnX-170f,spawnX+170f,360f,number % 2 == 0)
+            } else {
+                val index = decoy++
+                when(index) {
+                    0 -> makePin(id,120f,290f,170f)
+                    1 -> makePin(id,910f,1080f,170f,true)
+                    else -> makePin(id,490f,700f,120f)
+                }
+            }
+        }
+        val start = if (gate) 600f else spawnX
+        val c = listOf(
+            Creature(CreatureId.PIP,v(start-100f,260f),radius=40f),
+            Creature(CreatureId.MOCHI,v(start,260f),radius=40f),
+            Creature(CreatureId.BLOBBO,v(start+100f,260f),radius=40f)
+        )
+        val gates = if (gate) listOf(CreatureGate(pivot=v(795f,680f),closedEnd=v(405f,680f),thickness=22f,releasePinId=answer)) else emptyList()
+        val hazards = listOf(DangerPit(Rect2D(42f,1400f,150f,1570f)),DangerPit(Rect2D(1050f,1400f,1158f,1570f)))
+        return LevelDefinition(number=number,name=name,initialCreatures=c,pins=pins,
+            platforms=tracks+bowl(goalX),dangerPits=hazards,springBumpers=springs,seesaws=levers,
+            heavyBalls=balls,rollingStones=stones,creatureGates=gates,
+            goalZone=GoalZone(v(goalX,1350f),radius=190f),primaryMechanics=hint,newConceptIntroduced=hint,solutionPinId=answer)
     }
+
+    fun createLevel01() = level(1,"Primeiro voo",PinId.PIN_A,2,
+        tracks=listOf(rail(340f,710f,475f,940f),rail(860f,710f,725f,940f)),
+        hint="Uma trava. Três amigos. Encontre o caminho para casa.")
+    fun createLevel02() = level(2,"Curva de mel",PinId.PIN_B,2,spawnX=350f,goalX=760f,
+        tracks=listOf(rail(150f,520f,710f,950f)),
+        hint="A rampa transforma a queda em movimento para o lado.")
+    fun createLevel03() = level(3,"Caminho de volta",PinId.PIN_C,3,spawnX=830f,goalX=440f,
+        tracks=listOf(rail(1040f,520f,470f,950f)),
+        hint="Observe a inclinação antes de escolher.")
+    fun createLevel04() = level(4,"Porta do refúgio",PinId.PIN_C,3,gate=true,
+        tracks=listOf(rail(330f,420f,475f,575f),rail(870f,420f,725f,575f)),
+        hint="A trava lateral libera a dobradiça. Não o chão.")
+    fun createLevel05() = level(5,"Pulo de alegria",PinId.PIN_C,3,spawnX=420f,goalX=770f,
+        springs=listOf(SpringBumper(v(430f,735f),v(0.6f,-0.8f),width=340f)),
+        tracks=listOf(rail(980f,650f,970f,1060f)),
+        hint="A mola devolve energia: antecipe o salto.")
+    fun createLevel06() = level(6,"Peso de amizade",PinId.PIN_A,3,spawnX=450f,
+        levers=listOf(SeesawLever(v(600f,820f),halfLength=290f,angle=-0.12f)),
+        hint="O peso dos amigos inclina a gangorra.")
+    fun createLevel07() = level(7,"Gigante de ferro",PinId.PIN_A,3,spawnX=650f,goalX=650f,
+        tracks=listOf(rail(120f,620f,310f,900f),rail(310f,900f,340f,900f),rail(340f,750f,340f,900f)),
+        balls=listOf(HeavyBall(v(210f,460f),radius=48f)),
+        hint="Mantenha o peso de ferro fora do caminho dos amigos.")
+    fun createLevel08() = level(8,"Pedra viajante",PinId.PIN_B,3,spawnX=750f,goalX=680f,
+        tracks=listOf(rail(200f,430f,490f,750f),rail(490f,750f,520f,930f),rail(430f,940f,520f,940f)),
+        stones=listOf(RollingStone(v(290f,350f),radius=42f)),
+        hint="Pedras e amigos têm massa: colisões mudam o movimento.")
+    fun createLevel09() = level(9,"Passagem secreta",PinId.PIN_A,3,gate=true,goalX=650f,
+        tracks=listOf(rail(370f,890f,520f,1040f)),
+        hint="Abra a passagem e acompanhe a queda até o refúgio.")
+    fun createLevel10() = level(10,"Duplo impulso",PinId.PIN_B,4,spawnX=400f,goalX=700f,
+        springs=listOf(SpringBumper(v(420f,650f),v(0.6f,-0.8f),width=320f),SpringBumper(v(900f,1050f),v(-0.6f,-0.8f),width=170f)),
+        hint="Cada contato com a mola tem direção e intensidade.")
+    fun createLevel11() = level(11,"Zigue-zague",PinId.PIN_A,4,spawnX=360f,goalX=500f,
+        tracks=listOf(rail(190f,490f,730f,820f),rail(990f,850f,500f,1080f)),
+        hint="Siga a sequência das rampas, não só a primeira queda.")
+    fun createLevel12() = level(12,"A grande máquina",PinId.PIN_C,4,gate=true,
+        levers=listOf(SeesawLever(v(600f,910f),halfLength=270f,angle=-0.28f)),
+        stones=listOf(RollingStone(v(185f,100f),radius=40f)),
+        tracks=listOf(rail(80f,550f,210f,710f)),
+        hint="Dobradiça, peso e gravidade. Um único movimento.")
+
+    val ALL_LEVELS = listOf(createLevel01(),createLevel02(),createLevel03(),createLevel04(),createLevel05(),createLevel06(),createLevel07(),createLevel08(),createLevel09(),createLevel10(),createLevel11(),createLevel12())
+    fun getLevel(number: Int) = ALL_LEVELS[(number-1).coerceIn(0,ALL_LEVELS.lastIndex)]
 }
