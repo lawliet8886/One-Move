@@ -31,6 +31,7 @@ object MechanicalJointRenderer {
             drawLine(Color(0xFF334155), Offset(-seesaw.halfLength, 0f), Offset(seesaw.halfLength, 0f), seesaw.thickness, StrokeCap.Round)
             drawLine(Color(0xFF94A3B8), Offset(-seesaw.halfLength + 6f, -seesaw.thickness * 0.25f), Offset(seesaw.halfLength - 6f, -seesaw.thickness * 0.25f), 2.5f, StrokeCap.Round)
         }
+        if (HardwareSpriteRenderer.draw(this,HardwareSpriteRenderer.Kind.AXLE,pivot,22f)) return@with
         drawCircle(Color(0xFFB45309), 16f, pivot)
         drawCircle(Color(0xFFF59E0B), 12f, pivot)
         drawCircle(Color(0xFFFEF3C7), 6f, pivot)

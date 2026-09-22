@@ -6,83 +6,63 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import com.example.onemove.model.SpringBumper
+import kotlin.math.atan2
+import kotlin.math.sin
 
+/** A compact three-coil cartridge; the arrow follows the actual launch normal. */
 object SpringBumperRenderer {
-
-    fun drawSpringBumper(drawScope: DrawScope, bumper: SpringBumper) {
-        with(drawScope) {
-            val pos = Offset(bumper.position.x, bumper.position.y)
-            val normal = bumper.direction.normalized()
-            val dir = Offset(normal.x, normal.y)
-            val perp = Offset(-dir.y, dir.x)
-            val w = bumper.width
-            val currentH = bumper.restHeight * (1f - bumper.compression.coerceIn(0f, 0.9f))
-
-            // 1. Steel Mounting Base Plate
-            val baseP1 = pos - perp * (w * 0.5f)
-            val baseP2 = pos + perp * (w * 0.5f)
-            drawLine(
-                color = Color(0xFF1E293B),
-                start = baseP1,
-                end = baseP2,
-                strokeWidth = 10f,
-                cap = StrokeCap.Round
-            )
-            drawLine(
-                color = Color(0xFF475569),
-                start = baseP1,
-                end = baseP2,
-                strokeWidth = 6f,
-                cap = StrokeCap.Round
-            )
-
-            // 2. Coiled Spring Wire
-            val coils = 4
-            val coilStep = currentH / coils
-            val springPath = Path()
-            springPath.moveTo(pos.x, pos.y)
-
-            for (i in 0 until coils) {
-                val sign = if (i % 2 == 0) 1f else -1f
-                val midX = pos.x + dir.x * (i + 0.5f) * coilStep + perp.x * sign * (w * 0.25f)
-                val midY = pos.y + dir.y * (i + 0.5f) * coilStep + perp.y * sign * (w * 0.25f)
-                val endX = pos.x + dir.x * (i + 1f) * coilStep
-                val endY = pos.y + dir.y * (i + 1f) * coilStep
-                springPath.lineTo(midX, midY)
-                springPath.lineTo(endX, endY)
+    private val ink=Color(0xFF273C37)
+    private val brass=Color(0xFFB3844F)
+    private val brassLight=Color(0xFFF9D393)
+    private val steel=Color(0xFFACC2BF)
+    private val enamel=Color(0xFF258C91)
+    fun drawSpringBumper(drawScope: DrawScope, bumper: SpringBumper) = with(drawScope) {
+        val n=bumper.direction.normalized()
+        val angle=Math.toDegrees(atan2(n.y.toDouble(),n.x.toDouble())).toFloat()+90f
+        val w=bumper.width
+        val h=bumper.restHeight*(1f-0.70f*bumper.compression.coerceIn(0f,1f))
+        val half=w*0.5f
+        withTransform({ translate(bumper.position.x,bumper.position.y); rotate(angle,pivot=Offset.Zero) }) {
+            // Backplate stays behind the actual spring band, not an invented support.
+            drawLine(Color(0x33203931),Offset(-half,7f),Offset(half,7f),22f,StrokeCap.Round)
+            drawLine(ink,Offset(-half,0f),Offset(half,0f),18f,StrokeCap.Round)
+            drawLine(brass,Offset(-half,0f),Offset(half,0f),12f,StrokeCap.Round)
+            drawLine(brassLight,Offset(-half+4f,-4f),Offset(half-4f,-4f),2f,StrokeCap.Round)
+            for(x in listOf(-w*0.43f,w*0.43f)) {
+                drawCircle(ink,5f,Offset(x,0f)); drawCircle(brassLight,3f,Offset(x,-1f))
             }
-            drawPath(springPath, Color(0xFF94A3B8), style = Stroke(width = 3.5f))
-
-            // 3. Kinetic Cyan Strike Piston Head
-            val headCenter = pos + dir * currentH
-            val headP1 = headCenter - perp * (w * 0.45f)
-            val headP2 = headCenter + perp * (w * 0.45f)
-            val headColor = if (bumper.flashTimer > 0f) Color(0xFF38BDF8) else Color(0xFF0EA5E9)
-
-            drawLine(
-                color = headColor,
-                start = headP1,
-                end = headP2,
-                strokeWidth = 12f,
-                cap = StrokeCap.Round
-            )
-            drawLine(
-                color = Color(0xFFE0F2FE),
-                start = headP1,
-                end = headP2,
-                strokeWidth = 4f,
-                cap = StrokeCap.Round
-            )
-
-            // The launch direction must be legible before committing the one move.
-            // Uses the same normalized direction as the physical impulse.
-            val arrowBase = headCenter + dir * 32f
-            val arrowTip = arrowBase + dir * 58f
-            val arrowColor = Color(0xFFBAE6FD)
-            drawLine(arrowColor, arrowBase, arrowTip, 5f, cap = StrokeCap.Round)
-            drawLine(arrowColor, arrowTip, arrowTip - dir * 19f + perp * 14f, 5f, cap = StrokeCap.Round)
-            drawLine(arrowColor, arrowTip, arrowTip - dir * 19f - perp * 14f, 5f, cap = StrokeCap.Round)
+            val coil=Path()
+            val amplitude=minOf(12f,w*0.09f)
+            // Three narrow real-looking coils replace the old wide flat zigzag.
+            for(x in listOf(-w*0.28f,0f,w*0.28f)) {
+                drawLine(ink.copy(alpha=0.28f),Offset(x,0f),Offset(x,-h),4f,StrokeCap.Round)
+                coil.moveTo(x,-2f)
+                for(i in 1..32) {
+                    val t=i/32f
+                    coil.lineTo(x+sin(t*Math.PI.toFloat()*8f)*amplitude,-2f-t*(h-4f))
+                }
+            }
+            drawPath(coil,ink,style=Stroke(width=5.4f,cap=StrokeCap.Round))
+            drawPath(coil,steel,style=Stroke(width=3.2f,cap=StrokeCap.Round))
+            drawPath(coil,Color(0xFFEDF6DD),style=Stroke(width=1.0f,cap=StrokeCap.Round))
+            val headColor=if(bumper.flashTimer>0f) Color(0xFF6BE1C6) else enamel
+            drawLine(ink,Offset(-half,-h),Offset(half,-h),18f,StrokeCap.Round)
+            drawLine(headColor,Offset(-half,-h),Offset(half,-h),12f,StrokeCap.Round)
+            drawLine(Color(0xFFD8F4DD),Offset(-half+4f,-h-4f),Offset(half-4f,-h-4f),2.6f,StrokeCap.Round)
+            for(x in listOf(-half+4f,half-4f)) {
+                drawCircle(brass,6.5f,Offset(x,-h)); drawCircle(brassLight,3f,Offset(x-1f,-h-1f))
+            }
+            // The direction is a property of this machine, not an answer-key hint.
+            val tip=Offset(0f,-h-78f); val tail=Offset(0f,-h-30f)
+            val arrow=Color(0xFF367C75)
+            drawLine(arrow,tail,tip,5f,StrokeCap.Round)
+            drawLine(arrow,tip,tip+Offset(-13f,18f),5f,StrokeCap.Round)
+            drawLine(arrow,tip,tip+Offset(13f,18f),5f,StrokeCap.Round)
+            if(bumper.flashTimer>0f) {
+                drawCircle(Color(0xAAABFFE0),10f,Offset(0f,-h),style=Stroke(3f))
+            }
         }
     }
 }

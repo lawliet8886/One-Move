@@ -48,6 +48,13 @@ class ExampleRobolectricTest {
     assertEquals(null, world.chosenPinId)
   }
 
+  @Test fun bundledHardwareAtlasLoadsWithVerifiedHashAndBoundedMemory() {
+    val context=ApplicationProvider.getApplicationContext<Context>()
+    com.example.onemove.ui.render.HardwareSpriteRenderer.prepare(context)
+    assertTrue(com.example.onemove.ui.render.HardwareSpriteRenderer.isPrepared)
+    assertEquals(786432,com.example.onemove.ui.render.HardwareSpriteRenderer.DECODED_BYTES)
+  }
+
   @Test fun activeFramesInvalidateDrawingWithoutPublishingEveryHudFrame() {
     val model = OneMoveViewModel(ApplicationProvider.getApplicationContext<Application>())
     model.loadLevel(5); model.pullPin(PinId.PIN_C)

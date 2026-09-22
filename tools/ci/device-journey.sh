@@ -81,6 +81,7 @@ run_case() {
 run_case lifecycle backgroundPauseDoesNotAdvanceTheSimulation 60 lifecycle.mp4
 run_case campaign all12WinningPinsCompleteCampaignThroughRealUi 170 one-move-device-journey.mp4
 run_case wrong_choices causalPrototypeWrongChoicesFailForVisiblePhysicalReasonsAndRetryCleanly 150 wrong-choices.mp4
+run_case flying_key realSpringDeliversWeightAndAllOtherChoicesStayLocked 110 flying-key.mp4 com.example.OneMoveFlyingKeyTest
 run_case retry wrongPinFailsAndRetryRestoresReadyState 45 retry.mp4
 run_case back systemBackClosesLevelsWithoutLeavingOrResettingTheGame 60 back-navigation.mp4 com.example.OneMoveUiErgonomicsTest
 # These settings apply ONLY to the disposable emulator and are restored by collect.
@@ -114,4 +115,4 @@ if [[ "$FAILURES" -ne 0 ]]; then
     printf 'FAIL: %s failing checks. Read result.tsv and individual instrumentation logs; no full QA approval.\n' "$FAILURES" > device_artifacts/result.txt
     exit 1
 fi
-printf 'PASS: seven native methods; 12 phase completions; fourteen causal wrong choices; retry; lifecycle; Back navigation; 1.3x and 2.0x font controls; repeated touches; seven actual recordings. Scripted tests, not free exploration. Review footage before visual approval.\n' > device_artifacts/result.txt
+printf 'PASS: eight native methods; 12 phase completions; seventeen causal wrong choices; retry; lifecycle; Back navigation; 1.3x and 2.0x font controls; repeated touches; eight actual recordings; original hardware atlas verified. Scripted tests, not free exploration. Review footage before visual approval.\n' > device_artifacts/result.txt

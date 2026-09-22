@@ -75,7 +75,7 @@ object LevelCatalog {
     fun createLevel08() = PuzzlePrototypes.shield()
     fun createLevel09() = WeightSwitchLevel.create()
     fun createLevel10() = ReturnFlightLevel.create()
-    fun createLevel11() = board(11, "Across the Abyss", PinId.PIN_A, 4, 850f, 370f, heavy = true, seesaw = true)
+    fun createLevel11() = FlyingKeyLevel.create()
     fun createLevel12() = board(12, "The Grand Machine", PinId.PIN_C, 4, 360f, 800f, gate = true, stone = true, seesaw = true)
 
     val ALL_LEVELS: List<LevelDefinition> = listOf(createLevel01(), createLevel02(), createLevel03(), createLevel04(),

@@ -18,6 +18,7 @@ object WreckerAndStoneRenderer {
         val c = Offset(ball.position.x, ball.position.y)
         val r = ball.radius
         drawOval(Color(0x66000000), c + Offset(-r * 0.95f, r * 0.70f), Size(r * 1.9f, r * 0.45f))
+        if (HardwareSpriteRenderer.draw(this,HardwareSpriteRenderer.Kind.WRECKER,c,r,ball.rotation)) return@with
         drawCircle(Brush.radialGradient(OneMoveVisualTheme.HeavyObjects.wreckerGradient,
             c - Offset(r * 0.35f, r * 0.35f), r * 1.35f), r, c)
         drawCircle(OneMoveVisualTheme.HeavyObjects.wreckerIronCore, r, c, style = Stroke(3f))
@@ -42,6 +43,7 @@ object WreckerAndStoneRenderer {
         val c = Offset(stone.position.x, stone.position.y)
         val r = stone.radius
         drawOval(Color(0x66000000), c + Offset(-r * 0.90f, r * 0.70f), Size(r * 1.8f, r * 0.42f))
+        if (HardwareSpriteRenderer.draw(this,HardwareSpriteRenderer.Kind.STONE,c,r,stone.rotation)) return@with
         drawCircle(Brush.radialGradient(OneMoveVisualTheme.HeavyObjects.stoneGradient,
             c - Offset(r * 0.30f, r * 0.30f), r * 1.30f), r, c)
         drawCircle(OneMoveVisualTheme.HeavyObjects.stoneDarkRim, r, c, style = Stroke(3f))

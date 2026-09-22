@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "ORIGINAL OFFLINE ART; NOT ANDROID EVIDENCE",
+  "source_script": "tools/art/render_hardware.py",
+  "source_script_sha256": "4bc14fa8b6192f730cce81ced6c879a56593c82fadebe5fac7516ff99e42131f",
+  "blender": "5.2.0 LTS",
+  "credits_spent": 0,
+  "cell_size": 256,
+  "framing": 2.4,
+  "pivot_normalized": [
+    0.5,
+    0.5
+  ],
+  "physical_radius": 1.0,
+  "sprites": [
+    {
+      "name": "wrecker",
+      "file": "wrecker.png",
+      "sha256": "d11658cf9ed48ee3da14cde476315df6b71e9efa53b8622593013d4a3406751f",
+      "cell": 0,
+      "alpha_bounds": [
+        21,
+        22,
+        235,
+        234
+      ],
+      "physical_radius_pixels": 106.66666666666667
+    },
+    {
+      "name": "stone",
+      "file": "stone.png",
+      "sha256": "5449718f82914148038c5ad89bc7101c7f42f7c7fed4496ef337aa786c4a9d05",
+      "cell": 1,
+      "alpha_bounds": [
+        21,
+        21,
+        235,
+        235
+      ],
+      "physical_radius_pixels": 106.66666666666667
+    },
+    {
+      "name": "axle",
+      "file": "axle.png",
+      "sha256": "37558b49c0ebf3fcba2d39afc9ffa33d2aeb948a25eadab386fe16fb1ae860d6",
+      "cell": 2,
+      "alpha_bounds": [
+        21,
+        21,
+        235,
+        235
+      ],
+      "physical_radius_pixels": 106.66666666666667
+    }
+  ],
+  "atlas_sha256": "6f987e0361021d751535cfaa72ddc3789ec0e0dea503a54767b6b7e2cc9a86c9",
+  "atlas_width": 768,
+  "atlas_height": 256,
+  "decoded_bytes_rgba": 786432,
+  "base_commit": "73cd1d59756927b3b772c6bfec3f1d9b2718097a",
+  "source_revision": "exact source_script_sha256; authored on base_commit before commit"
+}
