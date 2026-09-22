@@ -79,10 +79,12 @@ fun OneMoveGameContent(
 ) {
     Scaffold(modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
         containerColor = Color(0xFF102D29)) { padding ->
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF173E37), Color(0xFF091E20)))).padding(padding)) {
+        BoxWithConstraints(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF173E37), Color(0xFF091E20)))).padding(padding)) {
+            val compact = maxHeight < 600.dp || LocalDensity.current.fontScale >= 1.6f
             Column(Modifier.fillMaxSize().widthIn(max = 600.dp).align(Alignment.Center)) {
-                RescueHud(uiState, onOpenLevelSelect, onReset)
-                Text(WorkshopRenderer.chapter(uiState.currentLevelNumber).name,
+                if (compact) CompactRescueHud(uiState, onOpenLevelSelect, onReset)
+                else RescueHud(uiState, onOpenLevelSelect, onReset)
+                if (!compact) Text(WorkshopRenderer.chapter(uiState.currentLevelNumber).name,
                     color = Color(0xFFB4C8B4), fontSize = 10.sp, letterSpacing = 2.sp,
                     modifier = Modifier.fillMaxWidth().padding(top = 7.dp), textAlign = TextAlign.Center)
                 BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(8.dp), contentAlignment = Alignment.Center) {
@@ -110,7 +112,7 @@ fun OneMoveGameContent(
                         scale(scaleFactor, pivot = Offset.Zero) { ToyBoxRenderer.renderToyBox(this, world) }
                     }
                 }
-                Text(text = if (uiState.simulationState == SimulationState.READY) "Read the machine. One pull. Bring everyone home."
+                if (!compact) Text(text = if (uiState.simulationState == SimulationState.READY) "Read the machine. One pull. Bring everyone home."
                     else "${uiState.creatures.count { it.isInsideGoal }} / ${uiState.creatures.size} friends safe",
                     color = Color(0xFFABC3B8), fontSize = 12.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("rescue_status"))

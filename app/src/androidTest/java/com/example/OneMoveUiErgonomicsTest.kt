@@ -1,6 +1,8 @@
 package com.example
 
 import android.os.SystemClock
+import android.view.KeyEvent
+import android.view.KeyCharacterMap
 import android.view.InputDevice
 import android.view.MotionEvent
 import androidx.lifecycle.Lifecycle
@@ -49,7 +51,7 @@ class OneMoveUiErgonomicsTest {
             node("level_select_button").click()
             node("level_select_sheet")
             capture("back_${attempt}_sheet")
-            assertTrue("Android Back was not injected", device.pressBack())
+            pressSystemBack()
             assertTrue("Back left the level selector open", device.wait(Until.gone(By.res("level_select_sheet")), 5_000L))
             node("game_board_canvas")
             instrumentation.runOnMainSync {
@@ -73,13 +75,14 @@ class OneMoveUiErgonomicsTest {
         node("level_title")
         assertTarget("reset_button")
         assertTarget("level_select_button")
+        assertPlayableBoard()
         capture("large_font_00_ready")
         node("level_select_button").click()
         node("level_select_sheet")
         assertTarget("close_levels_button")
         assertTarget("level_1")
         capture("large_font_01_named_levels")
-        assertTrue(device.pressBack())
+        pressSystemBack()
         assertTrue(device.wait(Until.gone(By.res("level_select_sheet")), 5_000L))
         node("game_board_canvas")
         // Five rapid down/up pairs at the same visible pin. Only the first may spend a move.
@@ -108,7 +111,27 @@ class OneMoveUiErgonomicsTest {
         instrumentation.runOnMainSync { assertEquals(3, model.uiState.value.currentLevelNumber) }
         assertFalse(device.hasObject(By.res("failure_overlay")))
         assertTarget("reset_button")
+        assertPlayableBoard()
         capture("large_font_04_next_level")
+    }
+
+    private fun pressSystemBack() {
+        // UiDevice.pressBack also waits for a specific accessibility event.
+        // Assert actual key injection separately from the strict visible/lifecycle outcomes.
+        val down = SystemClock.uptimeMillis()
+        for (action in listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP)) {
+            val event = KeyEvent(down, SystemClock.uptimeMillis(), action, KeyEvent.KEYCODE_BACK,
+                0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD)
+            assertTrue("System Back event was not injected: $action", instrumentation.uiAutomation.injectInputEvent(event, true))
+        }
+    }
+
+    private fun assertPlayableBoard() {
+        val bounds = node("game_board_canvas").visibleBounds
+        val density = instrumentation.targetContext.resources.displayMetrics.density
+        File(output, "large-font-board-bounds.txt").appendText("$bounds; ${bounds.width()/density} x ${bounds.height()/density} dp\n")
+        assertTrue("The HUD consumed the board width: $bounds", bounds.width() / density >= 250f)
+        assertTrue("The HUD consumed the board height: $bounds", bounds.height() / density >= 333f)
     }
 
     private fun assertTarget(tag: String) {
