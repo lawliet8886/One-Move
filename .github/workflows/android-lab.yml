@@ -19,6 +19,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify-and-play:
+    name: Android API ${{ matrix.api }}
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [35, 36]
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
@@ -47,7 +52,7 @@ jobs:
         run: |
           set -o pipefail
           ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug :app:assembleDebugAndroidTest 2>&1 | tee lab-evidence/build.log
-      - name: Run all active JVM regression tests
+      - name: Run active JVM regression suite
         timeout-minutes: 8
         shell: bash
         run: |
@@ -58,10 +63,10 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Real Android gameplay and screen recordings
+      - name: Real Android gameplay, recordings and random-input stress
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: ${{ matrix.api }}
           target: google_apis
           arch: x86_64
           profile: pixel_2
@@ -74,7 +79,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: one-move-lab-${{ github.run_number }}
+          name: one-move-lab-api${{ matrix.api }}-${{ github.run_number }}
           retention-days: 14
           path: |
             lab-evidence/

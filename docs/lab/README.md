@@ -1,37 +1,38 @@
 # One Move — laboratório verificável
 
-Base preservada: `db79e44ca035b5b7d951b625220f025494e6b185`. Trabalho em branch separada; não é uma certificação de perfeição.
+Base original preservada: `db79e44ca035b5b7d951b625220f025494e6b185`. Alterações em branch separada; `main` não foi substituída.
 
-## Achado crítico da base
+## Achado crítico
 
-`PhysicsWorld.step` consultava `solutionPinId`, interpolava personagens até o destino e forçava a derrota em 1,1s. Não calculava gravidade/colisões. Portanto, relatórios antigos de "simulação física" não comprovavam física. `HomeNestRenderer` também interpolava posições na apresentação. Ambos os atalhos foram removidos.
+Na base recebida, `PhysicsWorld.step` consultava `solutionPinId`, interpolava personagens até o destino e forçava derrota após 1,1s. Não calculava gravidade/colisões. `HomeNestRenderer` também deslocava posições na apresentação. A nova física remove esses atalhos. Relatórios antigos que chamavam isso de simulação não validam o motor novo.
 
-## Alterações
+## Implementado
 
-- Dinâmica de círculos e segmentos espessos com passo fixo de 1/240s, gravidade, contatos, impulsos, limites e mola com intervalo entre impulsos.
-- Portas com vínculo explícito à trava, gangorras, pedras e pesos; mesma geometria de porta para desenho e colisão.
-- Vitória depende da chegada física de todos os amigos. `solutionPinId` é apenas metadado do catálogo/teste.
-- Doze layouts físicos distintos, preservando os personagens e a regra de um movimento. Isso ainda é uma campanha de protótipo; dificuldade, diversão e acessibilidade exigem avaliação adicional por pessoas.
-- Relógio continua após o fim para animar e finalizar partículas. Retorno do segundo plano e seletor de fases pausam simulação.
-- Botões de pinos de 52dp, letras além das cores, resultados abaixo do tabuleiro, conclusão da campanha e persistência.
-- Pivôs de desenho corrigidos em gangorra, pesos, pedra e confete. Corpos dos personagens alinhados ao raio físico, iluminação por gradiente.
+Dinâmica de círculos e segmentos espessos, passo fixo de 1/240s, gravidade, contatos, impulsos, portas articuladas, gangorras e molas. Resgate exige presença física, velocidade baixa e permanência na zona; todos os amigos devem chegar. `solutionPinId` é apenas metadado de autoria/teste.
 
-## O que cada teste significa
+Doze layouts foram reconstruídos para a física real. Os personagens, a regra de um movimento e os pinos foram preservados como conceito, não os antigos roteiros de animação. Há controles de 52dp com letras, pausa, progresso, estados finais legíveis, pivôs corrigidos e arte procedural. A espiral das molas foi ampliada atrás da placa sem deslocar sua superfície de contato.
 
-`PhysicsIntegrityTest`: executa o motor real com seis cadências de quadros, repetições, gabarito alterado, bloqueio adicional, trilho fino, contato com perigo, reset e fim da animação.
+O wrapper oficial foi restaurado e seu JAR é conferido por SHA-256 no CI. Caches `.gradle/` não pertencem ao código-fonte.
 
-`VerticalSliceOutcomeMatrixTest`: conserva a matriz das escolhas e dez repetições por escolha. Não substitui testes do Android.
+## Significado dos testes
 
-`RenderingIntegrityTest`: impede que a apresentação teleporte um personagem que não chegou.
+- `PhysicsIntegrityTest`: 707 simulações e 122.991 verificações na bateria vigente. São repetições/cenários, não 707 métodos JUnit nem 122.991 bugs diferentes. Inclui seis cadências de quadros, gabarito alterado, barreira extra, trilho fino com queda rápida, contato com perigo, reset e pós-vitória.
+- `VerticalSliceOutcomeMatrixTest`: 37 escolhas, dez repetições cada, total de 370 simulações adicionais. Sucesso matemático não substitui toque real.
+- `RenderingIntegrityTest`: a apresentação não pode teletransportar personagens.
+- `DevicePlaythroughTest`: Android real em emulador, 12 vitórias, 25 escolhas restantes, toques por coordenadas/botões, reset, progresso persistente, pausa em segundo plano e resultado fora do tabuleiro.
+- `CompactUiTest`: 720x1280, densidade 320, fonte 1,15x, alvos mínimos de 48dp, toque fora do alvo, bloqueio de segundo movimento, pausa no seletor e reset.
+- Monkey: 300 eventos aleatórios de toque/movimento, semente 20260922, restritos ao pacote do jogo. Não é exploração inteligente e não demonstra ausência de todos os erros.
 
-`DevicePlaythroughTest`: abre o APK real num Android; injeta toques em coordenadas da tela; verifica 12 vitórias, demais pinos, reinício, persistência e pausa. Grava `screenrecord` por fase. É um roteiro automatizado de interação real, **não** uma pessoa nem um agente visual tomando decisões ao vivo.
+A suíte ativa tem seis métodos JUnit de regressão e dois métodos instrumentados. Os dois antigos geradores de arte foram movidos sem alterar seus bytes para `tools/legacy/`: continham geração de conceitos, pressupostos da animação antiga e esperas sem limite. Eles não foram contados como testes aprovados.
 
-Dois geradores antigos de arte (`FidelityVisualProofExportTest` e `ConceptArtAuditionGeneratorTest`) não são executados pela suíte `GameRegressionTestSuite`. O primeiro contém esperas sem limite e pressupostos de encaixe roteirizado incompatíveis com física real; o segundo gera conceitos, não valida partidas. Seu código foi preservado sem alterações para auditoria. Eles não contam como testes aprovados. A seleção é explícita no comando do workflow, não uma alegação de que todos os testes históricos passaram.
+## Evidências e integridade
 
-## Executar e verificar
+O workflow salva `lab-evidence/commit.txt`, a versão real do Android, os resultados, registros, 12 vídeos nativos e capturas atuais. O APK distribuído precisa corresponder a esse hash. Vídeo é captura do aplicativo em execução, não remontagem de imagens antigas. A seleção de ações é roteirizada, não decisão visual ao vivo de uma IA.
 
-O workflow instala Java 21, SDK Android e Gradle 9.3.1; regenera o wrapper oficial, compila ambos APKs, roda testes e um emulador API35. Cada execução tem limite de tempo, sem loop infinito, sem chave de IA, sem chamada do Codex e sem publicação na Play Store.
+A rodada `35680122883`, código `ae2b0876fe25c87839723b4a426ea6283e1adb1f`, passou no emulador API35 e produziu 12 vídeos verificados. A extensão para API36, o acabamento das molas e o estresse aleatório foram adicionados depois; seus resultados devem ser lidos na execução correspondente, não presumidos a partir da rodada anterior.
 
-Artefatos: APK, XML de testes, matriz de física, logs, imagens atuais, JSON por partida e vídeos nativos. Imagens antigas da raiz nunca são usadas como evidência de uma nova execução.
+## Limitações
 
-Uma execução vermelha não é sucesso. Um vídeo demonstra a execução nele mostrada, não ausência de todos os defeitos. A compilação/execução deve ser vinculada ao hash em `lab-evidence/commit.txt`.
+Este é um protótipo melhorado, não uma certificação de perfeição. Ainda cabem avaliação humana de diversão/dificuldade, aparelhos físicos variados, perfis de desempenho, áudio e acessibilidade mais ampla. A física é uma aproximação para este puzzle, não um simulador mecânico geral. Os níveis iniciais são simples; balanceamento não pode ser provado apenas por aprovação automática.
+
+Não houve instalação no computador do usuário, conexão MCP local, acesso a Tripo, uso de créditos de API, publicação na Play Store ou acionamento de tarefa Codex. O workflow usa computação do GitHub e não contém um loop autônomo de IA.
