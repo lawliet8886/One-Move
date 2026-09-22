@@ -12,8 +12,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -34,6 +35,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,8 @@ import com.example.onemove.model.PinId
 import com.example.onemove.physics.PhysicsWorld
 import com.example.onemove.physics.SimulationState
 import com.example.onemove.ui.render.ToyBoxRenderer
+import com.example.onemove.ui.render.WorkshopRenderer
+import com.example.onemove.ui.render.HeroCreatureRenderer
 import kotlinx.coroutines.isActive
 
 @Composable
@@ -86,10 +90,13 @@ fun OneMoveGameContent(
     onCanvasTapWithRadius: ((Float, Float, Float) -> Unit)? = null
 ) {
     Scaffold(modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
-        containerColor = Color(0xFF0A0F1D)) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
+        containerColor = Color(0xFF102D29)) { padding ->
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF173E37), Color(0xFF091E20)))).padding(padding)) {
             Column(Modifier.fillMaxSize().widthIn(max = 600.dp).align(Alignment.Center)) {
                 TopHudBar(uiState, onOpenLevelSelect, onReset)
+                Text(WorkshopRenderer.chapter(uiState.currentLevelNumber).name,
+                    color = Color(0xFFB4C8B4), fontSize = 10.sp, letterSpacing = 2.sp,
+                    modifier = Modifier.fillMaxWidth().padding(top = 7.dp), textAlign = TextAlign.Center)
                 BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(8.dp), contentAlignment = Alignment.Center) {
                     val boardWidth = minOf(maxWidth, maxHeight * (LevelDefinition.WORLD_WIDTH / LevelDefinition.WORLD_HEIGHT))
                     val scaleFactor = with(LocalDensity.current) { boardWidth.toPx() } / LevelDefinition.WORLD_WIDTH
@@ -117,12 +124,16 @@ fun OneMoveGameContent(
                 }
                 Text(text = if (uiState.simulationState == SimulationState.READY) "Read the machine. One pull. Bring everyone home."
                     else "${uiState.creatures.count { it.isInsideGoal }} / ${uiState.creatures.size} friends safe",
-                    color = Color(0xFF94A3B8), fontSize = 12.sp, textAlign = TextAlign.Center,
+                    color = Color(0xFFABC3B8), fontSize = 12.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("rescue_status"))
             }
             // Dismiss immediately. An exiting result must never render the next level's READY state as a defeat.
-            if (uiState.showResultOverlay) ResultCardOverlay(uiState, onReset, onNextLevel)
-            if (uiState.showLevelSelectSheet) LevelSelectSheet(uiState, { onSelectLevel(it); onCloseLevelSelect() }, onCloseLevelSelect)
+            if (uiState.showResultOverlay) {
+                ResultCardOverlay(uiState, onReset, onNextLevel)
+            }
+            if (uiState.showLevelSelectSheet) {
+                LevelSelectSheet(uiState, { onSelectLevel(it); onCloseLevelSelect() }, onCloseLevelSelect)
+            }
         }
     }
 }
@@ -132,8 +143,8 @@ private fun TopHudBar(state: GameUiState, levels: () -> Unit, reset: () -> Unit)
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("ONE MOVE  /  ${state.currentLevelNumber.toString().padStart(2, '0')}", color = Color(0xFF38BDF8), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text(state.currentLevel.name, color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.Bold,
+                Text("ONE MOVE  /  ${state.currentLevelNumber.toString().padStart(2, '0')}", color = Color(0xFFE9BD79), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(state.currentLevel.name, color = Color(0xFFFFEDCB), fontSize = 23.sp, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
                     maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("level_title"))
             }
             IconButton(levels, Modifier.testTag("level_select_button")) { Icon(Icons.AutoMirrored.Filled.List, "Level Select", tint = Color(0xFFE2E8F0)) }
@@ -147,10 +158,15 @@ private fun TopHudBar(state: GameUiState, levels: () -> Unit, reset: () -> Unit)
                     fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp))
             }
             repeat(state.creatures.size) { index ->
-                Box(Modifier.size(11.dp).background(if (state.creatures[index].isInsideGoal) Color(0xFF34D399)
-                    else Color(0xFF334155), CircleShape))
+                Canvas(Modifier.size(24.dp).semantics {
+                    contentDescription = "${state.creatures[index].id}: " +
+                        if (state.creatures[index].isInsideGoal) "rescued" else "waiting for rescue"
+                }) {
+                    val portrait = state.creatures[index].copy(radius = size.minDimension * 0.34f)
+                    HeroCreatureRenderer.drawCreature(this, portrait, center)
+                }
             }
-            Text("${state.completedLevels.size}/${state.totalLevels}", color = Color(0xFF94A3B8), fontSize = 12.sp,
+            Text("${state.completedLevels.size}/${state.totalLevels}", color = Color(0xFFABC3B8), fontSize = 12.sp,
                 modifier = Modifier.weight(1f), textAlign = TextAlign.End)
         }
     }
@@ -172,7 +188,7 @@ private fun ResultCardOverlay(state: GameUiState, reset: () -> Unit, next: () ->
     val final = state.currentLevelNumber == state.totalLevels
     val accent = if (success) Color(0xFF34D399) else Color(0xFFFBBF24)
     Box(Modifier.fillMaxSize().background(Color(0xCC060B15)).pointerInput(Unit) { detectTapGestures { } }, contentAlignment = Alignment.Center) {
-        Surface(shape = RoundedCornerShape(28.dp), color = Color(0xFF101D30),
+        Surface(shape = RoundedCornerShape(28.dp), color = Color(0xFF193D35),
             modifier = Modifier.padding(24.dp).widthIn(max = 380.dp)
                 .border(1.dp, accent.copy(alpha = 0.65f), RoundedCornerShape(28.dp))
                 .testTag(if (success) "success_overlay" else "failure_overlay")
@@ -200,7 +216,7 @@ private fun ResultCardOverlay(state: GameUiState, reset: () -> Unit, next: () ->
 @Composable
 private fun LevelSelectSheet(state: GameUiState, select: (Int) -> Unit, close: () -> Unit) {
     Box(Modifier.fillMaxSize().background(Color(0xEE0A0F1D)).clickable(onClick = close), contentAlignment = Alignment.Center) {
-        Surface(color = Color(0xFF152239), shape = RoundedCornerShape(24.dp),
+        Surface(color = Color(0xFF1B3E37), shape = RoundedCornerShape(24.dp),
             modifier = Modifier.padding(20.dp).widthIn(max = 480.dp).fillMaxWidth().clickable { }.testTag("level_select_sheet")) {
             Column(Modifier.padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -208,7 +224,7 @@ private fun LevelSelectSheet(state: GameUiState, select: (Int) -> Unit, close: (
                         maxLines = 2, modifier = Modifier.weight(1f))
                     IconButton(close) { Icon(Icons.Default.Close, "Close levels", tint = Color.White) }
                 }
-                Text("${state.completedLevels.size} of ${state.totalLevels} sanctuaries reached", color = Color(0xFF94A3B8), fontSize = 13.sp)
+                Text("${state.completedLevels.size} of ${state.totalLevels} sanctuaries reached", color = Color(0xFFABC3B8), fontSize = 13.sp)
                 Spacer(Modifier.height(16.dp))
                 LazyVerticalGrid(GridCells.Fixed(3), modifier = Modifier.heightIn(max = 340.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -216,12 +232,12 @@ private fun LevelSelectSheet(state: GameUiState, select: (Int) -> Unit, close: (
                         val unlocked = level.number <= state.highestUnlockedLevel
                         val complete = level.number in state.completedLevels
                         val current = level.number == state.currentLevelNumber
-                        val bg = if (current) Color(0xFF075985) else if (complete) Color(0xFF064E3B) else Color(0xFF24344F)
+                        val bg = if (current) Color(0xFF8C6139) else if (complete) Color(0xFF064E3B) else Color(0xFF34514A)
                         Column(Modifier.height(76.dp).clip(RoundedCornerShape(14.dp)).background(bg)
-                            .border(if (current) 2.dp else 1.dp, if (current) Color(0xFF38BDF8) else Color(0xFF3E526F), RoundedCornerShape(14.dp))
+                            .border(if (current) 2.dp else 1.dp, if (current) Color(0xFFE9BD79) else Color(0xFF3E526F), RoundedCornerShape(14.dp))
                             .clickable(enabled = unlocked) { select(level.number) }.testTag("level_${level.number}"),
                             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                            Text(level.number.toString().padStart(2, '0'), color = if (unlocked) Color.White else Color(0xFF94A3B8), fontSize = 21.sp, fontWeight = FontWeight.Bold)
+                            Text(level.number.toString().padStart(2, '0'), color = if (unlocked) Color.White else Color(0xFFABC3B8), fontSize = 21.sp, fontWeight = FontWeight.Bold)
                             Text(if (complete) "CLEAR" else if (unlocked) "READY" else "LOCKED", color = if (complete) Color(0xFF6EE7B7) else Color(0xFFCBD5E1), fontSize = 10.sp)
                         }
                     }

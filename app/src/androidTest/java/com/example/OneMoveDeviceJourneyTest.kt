@@ -2,6 +2,9 @@ package com.example
 
 import android.content.Intent
 import android.os.SystemClock
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.InputDevice
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
@@ -117,15 +120,37 @@ class OneMoveDeviceJourneyTest {
         // it remains physically in flight long enough to background the Activity reliably.
         instrumentation.runOnMainSync { model.loadLevel(5) }
         assertTrue(device.wait(Until.hasObject(By.text(LevelCatalog.getLevel(5).name)),5_000L))
-        tapPin(5,PinId.PIN_C)
-        SystemClock.sleep(120)
-        var beforeHome=0f
-        instrumentation.runOnMainSync {
-            assertEquals("Lifecycle fixture must be moving before HOME",SimulationState.RUNNING,model.physicsWorld.state)
-            beforeHome=model.physicsWorld.simulationTime
-            assertTrue("The move never started",beforeHome>0f)
+        // UiDevice.click() can wait for accessibility idle after dispatch. A short level
+        // can already be over by then, making the pause assertion meaningless/flaky.
+        // Inject the real pointer events without that idle wait; never alter physics state.
+        val pin = LevelCatalog.getLevel(5).pins.first { it.id == PinId.PIN_C }
+        val bounds = node("game_board_canvas").visibleBounds
+        val x = bounds.left + pin.handlePosition.x / LevelDefinition.WORLD_WIDTH * bounds.width()
+        val y = bounds.top + pin.handlePosition.y / LevelDefinition.WORLD_HEIGHT * bounds.height()
+        val automation = instrumentation.uiAutomation
+        val downTime = SystemClock.uptimeMillis()
+        for (action in listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP)) {
+            val event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, x, y, 0)
+            event.source = InputDevice.SOURCE_TOUCHSCREEN
+            try { assertTrue("Raw touch was not injected", automation.injectInputEvent(event, true)) }
+            finally { event.recycle() }
         }
-        device.executeShellCommand("input keyevent 3")
+        var beforeHome = 0f
+        var started = false
+        val deadline = SystemClock.uptimeMillis() + 2000L
+        while (!started && SystemClock.uptimeMillis() < deadline) {
+            instrumentation.runOnMainSync {
+                assertNotEquals("The pause gesture arrived after the run ended", SimulationState.SUCCESS, model.physicsWorld.state)
+                beforeHome = model.physicsWorld.simulationTime
+                started = model.physicsWorld.state == SimulationState.RUNNING && beforeHome > 0f
+            }
+            if (!started) SystemClock.sleep(8L)
+        }
+        assertTrue("The real touch never started the simulation", started)
+        // Still press actual HOME. We retain RUNNING and unchanged-time assertions below.
+        for (action in listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP)) {
+            assertTrue("HOME was not injected", automation.injectInputEvent(KeyEvent(action, KeyEvent.KEYCODE_HOME), true))
+        }
         assertTrue("App did not leave foreground",device.wait(Until.gone(By.res("game_board_canvas")),5_000L))
         var pausedAt=0f
         instrumentation.runOnMainSync {

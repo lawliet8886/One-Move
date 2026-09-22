@@ -9,25 +9,20 @@ object ToyBoxRenderer {
 
     fun renderToyBox(drawScope: DrawScope, world: PhysicsWorld) {
         // 1. Background chassis
-        ToyBoxBackgroundRenderer.drawBackingChassis(
-            drawScope,
-            LevelDefinition.WORLD_WIDTH,
-            LevelDefinition.WORLD_HEIGHT,
-            world.currentLevel.number
-        )
+        WorkshopRenderer.background(drawScope, world.currentLevel.number, LevelDefinition.WORLD_WIDTH, LevelDefinition.WORLD_HEIGHT)
 
         // 2. Danger pits
         for (pit in world.dangerPits) {
-            DangerBasinRenderer.drawDangerPit(drawScope, pit)
+            WorkshopRenderer.danger(drawScope, pit)
         }
 
         // 3. Home nest / Goal zone
         val rescuedCount = world.creatures.count { it.isInsideGoal }
-        HomeNestRenderer.drawHomeNest(drawScope, world.goalZone, rescuedCount)
+        WorkshopRenderer.nest(drawScope, world.goalZone, rescuedCount)
 
         // 4. Platforms & rails
         for (platform in world.platforms) {
-            RailRenderer.drawPlatformRail(drawScope, platform)
+            WorkshopRenderer.platform(drawScope, platform)
         }
 
         // 5. Spring bumpers
