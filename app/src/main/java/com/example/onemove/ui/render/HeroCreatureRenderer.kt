@@ -17,14 +17,14 @@ object HeroCreatureRenderer {
 
     fun drawCreature(scope: DrawScope, creature: Creature, center: Offset) {
         with(scope) {
-            // Body silhouette equals the physical radius. Ears/sprouts are cosmetic only.
+            // Body silhouette equals the physical radius. Ears/sprouts and tiny feet are cosmetic only.
             val r = creature.radius
             val color = when (creature.id) {
                 CreatureId.PIP -> OneMoveVisualTheme.Creatures.pipBody
                 CreatureId.MOCHI -> OneMoveVisualTheme.Creatures.mochiBody
                 CreatureId.BLOBBO -> OneMoveVisualTheme.Creatures.blobboBody
             }
-            drawOval(Color.Black.copy(alpha = 0.28f), center + Offset(-r*0.82f,r*0.70f), Size(r*1.64f,r*0.4f))
+            drawOval(Color.Black.copy(alpha = 0.34f), center + Offset(-r*0.86f,r*0.72f), Size(r*1.72f,r*0.42f))
             when (creature.id) {
                 CreatureId.PIP -> for (side in listOf(-1f,1f)) {
                     val ear=Path().apply {
@@ -47,12 +47,15 @@ object HeroCreatureRenderer {
                     drawPath(sprout,Color(0xFF34D399),style=Stroke(3.5f))
                 }
             }
-            drawCircle(Brush.radialGradient(listOf(lerp(color,Color.White,0.42f),color,lerp(color,Color.Black,0.28f)),
-                center+Offset(-r*0.32f,-r*0.38f),r*1.65f),r,center)
-            drawCircle(lerp(color,Color.Black,0.40f),r,center,style=Stroke(2f))
+            drawCircle(Brush.radialGradient(listOf(lerp(color,Color.White,0.52f),color,lerp(color,Color.Black,0.30f)),
+                center+Offset(-r*0.34f,-r*0.42f),r*1.70f),r,center)
+            drawCircle(lerp(color,Color.Black,0.43f),r,center,style=Stroke(2.4f))
+            drawCircle(Color.White.copy(alpha=0.24f),r-2.4f,center,style=Stroke(2.2f))
             if(creature.id==CreatureId.PIP) drawOval(Color(0xFFFFEAC0),center+Offset(-r*0.50f,r*0.02f),Size(r,r*0.77f))
-            drawOval(Color.White.copy(alpha=0.27f),center+Offset(-r*0.55f,-r*0.70f),Size(r*0.52f,r*0.22f))
-            for(side in listOf(-1f,1f)) drawOval(Color(0xFFFB7185).copy(alpha=0.40f),center+Offset(side*r*0.58f-4f,r*0.05f),Size(8f,5f))
+            drawOval(Color.White.copy(alpha=0.34f),center+Offset(-r*0.55f,-r*0.70f),Size(r*0.54f,r*0.23f))
+            for(side in listOf(-1f,1f)) drawOval(Color(0xFFFB7185).copy(alpha=0.44f),center+Offset(side*r*0.58f-4f,r*0.05f),Size(8f,5f))
+            // Tiny plush feet add character but stay within the collision silhouette.
+            for(side in listOf(-1f,1f)) drawOval(lerp(color,Color.Black,0.24f),center+Offset(side*r*0.36f-r*0.18f,r*0.58f),Size(r*0.36f,r*0.22f))
             face(this,center,r,creature.expression)
         }
     }
@@ -71,8 +74,8 @@ object HeroCreatureRenderer {
                 happy -> drawArc(ink,180f,180f,false,eye+Offset(-6f,-4f),Size(12f,8f),style=Stroke(2.5f))
                 else -> {
                     if(surprised) drawCircle(Color.White,7f,eye)
-                    drawCircle(ink,if(surprised)3.5f else 4.5f,eye)
-                    drawCircle(Color.White,1.5f,eye+Offset(-1.5f,-1.5f))
+                    drawCircle(ink,if(surprised)3.5f else 4.8f,eye)
+                    drawCircle(Color.White,1.7f,eye+Offset(-1.5f,-1.5f))
                 }
             }
         }

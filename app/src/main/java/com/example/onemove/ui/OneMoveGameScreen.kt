@@ -12,8 +12,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -115,18 +115,14 @@ fun OneMoveGameContent(
                         scale(scaleFactor, pivot = Offset.Zero) { ToyBoxRenderer.renderToyBox(this, world) }
                     }
                 }
-                Text(text = if (uiState.simulationState == SimulationState.READY) "Trace the route. Pull one pin. Rescue all three."
+                Text(text = if (uiState.simulationState == SimulationState.READY) "Read the machine. One pull. Bring everyone home."
                     else "${uiState.creatures.count { it.isInsideGoal }} / ${uiState.creatures.size} friends safe",
                     color = Color(0xFF94A3B8), fontSize = 12.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("rescue_status"))
             }
             // Dismiss immediately. An exiting result must never render the next level's READY state as a defeat.
-            if (uiState.showResultOverlay) {
-                ResultCardOverlay(uiState, onReset, onNextLevel)
-            }
-            if (uiState.showLevelSelectSheet) {
-                LevelSelectSheet(uiState, { onSelectLevel(it); onCloseLevelSelect() }, onCloseLevelSelect)
-            }
+            if (uiState.showResultOverlay) ResultCardOverlay(uiState, onReset, onNextLevel)
+            if (uiState.showLevelSelectSheet) LevelSelectSheet(uiState, { onSelectLevel(it); onCloseLevelSelect() }, onCloseLevelSelect)
         }
     }
 }
@@ -140,7 +136,7 @@ private fun TopHudBar(state: GameUiState, levels: () -> Unit, reset: () -> Unit)
                 Text(state.currentLevel.name, color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.Bold,
                     maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("level_title"))
             }
-            IconButton(levels, Modifier.testTag("level_select_button")) { Icon(Icons.Default.List, "Level Select", tint = Color(0xFFE2E8F0)) }
+            IconButton(levels, Modifier.testTag("level_select_button")) { Icon(Icons.AutoMirrored.Filled.List, "Level Select", tint = Color(0xFFE2E8F0)) }
             IconButton(reset, Modifier.testTag("reset_button")) { Icon(Icons.Default.Refresh, "Instant Reset", tint = Color(0xFFFBBF24)) }
         }
         Spacer(Modifier.height(8.dp))

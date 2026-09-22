@@ -17,6 +17,8 @@ RECORDER_PID=""
 collect() {
     set +e
     adb -e exec-out screencap -p > device_artifacts/final-screen.png
+    adb -e shell dumpsys gfxinfo com.example.onemove framestats > device_artifacts/gfxinfo.txt
+    adb -e shell dumpsys meminfo com.example.onemove > device_artifacts/meminfo.txt
     adb -e shell pkill -INT screenrecord
     if [[ -n "$RECORDER_PID" ]]; then wait "$RECORDER_PID"; fi
     adb -e pull /sdcard/one-move-device-journey.mp4 device_artifacts/one-move-device-journey.mp4
@@ -45,4 +47,8 @@ set -e
 test -s device_artifacts/one-move-device-journey.mp4
 COUNT=$(find device_artifacts/phases -name 'level_*_03_success.png' | wc -l)
 test "$COUNT" -eq 12
-printf 'PASS: 12 visible phase completions and native recording captured. Review footage before visual sign-off.\n' > device_artifacts/result.txt
+if grep -Eqi 'FATAL EXCEPTION.*com\.example\.onemove|ANR in com\.example\.onemove|Process: com\.example\.onemove.*FATAL' device_artifacts/logcat.txt; then
+    printf 'FAIL: fatal Android process evidence found in logcat.\n' > device_artifacts/result.txt
+    exit 1
+fi
+printf 'PASS: 12 visible phase completions, causal wrong-choice checks, lifecycle pause, native recording, gfxinfo and meminfo captured. Review footage before visual sign-off.\n' > device_artifacts/result.txt
