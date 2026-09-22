@@ -82,6 +82,7 @@ run_case lifecycle backgroundPauseDoesNotAdvanceTheSimulation 60 lifecycle.mp4
 run_case campaign all12WinningPinsCompleteCampaignThroughRealUi 170 one-move-device-journey.mp4
 run_case wrong_choices causalPrototypeWrongChoicesFailForVisiblePhysicalReasonsAndRetryCleanly 150 wrong-choices.mp4
 run_case retry wrongPinFailsAndRetryRestoresReadyState 45 retry.mp4
+run_case back systemBackClosesLevelsWithoutLeavingOrResettingTheGame 60 back-navigation.mp4 com.example.OneMoveUiErgonomicsTest
 # These settings apply ONLY to the disposable emulator and are restored by collect.
 ORIGINAL_FONT=$(adb -e shell settings get system font_scale | tr -d '\r')
 DISPLAY_CHANGED=1
@@ -90,6 +91,10 @@ adb -e shell wm density 320
 adb -e shell settings put system font_scale 1.3
 sleep 2
 run_case compact controlsRemainVisibleOnSmallScreen 90 compact.mp4 com.example.OneMoveCompactDeviceTest
+adb -e shell wm size 640x1136
+adb -e shell settings put system font_scale 2.0
+sleep 2
+run_case large_font largeFontResultsStayReachableAndRepeatedTouchesCannotSpendTwoMoves 120 large-font.mp4 com.example.OneMoveUiErgonomicsTest
 collect
 trap - EXIT
 COUNT=0
@@ -109,4 +114,4 @@ if [[ "$FAILURES" -ne 0 ]]; then
     printf 'FAIL: %s failing checks. Read result.tsv and individual instrumentation logs; no full QA approval.\n' "$FAILURES" > device_artifacts/result.txt
     exit 1
 fi
-printf 'PASS: five native methods, 12 visible phase completions, eleven causal wrong choices, retry, lifecycle and compact-screen/1.3x-font controls; five actual recordings. Review footage before visual approval.\n' > device_artifacts/result.txt
+printf 'PASS: seven native methods; 12 phase completions; eleven causal wrong choices; retry; lifecycle; Back navigation; 1.3x and 2.0x font controls; repeated touches; seven actual recordings. Scripted tests, not free exploration. Review footage before visual approval.\n' > device_artifacts/result.txt
