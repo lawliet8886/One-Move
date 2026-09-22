@@ -19,7 +19,7 @@ object FlyingKeyLevel {
             Pin(PinId.PIN_C,"C","Sanctuary floor",Vector2D(755f,1465f),Vector2D(1045f,1465f),
                 length=290f,color=OneMoveVisualTheme.Pins.pinC,handlePosition=Vector2D(705f,1465f)),
             Pin(PinId.PIN_D,"D","Key catcher",Vector2D(730f,610f),Vector2D(730f,1010f),
-                length=400f,color=OneMoveVisualTheme.Pins.pinD,handlePosition=Vector2D(730f,555f))),
+                length=400f,color=OneMoveVisualTheme.Pins.pinD,handlePosition=Vector2D(730f,680f))),
         platforms=listOf(rail(80f,1070f,290f,1070f),rail(450f,1040f,730f,1040f),
             rail(450f,840f,450f,1020f),rail(670f,1120f,755f,1260f),
             rail(1100f,500f,1045f,1270f),rail(755f,1220f,755f,1465f),rail(1045f,1220f,1045f,1465f)),

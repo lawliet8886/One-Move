@@ -27,3 +27,11 @@ This adds a0.75MiB decoded texture; there is no demonstrated handset FPS improve
 ## Tripo access boundary
 
 The CLI was authenticated in the prior turn with0 API credits; Gabriel's screenshot shows3915 Studio credits. In this turn Opera list-tabs returned Browser not connected. No Studio login bypass, cookie/key extraction, generation, purchase or top-up was attempted. The offline factory is usable; spending Studio credits still requires the actual Studio browser connection and a verified operation quote. One Move Lab automation was already paused and remains paused; no duplicate or invisible continuous execution was created.
+
+## Actual Android review and follow-up grip correction
+
+Native run35764885773 atc456509 passed all three jobs and all8 device methods. Downloaded and verified121 native screenshots plus8 real MP4 recordings; reviewed before/after screenshots for levels5/6 and the new level11 ready/latch/success states. Hardware and the spring were visibly integrated, with the original physical centres retained. The earlier build745159a failed the new image-loader smoke test in Robolectric's legacy graphics mode. Enabling native Android graphics for that one image test fixed it; hash/dimension/alpha assertions stayed intact.
+
+Despite green functional tests, actual level11 screenshots showed the D grip drawn over the unrelated B bridge. The follow-up changes ONLY its handlePosition from(730,555) to(730,680), leaving every collider, body, switch, spring and goal unchanged. Its perpendicular distance to B was18.03 world units and becomes122.03, above the56-unit visual-clearance contract. A second contract requires48dp between all grip centres at the already-established minimum250dp board width. Native clicks still use actual displayed handle positions; do not regard offline spacing checks as a substitute for the next screenshot review.
+
+Thec456509 native pass applies to that exact revision. The grip-corrected revision requires its own complete CI result and fresh Android screenshot/recording inspection before release approval. Source hardware art and physics solver remain byte-identical to the preceding candidate.

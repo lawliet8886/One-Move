@@ -8,6 +8,18 @@ import java.io.File
 object FlyingKeyContractCases {
     fun run(): Int {
         val level=FlyingKeyLevel.create()
+        // A grip must not visually claim an unrelated bridge. Native review found D over B.
+        val catcher=level.pins.first { it.id==PinId.PIN_D }
+        val bridge=level.pins.first { it.id==PinId.PIN_B }
+        val segment=bridge.end-bridge.start
+        val t=((catcher.handlePosition-bridge.start).dot(segment)/segment.lengthSquared()).coerceIn(0f,1f)
+        val separation=catcher.handlePosition.distanceTo(bridge.start+segment*t)
+        check(separation >= 36f+bridge.thickness/2f+12f) { "D grip obscures unrelated B bridge: $separation" }
+        // The established minimum board width is250dp: keep48dp between handle centres.
+        for(i in level.pins.indices) for(j in i+1 until level.pins.size) {
+            val gap=level.pins[i].handlePosition.distanceTo(level.pins[j].handlePosition)
+            check(gap*250f/LevelDefinition.WORLD_WIDTH>=48f) { "Crowded grip targets: $i/$j" }
+        }
         val schedules=listOf(floatArrayOf(1f/30f),floatArrayOf(1f/60f),floatArrayOf(1f/120f),floatArrayOf(0.009f,0.022f,0.016f,0.031f))
         val rows=mutableListOf("case,pin,state,reason,seconds,spring_contacts,latched")
         var simulations=0
