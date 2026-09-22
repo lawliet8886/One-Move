@@ -1,0 +1,36 @@
+name: Original Mascot Art
+on:
+  push:
+    branches: [chatgpt/android-lab]
+    paths: ['tools/art/**', '.github/workflows/art-studio.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: one-move-art-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  render-original-mascots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Install offline open-source art tool
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends blender
+          blender --version
+      - name: Render original transparent mascots
+        env:
+          ONE_MOVE_ART_OUT: art-output
+        run: blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/render_mascots.py
+      - name: Preserve art and provenance (not gameplay evidence)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-mascot-art
+          path: art-output/
+          if-no-files-found: error
+          retention-days: 7
