@@ -61,7 +61,7 @@ jobs:
           retention-days: 7
       - name: Run fast unit and Robolectric smoke tests
         run: |
-          gradle :app:testDebugUnitTest --tests com.example.ExampleUnitTest --tests com.example.ExampleRobolectricTest --stacktrace --no-daemon
+          gradle :app:testDebugUnitTest --tests com.example.ExampleUnitTest --tests com.example.ExampleRobolectricTest --tests com.example.WorkshopCacheContractTest --stacktrace --no-daemon
       - name: Upload smoke reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,6 +70,7 @@ jobs:
           path: |
             app/build/reports/tests/**
             app/build/test-results/**
+            app/build/reports/backdrop-contract/**
           if-no-files-found: ignore
           retention-days: 7
 

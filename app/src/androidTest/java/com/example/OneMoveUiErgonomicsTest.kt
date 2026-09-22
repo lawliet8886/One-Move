@@ -132,6 +132,12 @@ class OneMoveUiErgonomicsTest {
         File(output, "large-font-board-bounds.txt").appendText("$bounds; ${bounds.width()/density} x ${bounds.height()/density} dp\n")
         assertTrue("The HUD consumed the board width: $bounds", bounds.width() / density >= 250f)
         assertTrue("The HUD consumed the board height: $bounds", bounds.height() / density >= 333f)
+        instrumentation.runOnMainSync {
+            val bytes=com.example.onemove.ui.render.WorkshopBackdropCache.cachedPixelBytes
+            File(output,"display-backdrop-memory.txt").appendText("board=$bounds cachedBytes=$bytes legacyBytes=7680000\n")
+            assertTrue("No native background raster was created",bytes>0)
+            assertTrue("Large-font board still allocates the full world texture",bytes<2_000_000)
+        }
     }
 
     private fun assertTarget(tag: String) {
