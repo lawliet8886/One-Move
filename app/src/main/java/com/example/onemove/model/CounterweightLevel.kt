@@ -9,9 +9,9 @@ object CounterweightLevel {
     fun create() = LevelDefinition(
         number=6, name="The Counterweight",
         initialCreatures=listOf(
-            Creature(CreatureId.PIP,Vector2D(445f,620f),radius=32f),
+            Creature(CreatureId.PIP,Vector2D(438f,620f),radius=32f),
             Creature(CreatureId.MOCHI,Vector2D(510f,620f),radius=34f),
-            Creature(CreatureId.BLOBBO,Vector2D(575f,620f),radius=36f)),
+            Creature(CreatureId.BLOBBO,Vector2D(582f,620f),radius=36f)),
         pins=listOf(
             Pin(PinId.PIN_A,"A","Counterweight restraint",Vector2D(665f,450f),Vector2D(855f,450f),
                 length=190f,color=OneMoveVisualTheme.Pins.pinA,handlePosition=Vector2D(895f,450f)),

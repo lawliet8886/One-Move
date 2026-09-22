@@ -20,6 +20,10 @@ object CounterweightContractCases {
             return w
         }
         val level=CounterweightLevel.create()
+        for(i in level.initialCreatures.indices) for(j in i+1 until level.initialCreatures.size) {
+            val a=level.initialCreatures[i];val b=level.initialCreatures[j]
+            check(a.position.distanceTo(b.position)>=a.radius+b.radius) { "Initial bodies overlap" }
+        }
         for((s,frames) in schedules.withIndex()) {
             for(pin in level.pins) repeat(3) {
                 val w=simulate(level,pin.id,frames,"choice",s)
