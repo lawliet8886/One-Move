@@ -17,15 +17,19 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
+      - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '9.3.1'
           cache-provider: basic
+          cache-read-only: false
       - name: Record exact revision and environment
         run: |
           mkdir -p lab-evidence
@@ -34,14 +38,25 @@ jobs:
           gradle --version > lab-evidence/gradle.txt
       - name: Install required Android SDK packages
         run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
-      - name: Compile APK and execute existing tests
+      - name: Restore missing wrapper using an isolated empty Gradle project
+        run: |
+          mkdir -p "$RUNNER_TEMP/wrapper-bootstrap"
+          touch "$RUNNER_TEMP/wrapper-bootstrap/settings.gradle"
+          gradle --no-daemon -p "$RUNNER_TEMP/wrapper-bootstrap" wrapper --gradle-version 9.3.1 --distribution-type bin
+          cp "$RUNNER_TEMP/wrapper-bootstrap/gradlew" .
+          cp "$RUNNER_TEMP/wrapper-bootstrap/gradlew.bat" .
+          cp "$RUNNER_TEMP/wrapper-bootstrap/gradle/wrapper/gradle-wrapper.jar" gradle/wrapper/
+          chmod +x gradlew
+      - name: Compile APK
         shell: bash
         run: |
           set -o pipefail
-          gradle --no-daemon --stacktrace --console=plain :app:assembleDebug :app:testDebugUnitTest 2>&1 | tee lab-evidence/build.log
-      - name: Regenerate portable Gradle wrapper
-        if: success()
-        run: gradle --no-daemon wrapper --gradle-version 9.3.1 --distribution-type bin
+          ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug 2>&1 | tee lab-evidence/build.log
+      - name: Execute existing tests
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace --console=plain :app:testDebugUnitTest 2>&1 | tee lab-evidence/tests.log
       - name: Preserve APK, reports, logs and wrapper
         if: always()
         uses: actions/upload-artifact@v4
