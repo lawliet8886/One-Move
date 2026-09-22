@@ -113,21 +113,30 @@ class OneMoveDeviceJourneyTest {
 
     @Test fun backgroundPauseDoesNotAdvanceTheSimulation() {
         val instrumentation=InstrumentationRegistry.getInstrumentation()
-        tapPin(1,PinId.PIN_A)
-        SystemClock.sleep(250)
-        // Real HOME input avoids ActivityScenario.waitForIdleSync during animation.
+        // Use the spring-gap route as a lifecycle fixture: unlike the short tutorial drop,
+        // it remains physically in flight long enough to background the Activity reliably.
+        instrumentation.runOnMainSync { model.loadLevel(5) }
+        assertTrue(device.wait(Until.hasObject(By.text(LevelCatalog.getLevel(5).name)),5_000L))
+        tapPin(5,PinId.PIN_C)
+        SystemClock.sleep(120)
+        var beforeHome=0f
+        instrumentation.runOnMainSync {
+            assertEquals("Lifecycle fixture must be moving before HOME",SimulationState.RUNNING,model.physicsWorld.state)
+            beforeHome=model.physicsWorld.simulationTime
+            assertTrue("The move never started",beforeHome>0f)
+        }
         device.executeShellCommand("input keyevent 3")
         assertTrue("App did not leave foreground",device.wait(Until.gone(By.res("game_board_canvas")),5_000L))
-        var before=0f
+        var pausedAt=0f
         instrumentation.runOnMainSync {
             assertNotEquals(Lifecycle.State.RESUMED,activity.lifecycle.currentState)
-            assertEquals("Pause check must happen during gameplay, not after success",SimulationState.RUNNING,model.physicsWorld.state)
-            before=model.physicsWorld.simulationTime
-            assertTrue("The move never started",before>0f)
+            assertEquals("Simulation completed before lifecycle pause could be checked",SimulationState.RUNNING,model.physicsWorld.state)
+            pausedAt=model.physicsWorld.simulationTime
+            assertTrue("Simulation time moved backwards",pausedAt>=beforeHome)
         }
         SystemClock.sleep(800)
         instrumentation.runOnMainSync {
-            assertEquals("Physics advanced in the background",before,model.physicsWorld.simulationTime,0.005f)
+            assertEquals("Physics advanced in the background",pausedAt,model.physicsWorld.simulationTime,0.005f)
         }
         val context=instrumentation.targetContext
         val intent=context.packageManager.getLaunchIntentForPackage(context.packageName)!!

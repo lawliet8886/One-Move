@@ -12,7 +12,8 @@ object ToyBoxRenderer {
         ToyBoxBackgroundRenderer.drawBackingChassis(
             drawScope,
             LevelDefinition.WORLD_WIDTH,
-            LevelDefinition.WORLD_HEIGHT
+            LevelDefinition.WORLD_HEIGHT,
+            world.currentLevel.number
         )
 
         // 2. Danger pits
