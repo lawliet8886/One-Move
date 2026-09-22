@@ -30,17 +30,25 @@ class CompactUiTest {
         try {
             val board=DeviceLabUi.bounds("game_board_canvas")
             assertEquals("Board aspect ratio",.75f,board.width().toFloat()/board.height(),.015f)
-            for(tag in listOf("pin_A_button","pin_B_button","reset_button","level_select_button")) {
-                val r=DeviceLabUi.bounds(tag)
+            val targets=listOf("pin_A_button","pin_B_button","reset_button","level_select_button").associateWith{DeviceLabUi.bounds(it)}
+            for((tag,r) in targets) {
                 assertTrue("48dp target: $tag",r.width()>=96 && r.height()>=96)
                 assertTrue("On screen: $tag",r.top>=0 && r.bottom<=1280 && r.left>=0 && r.right<=720)
             }
             DeviceLabUi.screenshot("compact-720x1280-font115.png")
-            device.click(board.centerX(),board.centerY());SystemClock.sleep(150)
+            DeviceLabUi.tap(board.centerX(),board.centerY());SystemClock.sleep(150)
             scenario.onActivity{assertEquals(SimulationState.READY,ViewModelProvider(it)[OneMoveViewModel::class.java].physicsWorld.state)}
-            DeviceLabUi.click("pin_A_button");DeviceLabUi.click("pin_B_button")
-            scenario.onActivity{assertEquals("Only one move",PinId.PIN_A,ViewModelProvider(it)[OneMoveViewModel::class.java].physicsWorld.chosenPinId)}
-            DeviceLabUi.click("level_select_button")
+            // Locate before the run: repeated accessibility searches can outlast this short level.
+            for(tag in listOf("pin_A_button","pin_B_button","level_select_button")) {
+                val r=targets.getValue(tag);DeviceLabUi.tap(r.centerX(),r.centerY())
+            }
+            DeviceLabUi.bounds("close_level_picker")
+            scenario.onActivity {
+                val vm=ViewModelProvider(it)[OneMoveViewModel::class.java]
+                assertEquals("Only one move",PinId.PIN_A,vm.physicsWorld.chosenPinId)
+                assertEquals("Pause checked during active gameplay, not after completion",SimulationState.RUNNING,vm.physicsWorld.state)
+                assertTrue(vm.uiState.value.showLevelSelectSheet)
+            }
             val paused=time();SystemClock.sleep(500)
             assertEquals("Picker pauses gameplay",paused,time(),.001f)
             DeviceLabUi.click("close_level_picker")

@@ -1,7 +1,16 @@
 name: One Move Android Lab
 on:
   push:
-    branches: [chatgpt/android-lab-20260922]
+    branches: [main, chatgpt/android-lab-20260922]
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - 'gradlew*'
+      - '*.gradle.kts'
+      - 'gradle.properties'
+      - 'tools/run-device-lab.sh'
+      - 'tools/record-device.py'
+      - '.github/workflows/android-lab.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,31 +32,22 @@ jobs:
       - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '9.3.1'
           cache-provider: basic
           cache-read-only: false
-      - name: Record revision and environment
+      - name: Verify portable wrapper and record environment
         run: |
           mkdir -p lab-evidence
           git rev-parse HEAD > lab-evidence/commit.txt
           java -version 2> lab-evidence/java.txt
-          gradle --version > lab-evidence/gradle.txt
+          echo 'b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13  gradle/wrapper/gradle-wrapper.jar' | sha256sum -c -
+          ./gradlew --version > lab-evidence/gradle.txt
           sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
-      - name: Restore official wrapper
-        run: |
-          mkdir -p "$RUNNER_TEMP/wrapper-bootstrap"
-          touch "$RUNNER_TEMP/wrapper-bootstrap/settings.gradle"
-          gradle --no-daemon -p "$RUNNER_TEMP/wrapper-bootstrap" wrapper --gradle-version 9.3.1 --distribution-type bin
-          cp "$RUNNER_TEMP/wrapper-bootstrap/gradlew" .
-          cp "$RUNNER_TEMP/wrapper-bootstrap/gradlew.bat" .
-          cp "$RUNNER_TEMP/wrapper-bootstrap/gradle/wrapper/gradle-wrapper.jar" gradle/wrapper/
-          chmod +x gradlew
       - name: Compile game and instrumentation APKs
         shell: bash
         run: |
           set -o pipefail
           ./gradlew --no-daemon --stacktrace --console=plain :app:assembleDebug :app:assembleDebugAndroidTest 2>&1 | tee lab-evidence/build.log
-      - name: Run physics and regression tests
+      - name: Run all active JVM regression tests
         timeout-minutes: 8
         shell: bash
         run: |

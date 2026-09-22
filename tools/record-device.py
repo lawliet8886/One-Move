@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Native screenrecord supervisor on a dedicated CI emulator; no generated frames or AI calls."""
+"""Native screenrecord supervisor; uses only the dedicated emulator and this debug app's files."""
 from pathlib import Path
 import re
 import signal
 import subprocess
 import time
 
-root = '/data/local/tmp/one-move-lab'
+package = 'com.example.onemove'
 output = Path('lab-evidence/recorder')
 output.mkdir(parents=True, exist_ok=True)
 running = True
@@ -16,6 +16,10 @@ last = ''
 
 def shell(command: str) -> str:
     return subprocess.run(['adb', 'shell', command], capture_output=True, text=True, timeout=10).stdout.strip()
+
+def ack(message: str) -> None:
+    assert re.fullmatch(r'(?:error-)?(?:start|stop)-(?:0[1-9]|1[0-2])', message)
+    shell(f"run-as {package} sh -c 'echo {message} > files/lab/record-ack'")
 
 def stop() -> None:
     global recorder, log
@@ -37,13 +41,15 @@ def terminate(*_):
 
 signal.signal(signal.SIGTERM, terminate)
 signal.signal(signal.SIGINT, terminate)
-shell(f'mkdir -p {root} /sdcard/Download/one-move-lab')
+shell('mkdir -p /sdcard/Download/one-move-lab')
 try:
     while running:
-        request = shell(f'cat {root}/request 2>/dev/null')
+        request = shell(f'run-as {package} cat files/lab/record-request 2>/dev/null')
         match = re.fullmatch(r'(start|stop)-(0[1-9]|1[0-2])', request)
         if match and request != last:
             action, level = match.groups()
+            with (output / 'events.log').open('a') as events:
+                events.write(f'{time.time():.3f} {request}\n')
             try:
                 stop()
                 if action == 'start':
@@ -56,11 +62,11 @@ try:
                     size = shell(f'stat -c %s /sdcard/Download/one-move-lab/level-{level}.mp4')
                     if not size.isdigit() or int(size) < 1000:
                         raise RuntimeError('recording file missing or empty')
-                shell(f'echo {request} > {root}/ack')
+                ack(request)
                 last = request
             except Exception as exc:
                 (output / 'error.txt').write_text(repr(exc))
-                shell(f'echo error-{request} > {root}/ack')
+                ack(f'error-{request}')
                 raise
         time.sleep(.12)
 finally:
