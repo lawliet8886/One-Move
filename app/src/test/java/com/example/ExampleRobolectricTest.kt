@@ -48,6 +48,7 @@ class ExampleRobolectricTest {
     assertEquals(null, world.chosenPinId)
   }
 
+  @org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
   @Test fun bundledHardwareAtlasLoadsWithVerifiedHashAndBoundedMemory() {
     val context=ApplicationProvider.getApplicationContext<Context>()
     com.example.onemove.ui.render.HardwareSpriteRenderer.prepare(context)

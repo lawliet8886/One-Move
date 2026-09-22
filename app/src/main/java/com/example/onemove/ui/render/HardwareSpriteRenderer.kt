@@ -32,7 +32,9 @@ object HardwareSpriteRenderer {
         check(digest==manifest.getString("atlas_sha256")) { "Hardware atlas hash mismatch" }
         check(manifest.getInt("cell_size")==CELL && manifest.getDouble("framing")==2.4)
         val bitmap=checkNotNull(BitmapFactory.decodeByteArray(bytes,0,bytes.size))
-        check(bitmap.width==CELL*3 && bitmap.height==CELL && bitmap.hasAlpha())
+        check(bitmap.width==CELL*3 && bitmap.height==CELL && bitmap.hasAlpha()) {
+            "Hardware decode geometry/alpha mismatch: ${bitmap.width}x${bitmap.height}; alpha=${bitmap.hasAlpha()}"
+        }
         atlas=bitmap.asImageBitmap()
         Log.i("OneMoveAssets","Hardware atlas ready: ${bitmap.width}x${bitmap.height}; ${bytes.size} bytes; $DECODED_BYTES decoded bytes")
     }
