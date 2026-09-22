@@ -1,5 +1,6 @@
 package com.example
 
+import android.content.Intent
 import android.os.SystemClock
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +15,7 @@ import com.example.onemove.model.LevelCatalog
 import com.example.onemove.model.LevelDefinition
 import com.example.onemove.model.PinId
 import com.example.onemove.ui.OneMoveViewModel
+import com.example.onemove.physics.SimulationState
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -25,12 +27,15 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class OneMoveDeviceJourneyTest {
     private lateinit var scenario: ActivityScenario<MainActivity>
+    private lateinit var model: OneMoveViewModel
+    private lateinit var activity: MainActivity
     private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     private val output: File get() = File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null), "qa").apply { mkdirs() }
 
     @Before fun launch() {
         scenario = ActivityScenario.launch(MainActivity::class.java)
         node("game_board_canvas")
+        scenario.onActivity { activity = it; model = ViewModelProvider(it)[OneMoveViewModel::class.java] }
     }
     @After fun close() { scenario.close() }
 
@@ -38,6 +43,7 @@ class OneMoveDeviceJourneyTest {
         for (number in 1..12) {
             val level = LevelCatalog.getLevel(number)
             assertTrue("Missing level title $number", device.wait(Until.hasObject(By.text(level.name)), 5_000L))
+            assertFalse("Old failure card flashed over the new READY level",device.hasObject(By.res("failure_overlay")))
             capture("level_${number.toString().padStart(2,'0')}_00_ready")
             tapPin(number,level.solutionPinId)
             SystemClock.sleep(250)
@@ -62,20 +68,32 @@ class OneMoveDeviceJourneyTest {
         node("retry_button").click()
         assertTrue(device.wait(Until.hasObject(By.text("1 MOVE LEFT")),5_000L))
         node("game_board_canvas")
+        assertFalse("Retry retained the old failure card",device.hasObject(By.res("failure_overlay")))
         capture("retry_ready")
     }
 
     @Test fun backgroundPauseDoesNotAdvanceTheSimulation() {
+        val instrumentation=InstrumentationRegistry.getInstrumentation()
         tapPin(1,PinId.PIN_A)
         SystemClock.sleep(250)
-        scenario.moveToState(Lifecycle.State.STARTED)
+        // Real HOME input avoids ActivityScenario.waitForIdleSync during animation.
+        device.executeShellCommand("input keyevent 3")
+        assertTrue("App did not leave foreground",device.wait(Until.gone(By.res("game_board_canvas")),5_000L))
         var before=0f
-        scenario.onActivity { before=ViewModelProvider(it)[OneMoveViewModel::class.java].physicsWorld.simulationTime }
+        instrumentation.runOnMainSync {
+            assertNotEquals(Lifecycle.State.RESUMED,activity.lifecycle.currentState)
+            assertEquals("Pause check must happen during gameplay, not after success",SimulationState.RUNNING,model.physicsWorld.state)
+            before=model.physicsWorld.simulationTime
+            assertTrue("The move never started",before>0f)
+        }
         SystemClock.sleep(800)
-        var after=0f
-        scenario.onActivity { after=ViewModelProvider(it)[OneMoveViewModel::class.java].physicsWorld.simulationTime }
-        assertEquals("Physics advanced while the Activity was not resumed",before,after,0.005f)
-        scenario.moveToState(Lifecycle.State.RESUMED)
+        instrumentation.runOnMainSync {
+            assertEquals("Physics advanced in the background",before,model.physicsWorld.simulationTime,0.005f)
+        }
+        val context=instrumentation.targetContext
+        val intent=context.packageManager.getLaunchIntentForPackage(context.packageName)!!
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        context.startActivity(intent)
         node("success_overlay",12_000L)
         capture("resume_success")
     }
@@ -87,7 +105,6 @@ class OneMoveDeviceJourneyTest {
         val y=bounds.top+pin.handlePosition.y/LevelDefinition.WORLD_HEIGHT*bounds.height()
         assertTrue("Tap could not be injected",device.click(x.toInt(),y.toInt()))
     }
-
     private fun node(tag: String, timeout: Long=5_000L): UiObject2 {
         val found=device.wait(Until.findObject(By.res(tag)),timeout)
         if(found==null) {
@@ -97,7 +114,6 @@ class OneMoveDeviceJourneyTest {
         }
         return found!!
     }
-
     private fun capture(name: String) {
         assertTrue("Screenshot failed: $name",device.takeScreenshot(File(output,"$name.png")))
     }

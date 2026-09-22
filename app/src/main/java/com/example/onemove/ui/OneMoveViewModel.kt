@@ -30,7 +30,6 @@ data class GameUiState(
     val creatures: List<Creature> = emptyList()
 )
 
-/** The visible Compose screen owns the frame clock; there is no background polling loop. */
 class OneMoveViewModel(application: Application) : AndroidViewModel(application) {
     private val progressRepo = GameProgressRepository(application.applicationContext)
     private val hapticManager = HapticManager(application.applicationContext)
@@ -50,7 +49,7 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
 
     fun resetFrameClock() { lastFrameNanos = null }
 
-    /** Called only on the main thread by a RESUMED, display-synchronised Compose frame. */
+    /** Main-thread, display-synchronised ticks only while visible work remains. */
     fun onFrame(frameNanos: Long) {
         val previous = lastFrameNanos
         lastFrameNanos = frameNanos
@@ -58,6 +57,8 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         val dt = ((frameNanos - previous) / 1_000_000_000f).coerceIn(0f, 0.1f)
         if (dt <= 0f) return
         if (physicsWorld.state == SimulationState.READY && physicsWorld.particles.isEmpty()) return
+        if (physicsWorld.state != SimulationState.RUNNING && resultDelay < 0f &&
+            physicsWorld.particles.isEmpty() && physicsWorld.screenShake <= 0f) return
         val old = physicsWorld.state
         physicsWorld.step(dt)
         val now = physicsWorld.state
@@ -96,14 +97,11 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         if (_uiState.value.currentLevelNumber >= LevelCatalog.ALL_LEVELS.size) openLevelSelect()
         else loadLevel(_uiState.value.currentLevelNumber + 1)
     }
-
     fun previousLevel() = loadLevel((_uiState.value.currentLevelNumber - 1).coerceAtLeast(1))
-
     fun onCanvasTap(worldX: Float, worldY: Float, handleRadius: Float = 65f) {
         if (_uiState.value.simulationState != SimulationState.READY || _uiState.value.showLevelSelectSheet) return
         PinHitTester.find(physicsWorld.pins, worldX, worldY, handleRadius)?.let(::pullPin)
     }
-
     fun pullPin(pinId: PinId) {
         if (_uiState.value.showLevelSelectSheet) return
         if (physicsWorld.pullPin(pinId)) {
@@ -112,7 +110,6 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
                 moveCountLeft = 0, showResultOverlay = false) }
         }
     }
-
     fun resetGame() {
         resultDelay = -1f
         resetFrameClock()
@@ -123,7 +120,6 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
             failureReason = "", screenShake = 0f, moveCountLeft = 1, showResultOverlay = false,
             creatures = physicsWorld.creatures) }
     }
-
     fun openLevelSelect() { _uiState.update { it.copy(showLevelSelectSheet = true) } }
     fun closeLevelSelect() { resetFrameClock(); _uiState.update { it.copy(showLevelSelectSheet = false) } }
     fun toggleDebugBounds() { _uiState.update { it.copy(showDebugBounds = !it.showDebugBounds) } }

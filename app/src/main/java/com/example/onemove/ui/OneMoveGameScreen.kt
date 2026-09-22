@@ -1,8 +1,5 @@
 package com.example.onemove.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +22,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
@@ -58,7 +54,13 @@ import kotlinx.coroutines.isActive
 fun OneMoveGameScreen(viewModel: OneMoveViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
     val owner = LocalLifecycleOwner.current
-    LaunchedEffect(owner, viewModel) {
+    val animate = !state.showLevelSelectSheet && (
+        state.simulationState == SimulationState.RUNNING ||
+        (state.simulationState != SimulationState.READY && !state.showResultOverlay) ||
+        viewModel.physicsWorld.particles.isNotEmpty() || state.screenShake > 0f)
+    LaunchedEffect(owner, viewModel, animate) {
+        viewModel.resetFrameClock()
+        if (!animate) return@LaunchedEffect
         owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.resetFrameClock()
             while (isActive) withFrameNanos { viewModel.onFrame(it) }
@@ -109,7 +111,6 @@ fun OneMoveGameContent(
                                 else onCanvasTapCoordinates(x, y)
                             }
                         } else Modifier)) {
-                        // Capture the frame version so mutations in the physical world invalidate drawing.
                         @Suppress("UNUSED_VARIABLE") val frame = uiState.frameTick
                         scale(scaleFactor, pivot = Offset.Zero) { ToyBoxRenderer.renderToyBox(this, world) }
                     }
@@ -119,10 +120,11 @@ fun OneMoveGameContent(
                     color = Color(0xFF94A3B8), fontSize = 12.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("rescue_status"))
             }
-            AnimatedVisibility(uiState.showResultOverlay, enter = fadeIn(), exit = fadeOut()) {
+            // Dismiss immediately. An exiting result must never render the next level's READY state as a defeat.
+            if (uiState.showResultOverlay) {
                 ResultCardOverlay(uiState, onReset, onNextLevel)
             }
-            AnimatedVisibility(uiState.showLevelSelectSheet, enter = fadeIn(), exit = fadeOut()) {
+            if (uiState.showLevelSelectSheet) {
                 LevelSelectSheet(uiState, { onSelectLevel(it); onCloseLevelSelect() }, onCloseLevelSelect)
             }
         }
