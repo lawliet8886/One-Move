@@ -82,6 +82,8 @@ def ear(side, mat, pink):
     mesh.materials.append(mat)
     bevel = obj.modifiers.new("Rounded fabric seam", "BEVEL")
     bevel.width, bevel.segments = 0.065, 4
+    if hasattr(mesh, "use_auto_smooth"):
+        mesh.use_auto_smooth = True
     obj.modifiers.new("Weighted corner normals", "WEIGHTED_NORMAL")
     inner = sphere("ear_lining", (x+side*0.04,-0.265,0.99), (0.105,0.035,0.23), pink)
     inner.rotation_euler.y = side*0.18
@@ -126,8 +128,9 @@ def setup_scene():
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
-    scene.cycles.samples = 32
-    scene.cycles.use_denoising = True
+    scene.cycles.samples = 96
+    # Ubuntu Blender may be built without OpenImageDenoise.
+    scene.cycles.use_denoising = False
     scene.cycles.max_bounces = 4
     scene.render.threads_mode = "FIXED"
     scene.render.threads = 2
