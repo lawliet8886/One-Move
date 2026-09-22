@@ -58,10 +58,7 @@ import kotlinx.coroutines.isActive
 fun OneMoveGameScreen(viewModel: OneMoveViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
     val owner = LocalLifecycleOwner.current
-    val animate = !state.showLevelSelectSheet && (
-        state.simulationState == SimulationState.RUNNING ||
-        (state.simulationState != SimulationState.READY && !state.showResultOverlay) ||
-        viewModel.physicsWorld.particles.isNotEmpty() || state.screenShake > 0f)
+    val animate = !state.showLevelSelectSheet && state.needsAnimation
     LaunchedEffect(owner, viewModel, animate) {
         viewModel.resetFrameClock()
         if (!animate) return@LaunchedEffect
@@ -76,7 +73,8 @@ fun OneMoveGameScreen(viewModel: OneMoveViewModel = viewModel()) {
         onOpenLevelSelect = viewModel::openLevelSelect, onCloseLevelSelect = viewModel::closeLevelSelect,
         onSelectLevel = viewModel::loadLevel,
         onCanvasTapCoordinates = { x, y -> viewModel.onCanvasTap(x, y) },
-        onCanvasTapWithRadius = { x, y, radius -> viewModel.onCanvasTap(x, y, radius) })
+        onCanvasTapWithRadius = { x, y, radius -> viewModel.onCanvasTap(x, y, radius) },
+        renderFrame = { viewModel.renderTick.longValue })
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -87,7 +85,8 @@ fun OneMoveGameContent(
     onPrevLevel: () -> Unit = {}, onOpenLevelSelect: () -> Unit = {}, onCloseLevelSelect: () -> Unit = {},
     onSelectLevel: (Int) -> Unit = {}, onCanvasTapCoordinates: (Float, Float) -> Unit = { _, _ -> },
     animatePill: Boolean = true, enableGestures: Boolean = true,
-    onCanvasTapWithRadius: ((Float, Float, Float) -> Unit)? = null
+    onCanvasTapWithRadius: ((Float, Float, Float) -> Unit)? = null,
+    renderFrame: (() -> Long)? = null
 ) {
     Scaffold(modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
         containerColor = Color(0xFF102D29)) { padding ->
@@ -118,7 +117,7 @@ fun OneMoveGameContent(
                                 else onCanvasTapCoordinates(x, y)
                             }
                         } else Modifier)) {
-                        @Suppress("UNUSED_VARIABLE") val frame = uiState.frameTick
+                        @Suppress("UNUSED_VARIABLE") val frame = renderFrame?.invoke() ?: uiState.frameTick
                         scale(scaleFactor, pivot = Offset.Zero) { ToyBoxRenderer.renderToyBox(this, world) }
                     }
                 }

@@ -2,6 +2,8 @@ package com.example.onemove.ui
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.compose.runtime.LongState
+import androidx.compose.runtime.mutableLongStateOf
 import com.example.onemove.audio.HapticManager
 import com.example.onemove.model.*
 import com.example.onemove.physics.PhysicsWorld
@@ -27,7 +29,9 @@ data class GameUiState(
     val frameTick: Long = 0L,
     val showResultOverlay: Boolean = false,
     val showLevelSelectSheet: Boolean = false,
-    val creatures: List<Creature> = emptyList()
+    val creatures: List<Creature> = emptyList(),
+    val rescuedCount: Int = 0,
+    val needsAnimation: Boolean = false
 )
 
 class OneMoveViewModel(application: Application) : AndroidViewModel(application) {
@@ -39,6 +43,8 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         highestUnlockedLevel = progressRepo.getHighestUnlockedLevel(),
         completedLevels = completed(), creatures = physicsWorld.creatures))
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
+    private val _renderTick = mutableLongStateOf(0L)
+    val renderTick: LongState get() = _renderTick
     private var resultDelay = -1f
     private var lastFrameNanos: Long? = null
 
@@ -75,10 +81,17 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
                 _uiState.update { it.copy(showResultOverlay = true) }
             }
         }
-        _uiState.update { it.copy(simulationState = now, chosenPin = physicsWorld.chosenPinId,
-            failureReason = physicsWorld.failureReason, screenShake = physicsWorld.screenShake,
+        val rescued = physicsWorld.creatures.count { it.isInsideGoal }
+        val hasWork = now == SimulationState.RUNNING || resultDelay >= 0f ||
+            physicsWorld.particles.isNotEmpty() || physicsWorld.screenShake > 0f
+        _uiState.update { current -> current.copy(simulationState = now, chosenPin = physicsWorld.chosenPinId,
+            failureReason = physicsWorld.failureReason, screenShake = if (physicsWorld.screenShake > 0f) 1f else 0f,
             moveCountLeft = if (now == SimulationState.READY) 1 else 0,
-            frameTick = it.frameTick + 1, creatures = physicsWorld.creatures) }
+            rescuedCount = rescued, needsAnimation = hasWork,
+            creatures = if (current.rescuedCount != rescued || current.simulationState != now)
+                physicsWorld.creatures.map { it.copy() } else current.creatures) }
+        // Only Canvas observes this high-frequency state, not the HUD/layout tree.
+        _renderTick.longValue++
     }
 
     fun loadLevel(levelNumber: Int) {
@@ -90,7 +103,9 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         progressRepo.recordAttempt(level.number)
         _uiState.update { it.copy(currentLevelNumber = level.number, currentLevel = level,
             simulationState = SimulationState.READY, chosenPin = null, failureReason = "", screenShake = 0f,
-            moveCountLeft = 1, showResultOverlay = false, showLevelSelectSheet = false, creatures = physicsWorld.creatures) }
+            moveCountLeft = 1, showResultOverlay = false, showLevelSelectSheet = false,
+            rescuedCount = 0, needsAnimation = false, creatures = physicsWorld.creatures.map { it.copy() }) }
+        _renderTick.longValue++
     }
 
     fun nextLevel() {
@@ -107,7 +122,7 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         if (physicsWorld.pullPin(pinId)) {
             resultDelay = -1f
             _uiState.update { it.copy(simulationState = physicsWorld.state, chosenPin = pinId,
-                moveCountLeft = 0, showResultOverlay = false) }
+                moveCountLeft = 0, showResultOverlay = false, needsAnimation = true) }
         }
     }
     fun resetGame() {
@@ -118,7 +133,8 @@ class OneMoveViewModel(application: Application) : AndroidViewModel(application)
         progressRepo.recordRetry(_uiState.value.currentLevelNumber)
         _uiState.update { it.copy(simulationState = SimulationState.READY, chosenPin = null,
             failureReason = "", screenShake = 0f, moveCountLeft = 1, showResultOverlay = false,
-            creatures = physicsWorld.creatures) }
+            creatures = physicsWorld.creatures.map { it.copy() }, rescuedCount = 0, needsAnimation = false) }
+        _renderTick.longValue++
     }
     fun openLevelSelect() { _uiState.update { it.copy(showLevelSelectSheet = true) } }
     fun closeLevelSelect() { resetFrameClock(); _uiState.update { it.copy(showLevelSelectSheet = false) } }
