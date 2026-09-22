@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.InputDevice
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
@@ -40,7 +41,15 @@ class OneMoveDeviceJourneyTest {
         node("game_board_canvas")
         scenario.onActivity { activity = it; model = ViewModelProvider(it)[OneMoveViewModel::class.java] }
     }
-    @After fun close() { scenario.close() }
+    @After fun close() {
+        // Capture metrics while the Activity/process still exists, not after teardown.
+        val stamp=SystemClock.uptimeMillis()
+        runCatching {
+            File(output,"gfxinfo_$stamp.txt").writeText(device.executeShellCommand("dumpsys gfxinfo com.example.onemove framestats"))
+            File(output,"meminfo_$stamp.txt").writeText(device.executeShellCommand("dumpsys meminfo com.example.onemove"))
+        }.onFailure { File(output,"metrics_error_$stamp.txt").writeText(it.toString()) }
+        scenario.close()
+    }
 
     @Test fun all12WinningPinsCompleteCampaignThroughRealUi() {
         for (number in 1..12) {
@@ -81,17 +90,17 @@ class OneMoveDeviceJourneyTest {
             Triple(2, PinId.PIN_A, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
             Triple(5, PinId.PIN_A, "PATH_BLOCKED"),
             Triple(5, PinId.PIN_B, "PATH_BLOCKED"),
+            Triple(6, PinId.PIN_B, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
+            Triple(6, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN"),
             Triple(8, PinId.PIN_A, "HIT_BY_HEAVY_OBJECT"),
             Triple(8, PinId.PIN_C, "CREATURE_TRAPPED_IN_DANGER_BASIN")
         )
-
         for ((number, pinId, expectedReason) in cases) {
             instrumentation.runOnMainSync { model.loadLevel(number) }
             val level = LevelCatalog.getLevel(number)
             assertTrue("Missing prototype level title $number", device.wait(Until.hasObject(By.text(level.name)), 5_000L))
             assertFalse("Prototype level $number opened with a stale failure card", device.hasObject(By.res("failure_overlay")))
             capture("level_${number.toString().padStart(2,'0')}_wrong_${pinId.name}_00_ready")
-
             tapPin(number, pinId)
             node("failure_overlay", 12_000L)
             instrumentation.runOnMainSync {
@@ -100,7 +109,6 @@ class OneMoveDeviceJourneyTest {
                 assertEquals("A failed route must not rescue any friend", 0, model.physicsWorld.creatures.count { it.isInsideGoal })
             }
             capture("level_${number.toString().padStart(2,'0')}_wrong_${pinId.name}_01_failure")
-
             node("retry_button").click()
             assertTrue("Retry did not restore the move", device.wait(Until.hasObject(By.text("1 MOVE LEFT")), 5_000L))
             node("game_board_canvas")
@@ -116,13 +124,8 @@ class OneMoveDeviceJourneyTest {
 
     @Test fun backgroundPauseDoesNotAdvanceTheSimulation() {
         val instrumentation=InstrumentationRegistry.getInstrumentation()
-        // Use the spring-gap route as a lifecycle fixture: unlike the short tutorial drop,
-        // it remains physically in flight long enough to background the Activity reliably.
         instrumentation.runOnMainSync { model.loadLevel(5) }
         assertTrue(device.wait(Until.hasObject(By.text(LevelCatalog.getLevel(5).name)),5_000L))
-        // UiDevice.click() can wait for accessibility idle after dispatch. A short level
-        // can already be over by then, making the pause assertion meaningless/flaky.
-        // Inject the real pointer events without that idle wait; never alter physics state.
         val pin = LevelCatalog.getLevel(5).pins.first { it.id == PinId.PIN_C }
         val bounds = node("game_board_canvas").visibleBounds
         val x = bounds.left + pin.handlePosition.x / LevelDefinition.WORLD_WIDTH * bounds.width()
@@ -147,9 +150,14 @@ class OneMoveDeviceJourneyTest {
             if (!started) SystemClock.sleep(8L)
         }
         assertTrue("The real touch never started the simulation", started)
-        // Still press actual HOME. We retain RUNNING and unchanged-time assertions below.
+        Log.i("OneMoveQA","Lifecycle: RUNNING before HOME at $beforeHome")
+        // The two-argument KeyEvent constructor had timestamp zero; Android rejected
+        // it as stale. Timestamp actual HOME key events instead of dropping assertions.
+        val homeDown=SystemClock.uptimeMillis()
         for (action in listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP)) {
-            assertTrue("HOME was not injected", automation.injectInputEvent(KeyEvent(action, KeyEvent.KEYCODE_HOME), true))
+            val event=KeyEvent(homeDown,SystemClock.uptimeMillis(),action,KeyEvent.KEYCODE_HOME,0)
+            event.source=InputDevice.SOURCE_KEYBOARD
+            assertTrue("HOME was not injected",automation.injectInputEvent(event,true))
         }
         assertTrue("App did not leave foreground",device.wait(Until.gone(By.res("game_board_canvas")),5_000L))
         var pausedAt=0f
@@ -163,12 +171,14 @@ class OneMoveDeviceJourneyTest {
         instrumentation.runOnMainSync {
             assertEquals("Physics advanced in the background",pausedAt,model.physicsWorld.simulationTime,0.005f)
         }
+        Log.i("OneMoveQA","Lifecycle: background clock held at $pausedAt")
         val context=instrumentation.targetContext
         val intent=context.packageManager.getLaunchIntentForPackage(context.packageName)!!
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         context.startActivity(intent)
         node("success_overlay",12_000L)
         capture("resume_success")
+        Log.i("OneMoveQA","Lifecycle: resumed and visibly completed")
     }
 
     private fun tapPin(number: Int, id: PinId) {
