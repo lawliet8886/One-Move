@@ -76,7 +76,7 @@ object LevelCatalog {
     fun createLevel09() = WeightSwitchLevel.create()
     fun createLevel10() = ReturnFlightLevel.create()
     fun createLevel11() = FlyingKeyLevel.create()
-    fun createLevel12() = board(12, "The Grand Machine", PinId.PIN_C, 4, 360f, 800f, gate = true, stone = true, seesaw = true)
+    fun createLevel12() = GrandMachineLevel.create()
 
     val ALL_LEVELS: List<LevelDefinition> = listOf(createLevel01(), createLevel02(), createLevel03(), createLevel04(),
         createLevel05(), createLevel06(), createLevel07(), createLevel08(), createLevel09(), createLevel10(), createLevel11(), createLevel12())
