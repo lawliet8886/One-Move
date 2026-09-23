@@ -104,6 +104,7 @@ jobs:
             --tests com.example.PhysicsContractTest \
             --tests com.example.PinHitTesterTest \
             --tests com.example.GrandMachineLevelContractTest \
+            --tests com.example.GatewayKeyLevelContractTest \
             --stacktrace --no-daemon
       - name: Upload physics and input reports
         if: always()
