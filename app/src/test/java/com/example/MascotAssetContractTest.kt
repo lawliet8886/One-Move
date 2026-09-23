@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.onemove.ui.render.SpriteMascotRenderer
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +22,9 @@ class MascotAssetContractTest {
     @Test
     fun animatedMascotAtlasesAreVerifiedTransparentBoundedAndPrepared() {
         val context = ApplicationProvider.getApplicationContext<Context>()
+        val mascotAssets = context.assets.list("mascots")?.toSet().orEmpty()
+        assertFalse("Legacy atlas must not ship once every mascot has a reviewed replacement", "atlas.webp" in mascotAssets)
+        assertFalse("Legacy atlas manifest must not ship without its runtime atlas", "manifest.json" in mascotAssets)
         for (stem in listOf("pip_animated", "mochi_animated", "blobbo_animated")) {
             val bytes = context.assets.open("mascots/$stem.webp").use { it.readBytes() }
             val manifest = context.assets.open("mascots/$stem.json")
@@ -56,7 +60,11 @@ class MascotAssetContractTest {
             }
         }
 
-        // Exercises static portrait fallback plus every approved animated atlas.
         SpriteMascotRenderer.prepare(context)
+        assertEquals(
+            "Only the three reviewed 640x512 RGBA atlases should remain decoded",
+            3 * 640 * 512 * 4,
+            SpriteMascotRenderer.residentDecodedBytesForTest()
+        )
     }
 }

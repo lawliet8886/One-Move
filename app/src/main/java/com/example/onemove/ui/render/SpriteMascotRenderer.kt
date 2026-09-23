@@ -21,8 +21,7 @@ import kotlin.math.roundToInt
 
 /** Reviewed sprite art. Animation is visual-only and never feeds positions back into physics. */
 object SpriteMascotRenderer {
-    private const val STATIC_CELL = 192
-    private const val STATIC_FRAMING = 3.6f
+    private const val DEFAULT_FRAMING = 3.6f
     private const val ANIMATED_CELL = 128
     private const val ANIMATED_COLUMNS = 5
     private const val ANIMATED_ROWS = 4
@@ -36,34 +35,15 @@ object SpriteMascotRenderer {
     private data class AnimatedAsset(
         val image: ImageBitmap,
         val framing: Float,
-        val compressedBytes: Int
+        val compressedBytes: Int,
+        val decodedBytes: Int
     )
 
-    @Volatile private var staticAtlas: ImageBitmap? = null
-    @Volatile private var staticCompressedBytes: Int = 0
     @Volatile private var animatedAssets: Map<CreatureId, AnimatedAsset> = emptyMap()
 
     @Synchronized
     fun prepare(context: Context) {
-        if (staticAtlas != null && animatedAssets.keys.containsAll(animatedSpecs.keys)) return
-
-        if (staticAtlas == null) {
-            val bytes = context.assets.open("mascots/atlas.webp").use { it.readBytes() }
-            val manifest = context.assets.open("mascots/manifest.json")
-                .bufferedReader().use { JSONObject(it.readText()) }
-            check(sha256(bytes) == manifest.getString("atlas_sha256")) {
-                "Mascot atlas integrity failure"
-            }
-            val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
-                "Cannot decode mascot atlas"
-            }
-            check(bitmap.width == STATIC_CELL * 4 && bitmap.height == STATIC_CELL * 3) {
-                "Incorrect static mascot atlas geometry"
-            }
-            check(bitmap.hasAlpha()) { "Mascot atlas must retain transparency" }
-            staticAtlas = bitmap.asImageBitmap()
-            staticCompressedBytes = bytes.size
-        }
+        if (animatedAssets.keys.containsAll(animatedSpecs.keys)) return
 
         val loaded = linkedMapOf<CreatureId, AnimatedAsset>()
         for ((id, stem) in animatedSpecs) loaded[id] = loadAnimated(context, stem)
@@ -71,11 +51,14 @@ object SpriteMascotRenderer {
 
         Log.i(
             "OneMoveAssets",
-            "Loaded static portraits + animated " + loaded.keys.joinToString() +
-                "; " + (staticCompressedBytes + loaded.values.sumOf { it.compressedBytes }) +
-                " compressed bytes"
+            "Loaded animated " + loaded.keys.joinToString() +
+                "; compressedBytes=" + loaded.values.sumOf { it.compressedBytes } +
+                "; decodedBytes=" + loaded.values.sumOf { it.decodedBytes } +
+                "; legacyStaticDecodedBytes=0"
         )
     }
+
+    internal fun residentDecodedBytesForTest(): Int = animatedAssets.values.sumOf { it.decodedBytes }
 
     private fun loadAnimated(context: Context, stem: String): AnimatedAsset {
         val bytes = context.assets.open("mascots/" + stem + ".webp").use { it.readBytes() }
@@ -97,8 +80,9 @@ object SpriteMascotRenderer {
         check(bitmap.hasAlpha()) { "Animated mascot atlas must retain transparency: $stem" }
         return AnimatedAsset(
             image = bitmap.asImageBitmap(),
-            framing = manifest.optDouble("framing", STATIC_FRAMING.toDouble()).toFloat(),
-            compressedBytes = bytes.size
+            framing = manifest.optDouble("framing", DEFAULT_FRAMING.toDouble()).toFloat(),
+            compressedBytes = bytes.size,
+            decodedBytes = bitmap.allocationByteCount
         )
     }
 
@@ -175,32 +159,7 @@ object SpriteMascotRenderer {
             return true
         }
 
-        val image = staticAtlas ?: return false
-        drawShadow(scope, creature, center)
-        val column = when (creature.expression) {
-            CreatureExpression.HAPPY -> 1
-            CreatureExpression.SCARED,
-            CreatureExpression.PANIC,
-            CreatureExpression.SURPRISED -> 2
-            CreatureExpression.DIZZY,
-            CreatureExpression.DISAPPOINTED -> 3
-            else -> 0
-        }
-        val side = (creature.radius * STATIC_FRAMING).roundToInt().coerceAtLeast(1)
-        with(scope) {
-            drawImage(
-                image = image,
-                srcOffset = IntOffset(column * STATIC_CELL, creature.id.ordinal * STATIC_CELL),
-                srcSize = IntSize(STATIC_CELL, STATIC_CELL),
-                dstOffset = IntOffset(
-                    (center.x - side / 2f).roundToInt(),
-                    (center.y - side / 2f).roundToInt()
-                ),
-                dstSize = IntSize(side, side),
-                filterQuality = FilterQuality.Medium
-            )
-        }
-        return true
+        return false
     }
 
     private fun drawShadow(scope: DrawScope, creature: Creature, center: Offset) = with(scope) {

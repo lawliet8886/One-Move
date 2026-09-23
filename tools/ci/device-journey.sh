@@ -45,6 +45,7 @@ collect() {
     adb -e shell dumpsys meminfo com.example.onemove > device_artifacts/meminfo.txt || true
     adb -e pull /sdcard/Android/data/com.example.onemove/files/qa device_artifacts/phases || true
     adb -e logcat -d > device_artifacts/logcat.txt || true
+    grep 'OneMoveAssets' device_artifacts/logcat.txt > device_artifacts/asset-memory.txt || true
     restore_display
 }
 trap collect EXIT
