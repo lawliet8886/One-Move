@@ -23,54 +23,81 @@ import kotlin.math.roundToInt
 object SpriteMascotRenderer {
     private const val STATIC_CELL = 192
     private const val STATIC_FRAMING = 3.6f
-    private const val PIP_CELL = 128
-    private const val PIP_COLUMNS = 5
-    private const val PIP_ROWS = 4
+    private const val ANIMATED_CELL = 128
+    private const val ANIMATED_COLUMNS = 5
+    private const val ANIMATED_ROWS = 4
+
+    private val animatedSpecs = linkedMapOf(
+        CreatureId.PIP to "pip_animated",
+        CreatureId.BLOBBO to "blobbo_animated"
+    )
+
+    private data class AnimatedAsset(
+        val image: ImageBitmap,
+        val framing: Float,
+        val compressedBytes: Int
+    )
 
     @Volatile private var staticAtlas: ImageBitmap? = null
-    @Volatile private var pipAnimatedAtlas: ImageBitmap? = null
-    @Volatile private var pipFraming: Float = STATIC_FRAMING
+    @Volatile private var staticCompressedBytes: Int = 0
+    @Volatile private var animatedAssets: Map<CreatureId, AnimatedAsset> = emptyMap()
 
     @Synchronized
     fun prepare(context: Context) {
-        if (staticAtlas != null && pipAnimatedAtlas != null) return
+        if (staticAtlas != null && animatedAssets.keys.containsAll(animatedSpecs.keys)) return
 
-        val staticBytes = context.assets.open("mascots/atlas.webp").use { it.readBytes() }
-        val staticManifest = context.assets.open("mascots/manifest.json")
-            .bufferedReader().use { JSONObject(it.readText()) }
-        check(sha256(staticBytes) == staticManifest.getString("atlas_sha256")) {
-            "Mascot atlas integrity failure"
+        if (staticAtlas == null) {
+            val bytes = context.assets.open("mascots/atlas.webp").use { it.readBytes() }
+            val manifest = context.assets.open("mascots/manifest.json")
+                .bufferedReader().use { JSONObject(it.readText()) }
+            check(sha256(bytes) == manifest.getString("atlas_sha256")) {
+                "Mascot atlas integrity failure"
+            }
+            val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
+                "Cannot decode mascot atlas"
+            }
+            check(bitmap.width == STATIC_CELL * 4 && bitmap.height == STATIC_CELL * 3) {
+                "Incorrect static mascot atlas geometry"
+            }
+            check(bitmap.hasAlpha()) { "Mascot atlas must retain transparency" }
+            staticAtlas = bitmap.asImageBitmap()
+            staticCompressedBytes = bytes.size
         }
-        val staticBitmap = checkNotNull(BitmapFactory.decodeByteArray(staticBytes, 0, staticBytes.size)) {
-            "Cannot decode mascot atlas"
-        }
-        check(staticBitmap.width == STATIC_CELL * 4 && staticBitmap.height == STATIC_CELL * 3) {
-            "Incorrect static mascot atlas geometry"
-        }
-        check(staticBitmap.hasAlpha()) { "Mascot atlas must retain transparency" }
-        staticAtlas = staticBitmap.asImageBitmap()
 
-        val pipBytes = context.assets.open("mascots/pip_animated.webp").use { it.readBytes() }
-        val pipManifest = context.assets.open("mascots/pip_animated.json")
-            .bufferedReader().use { JSONObject(it.readText()) }
-        check(sha256(pipBytes) == pipManifest.getString("atlas_sha256")) {
-            "Animated Pip atlas integrity failure"
-        }
-        val pipBitmap = checkNotNull(BitmapFactory.decodeByteArray(pipBytes, 0, pipBytes.size)) {
-            "Cannot decode animated Pip atlas"
-        }
-        check(pipBitmap.width == PIP_CELL * PIP_COLUMNS && pipBitmap.height == PIP_CELL * PIP_ROWS) {
-            "Incorrect animated Pip atlas geometry"
-        }
-        check(pipBitmap.hasAlpha()) { "Animated Pip atlas must retain transparency" }
-        pipFraming = pipManifest.optDouble("framing", STATIC_FRAMING.toDouble()).toFloat()
-        pipAnimatedAtlas = pipBitmap.asImageBitmap()
+        val loaded = linkedMapOf<CreatureId, AnimatedAsset>()
+        for ((id, stem) in animatedSpecs) loaded[id] = loadAnimated(context, stem)
+        animatedAssets = loaded
 
         Log.i(
             "OneMoveAssets",
-            "Loaded static mascot atlas " + staticBitmap.width + "x" + staticBitmap.height +
-                " and animated Pip " + pipBitmap.width + "x" + pipBitmap.height + "; " +
-                (staticBytes.size + pipBytes.size) + " compressed bytes"
+            "Loaded static portraits + animated " + loaded.keys.joinToString() +
+                "; " + (staticCompressedBytes + loaded.values.sumOf { it.compressedBytes }) +
+                " compressed bytes"
+        )
+    }
+
+    private fun loadAnimated(context: Context, stem: String): AnimatedAsset {
+        val bytes = context.assets.open("mascots/" + stem + ".webp").use { it.readBytes() }
+        val manifest = context.assets.open("mascots/" + stem + ".json")
+            .bufferedReader().use { JSONObject(it.readText()) }
+        check(manifest.getBoolean("approved_for_runtime")) {
+            "Animated mascot is not approved for runtime: $stem"
+        }
+        check(sha256(bytes) == manifest.getString("atlas_sha256")) {
+            "Animated mascot atlas integrity failure: $stem"
+        }
+        val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
+            "Cannot decode animated mascot atlas: $stem"
+        }
+        check(bitmap.width == ANIMATED_CELL * ANIMATED_COLUMNS &&
+            bitmap.height == ANIMATED_CELL * ANIMATED_ROWS) {
+            "Incorrect animated mascot atlas geometry: $stem"
+        }
+        check(bitmap.hasAlpha()) { "Animated mascot atlas must retain transparency: $stem" }
+        return AnimatedAsset(
+            image = bitmap.asImageBitmap(),
+            framing = manifest.optDouble("framing", STATIC_FRAMING.toDouble()).toFloat(),
+            compressedBytes = bytes.size
         )
     }
 
@@ -78,38 +105,38 @@ object SpriteMascotRenderer {
         MessageDigest.getInstance("SHA-256").digest(bytes)
             .joinToString("") { "%02x".format(it) }
 
-    private data class PipClip(val row: Int, val frameSeconds: Float, val fixedFrame: Int? = null)
+    private data class Clip(val row: Int, val frameSeconds: Float, val fixedFrame: Int? = null)
 
-    private fun selectPipClip(creature: Creature): PipClip = when {
+    private fun selectClip(creature: Creature): Clip = when {
         creature.expression == CreatureExpression.HAPPY || creature.isInsideGoal ->
-            PipClip(row = 3, frameSeconds = 0.18f)
+            Clip(row = 3, frameSeconds = 0.18f)
         creature.expression == CreatureExpression.DIZZY ||
             creature.expression == CreatureExpression.DISAPPOINTED ->
-            PipClip(row = 2, frameSeconds = 0.11f, fixedFrame = 4)
+            Clip(row = 2, frameSeconds = 0.11f, fixedFrame = 4)
         creature.velocity.y < -120f ->
-            PipClip(row = 1, frameSeconds = 0.11f)
+            Clip(row = 1, frameSeconds = 0.11f)
         creature.velocity.y > 140f ||
             creature.expression == CreatureExpression.SURPRISED ||
             creature.expression == CreatureExpression.PANIC ||
             creature.expression == CreatureExpression.SCARED ->
-            PipClip(row = 2, frameSeconds = 0.11f)
-        else -> PipClip(row = 0, frameSeconds = 0.40f)
+            Clip(row = 2, frameSeconds = 0.11f)
+        else -> Clip(row = 0, frameSeconds = 0.40f)
     }
 
     /** False only for isolated vector preview tests which did not create MainActivity. */
     fun draw(scope: DrawScope, creature: Creature, center: Offset, visualTime: Float = 0f): Boolean {
-        val animated = pipAnimatedAtlas
-        if (creature.id == CreatureId.PIP && animated != null) {
+        val animated = animatedAssets[creature.id]
+        if (animated != null) {
             drawShadow(scope, creature, center)
-            val clip = selectPipClip(creature)
+            val clip = selectClip(creature)
             val safeTime = if (visualTime.isFinite() && visualTime >= 0f) visualTime else 0f
-            val frame = clip.fixedFrame ?: ((safeTime / clip.frameSeconds).toInt() % PIP_COLUMNS)
-            val side = (creature.radius * pipFraming).roundToInt().coerceAtLeast(1)
+            val frame = clip.fixedFrame ?: ((safeTime / clip.frameSeconds).toInt() % ANIMATED_COLUMNS)
+            val side = (creature.radius * animated.framing).roundToInt().coerceAtLeast(1)
             with(scope) {
                 drawImage(
-                    image = animated,
-                    srcOffset = IntOffset(frame * PIP_CELL, clip.row * PIP_CELL),
-                    srcSize = IntSize(PIP_CELL, PIP_CELL),
+                    image = animated.image,
+                    srcOffset = IntOffset(frame * ANIMATED_CELL, clip.row * ANIMATED_CELL),
+                    srcSize = IntSize(ANIMATED_CELL, ANIMATED_CELL),
                     dstOffset = IntOffset(
                         (center.x - side / 2f).roundToInt(),
                         (center.y - side / 2f).roundToInt()
@@ -120,7 +147,11 @@ object SpriteMascotRenderer {
             }
             return true
         }
+        return drawPortrait(scope, creature, center)
+    }
 
+    /** UI portrait mode deliberately stays visually uniform while gameplay sprites animate. */
+    fun drawPortrait(scope: DrawScope, creature: Creature, center: Offset): Boolean {
         val image = staticAtlas ?: return false
         drawShadow(scope, creature, center)
         val column = when (creature.expression) {

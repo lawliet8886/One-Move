@@ -15,6 +15,10 @@ import com.example.onemove.model.*
 object HeroCreatureRenderer {
     fun drawCreature(scope: DrawScope, creature: Creature) = drawCreature(scope,creature,Offset(creature.position.x,creature.position.y),0f)
     fun drawCreature(scope: DrawScope, creature: Creature, visualTime: Float) = drawCreature(scope,creature,Offset(creature.position.x,creature.position.y),visualTime)
+    fun drawPortrait(scope: DrawScope, creature: Creature, center: Offset) = with(scope) {
+        if (SpriteMascotRenderer.drawPortrait(scope, creature, center)) return@with
+        drawCreature(scope, creature, center, 0f)
+    }
     fun drawCreature(scope: DrawScope, creature: Creature, renderPos: Vector2D) = drawCreature(scope,creature,Offset(renderPos.x,renderPos.y),0f)
     fun drawCreature(scope: DrawScope, creature: Creature, center: Offset, visualTime: Float = 0f) = with(scope) {
         if(SpriteMascotRenderer.draw(scope,creature,center,visualTime)) return@with
