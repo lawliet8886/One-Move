@@ -290,9 +290,17 @@ class PhysicsWorld(initialLevel: LevelDefinition, private val hapticManager: Hap
             val impulse = n * (-1.12f * closing / massSum)
             a.v -= impulse * a.invMass; b.v += impulse * b.invMass
             collisionCount++
-            if (abs(closing) > 340f) {
-                if (a.creature != null && (b.ball != null || b.stone != null)) fail("HIT_BY_HEAVY_OBJECT", a.creature)
-                if (b.creature != null && (a.ball != null || a.stone != null)) fail("HIT_BY_HEAVY_OBJECT", b.creature)
+            // A heavy-object failure must be caused by the heavy body striking the friend.
+            // Relative speed alone is not enough: a friend running into a parked weight is
+            // a collision/deflection, not the weight magically "attacking" the friend.
+            val heavyImpactThreshold = 340f
+            if (a.creature != null && (b.ball != null || b.stone != null)) {
+                val heavyTowardCreature = -b.v.dot(n)
+                if (heavyTowardCreature > heavyImpactThreshold) fail("HIT_BY_HEAVY_OBJECT", a.creature)
+            }
+            if (b.creature != null && (a.ball != null || a.stone != null)) {
+                val heavyTowardCreature = a.v.dot(n)
+                if (heavyTowardCreature > heavyImpactThreshold) fail("HIT_BY_HEAVY_OBJECT", b.creature)
             }
         }
     }
