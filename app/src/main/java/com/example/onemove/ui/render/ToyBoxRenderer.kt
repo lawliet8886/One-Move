@@ -22,7 +22,7 @@ object ToyBoxRenderer {
         for (ball in world.heavyBalls) WreckerAndStoneRenderer.drawHeavyWreckerBall(drawScope, ball)
         val isReady = world.state == SimulationState.READY
         for (pin in world.pins) PinRenderer.drawPin(drawScope, pin, isReady = isReady)
-        for (creature in world.creatures) HeroCreatureRenderer.drawCreature(drawScope, creature)
+        for (creature in world.creatures) HeroCreatureRenderer.drawCreature(drawScope, creature, world.visualTime)
         KineticParticleRenderer.drawParticles(drawScope, world.particles)
     }
 }

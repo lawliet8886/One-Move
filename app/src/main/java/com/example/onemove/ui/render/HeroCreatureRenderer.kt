@@ -13,10 +13,11 @@ import com.example.onemove.model.*
 
 /** Bundled plush sprites in Android; vector fallback for isolated preview tests. */
 object HeroCreatureRenderer {
-    fun drawCreature(scope: DrawScope, creature: Creature) = drawCreature(scope,creature,Offset(creature.position.x,creature.position.y))
-    fun drawCreature(scope: DrawScope, creature: Creature, renderPos: Vector2D) = drawCreature(scope,creature,Offset(renderPos.x,renderPos.y))
-    fun drawCreature(scope: DrawScope, creature: Creature, center: Offset) = with(scope) {
-        if(SpriteMascotRenderer.draw(scope,creature,center)) return@with
+    fun drawCreature(scope: DrawScope, creature: Creature) = drawCreature(scope,creature,Offset(creature.position.x,creature.position.y),0f)
+    fun drawCreature(scope: DrawScope, creature: Creature, visualTime: Float) = drawCreature(scope,creature,Offset(creature.position.x,creature.position.y),visualTime)
+    fun drawCreature(scope: DrawScope, creature: Creature, renderPos: Vector2D) = drawCreature(scope,creature,Offset(renderPos.x,renderPos.y),0f)
+    fun drawCreature(scope: DrawScope, creature: Creature, center: Offset, visualTime: Float = 0f) = with(scope) {
+        if(SpriteMascotRenderer.draw(scope,creature,center,visualTime)) return@with
         val r=creature.radius
         val base=when(creature.id) {
             CreatureId.PIP -> Color(0xFFE9A242)

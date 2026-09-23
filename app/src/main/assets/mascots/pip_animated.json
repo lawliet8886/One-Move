@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "asset_id": "pip-workshop-hero-animated",
+  "version": "1.0.0",
+  "cell_size": 128,
+  "columns": 5,
+  "rows": 4,
+  "atlas_width": 640,
+  "atlas_height": 512,
+  "decoded_bytes_rgba": 1310720,
+  "framing": 3.6,
+  "physical_pivot_cell": [
+    64,
+    64
+  ],
+  "clips": {
+    "idle": [
+      {
+        "index": 0,
+        "rect": [
+          0,
+          0,
+          128,
+          128
+        ],
+        "duration_ms": 400,
+        "alpha_bounds": [
+          41,
+          22,
+          87,
+          106
+        ],
+        "source_file": "final_idle_00.png"
+      },
+      {
+        "index": 1,
+        "rect": [
+          128,
+          0,
+          128,
+          128
+        ],
+        "duration_ms": 400,
+        "alpha_bounds": [
+          41,
+          22,
+          87,
+          106
+        ],
+        "source_file": "final_idle_01.png"
+      },
+      {
+        "index": 2,
+        "rect": [
+          256,
+          0,
+          128,
+          128
+        ],
+        "duration_ms": 400,
+        "alpha_bounds": [
+          41,
+          21,
+          87,
+          105
+        ],
+        "source_file": "final_idle_02.png"
+      },
+      {
+        "index": 3,
+        "rect": [
+          384,
+          0,
+          128,
+          128
+        ],
+        "duration_ms": 400,
+        "alpha_bounds": [
+          41,
+          22,
+          87,
+          106
+        ],
+        "source_file": "final_idle_03.png"
+      },
+      {
+        "index": 4,
+        "rect": [
+          512,
+          0,
+          128,
+          128
+        ],
+        "duration_ms": 400,
+        "alpha_bounds": [
+          41,
+          22,
+          87,
+          106
+        ],
+        "source_file": "final_idle_04.png"
+      }
+    ],
+    "jump": [
+      {
+        "index": 0,
+        "rect": [
+          0,
+          128,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          41,
+          22,
+          90,
+          105
+        ],
+        "source_file": "final_jump_00.png"
+      },
+      {
+        "index": 1,
+        "rect": [
+          128,
+          128,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          43,
+          22,
+          87,
+          106
+        ],
+        "source_file": "final_jump_01.png"
+      },
+      {
+        "index": 2,
+        "rect": [
+          256,
+          128,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          42,
+          18,
+          86,
+          105
+        ],
+        "source_file": "final_jump_02.png"
+      },
+      {
+        "index": 3,
+        "rect": [
+          384,
+          128,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          42,
+          18,
+          87,
+          106
+        ],
+        "source_file": "final_jump_03.png"
+      },
+      {
+        "index": 4,
+        "rect": [
+          512,
+          128,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          41,
+          22,
+          89,
+          105
+        ],
+        "source_file": "final_jump_04.png"
+      }
+    ],
+    "fall": [
+      {
+        "index": 0,
+        "rect": [
+          0,
+          256,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          40,
+          27,
+          94,
+          106
+        ],
+        "source_file": "final_fall_00.png"
+      },
+      {
+        "index": 1,
+        "rect": [
+          128,
+          256,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          37,
+          22,
+          95,
+          105
+        ],
+        "source_file": "final_fall_01.png"
+      },
+      {
+        "index": 2,
+        "rect": [
+          256,
+          256,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          23,
+          33,
+          98,
+          106
+        ],
+        "source_file": "final_fall_02.png"
+      },
+      {
+        "index": 3,
+        "rect": [
+          384,
+          256,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          36,
+          24,
+          100,
+          107
+        ],
+        "source_file": "final_fall_03.png"
+      },
+      {
+        "index": 4,
+        "rect": [
+          512,
+          256,
+          128,
+          128
+        ],
+        "duration_ms": 110,
+        "alpha_bounds": [
+          37,
+          34,
+          98,
+          108
+        ],
+        "source_file": "final_fall_04.png"
+      }
+    ],
+    "happy": [
+      {
+        "index": 0,
+        "rect": [
+          0,
+          384,
+          128,
+          128
+        ],
+        "duration_ms": 180,
+        "alpha_bounds": [
+          48,
+          22,
+          94,
+          105
+        ],
+        "source_file": "final_happy_00.png"
+      },
+      {
+        "index": 1,
+        "rect": [
+          128,
+          384,
+          128,
+          128
+        ],
+        "duration_ms": 180,
+        "alpha_bounds": [
+          45,
+          21,
+          90,
+          105
+        ],
+        "source_file": "final_happy_01.png"
+      },
+      {
+        "index": 2,
+        "rect": [
+          256,
+          384,
+          128,
+          128
+        ],
+        "duration_ms": 180,
+        "alpha_bounds": [
+          26,
+          24,
+          99,
+          105
+        ],
+        "source_file": "final_happy_02.png"
+      },
+      {
+        "index": 3,
+        "rect": [
+          384,
+          384,
+          128,
+          128
+        ],
+        "duration_ms": 180,
+        "alpha_bounds": [
+          41,
+          21,
+          98,
+          105
+        ],
+        "source_file": "final_happy_03.png"
+      },
+      {
+        "index": 4,
+        "rect": [
+          512,
+          384,
+          128,
+          128
+        ],
+        "duration_ms": 180,
+        "alpha_bounds": [
+          48,
+          22,
+          93,
+          105
+        ],
+        "source_file": "final_happy_04.png"
+      }
+    ]
+  },
+  "atlas_sha256": "d9de859fd2960465eb059d1e772b559e8780898b040d6338244bd87720d37325",
+  "approved_for_runtime": true,
+  "runtime_mapping": "visual-only; center fixed to physics position; no collision changes",
+  "approval_basis": "Reviewed fixed-pivot contact sheet and focused unit/physics contracts; Android native verification required on the exact integration commit.",
+  "provenance": {
+    "character": "Pip / Workshop Hero V2",
+    "source": "Tripo Studio image-to-3D from original One Move concept",
+    "studio_model_id": "000e1e32-7b66-4f98-a8a3-e3700ef1df9a",
+    "generation_credits": 55,
+    "retopology": "Quad ~10k",
+    "retopology_credits": 40,
+    "rig": "Mixamo humanoid",
+    "rig_credits": 20,
+    "animation_presets": [
+      "idle",
+      "jump",
+      "fall (pre-impact subset)",
+      "cheer"
+    ],
+    "animation_preset_credits": 0,
+    "export_credits": 0,
+    "source_fbx_actions": [
+      "Armature|idle.001",
+      "Armature|jump.001",
+      "Armature|fall.001",
+      "Armature|cheer.001"
+    ]
+  }
+}
