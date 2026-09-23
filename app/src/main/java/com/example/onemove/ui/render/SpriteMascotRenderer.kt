@@ -26,65 +26,64 @@ object SpriteMascotRenderer {
     private const val ANIMATED_COLUMNS = 5
     private const val ANIMATED_ROWS = 4
 
-    private val animatedSpecs = linkedMapOf(
-        CreatureId.PIP to "pip_animated",
-        CreatureId.MOCHI to "mochi_animated",
-        CreatureId.BLOBBO to "blobbo_animated"
-    )
-
     private data class AnimatedAsset(
-        val image: ImageBitmap,
-        val framing: Float,
-        val compressedBytes: Int,
-        val decodedBytes: Int
+        val baseRow: Int,
+        val framing: Float
     )
 
+    @Volatile private var trioAtlas: ImageBitmap? = null
+    @Volatile private var trioDecodedBytes: Int = 0
+    @Volatile private var trioCompressedBytes: Int = 0
     @Volatile private var animatedAssets: Map<CreatureId, AnimatedAsset> = emptyMap()
 
     @Synchronized
     fun prepare(context: Context) {
-        if (animatedAssets.keys.containsAll(animatedSpecs.keys)) return
+        if (trioAtlas != null && animatedAssets.size == 3) return
 
+        val bytes = context.assets.open("mascots/trio_runtime.webp").use { it.readBytes() }
+        val manifest = context.assets.open("mascots/trio_runtime.json")
+            .bufferedReader().use { JSONObject(it.readText()) }
+        check(manifest.getBoolean("approved_for_runtime")) {
+            "Trio runtime atlas is not approved"
+        }
+        check(sha256(bytes) == manifest.getString("atlas_sha256")) {
+            "Trio runtime atlas integrity failure"
+        }
+        val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
+            "Cannot decode trio runtime atlas"
+        }
+        check(bitmap.width == ANIMATED_CELL * ANIMATED_COLUMNS &&
+            bitmap.height == ANIMATED_CELL * ANIMATED_ROWS * 3) {
+            "Incorrect trio runtime atlas geometry"
+        }
+        check(bitmap.hasAlpha()) { "Trio runtime atlas must retain transparency" }
+
+        val characters = manifest.getJSONObject("characters")
         val loaded = linkedMapOf<CreatureId, AnimatedAsset>()
-        for ((id, stem) in animatedSpecs) loaded[id] = loadAnimated(context, stem)
+        for (id in listOf(CreatureId.PIP, CreatureId.MOCHI, CreatureId.BLOBBO)) {
+            val spec = characters.getJSONObject(id.name)
+            check(spec.getBoolean("approved_for_runtime")) {
+                "Animated mascot is not approved for runtime: $id"
+            }
+            loaded[id] = AnimatedAsset(
+                baseRow = spec.getInt("base_row"),
+                framing = spec.getDouble("framing").toFloat()
+            )
+        }
+        trioAtlas = bitmap.asImageBitmap()
+        trioDecodedBytes = bitmap.allocationByteCount
+        trioCompressedBytes = bytes.size
         animatedAssets = loaded
 
         Log.i(
             "OneMoveAssets",
-            "Loaded animated " + loaded.keys.joinToString() +
-                "; compressedBytes=" + loaded.values.sumOf { it.compressedBytes } +
-                "; decodedBytes=" + loaded.values.sumOf { it.decodedBytes } +
-                "; legacyStaticDecodedBytes=0"
+            "Loaded shared trio atlas; textureCount=1; compressedBytes=" + trioCompressedBytes +
+                "; decodedBytes=" + trioDecodedBytes + "; legacyStaticDecodedBytes=0"
         )
     }
 
-    internal fun residentDecodedBytesForTest(): Int = animatedAssets.values.sumOf { it.decodedBytes }
-
-    private fun loadAnimated(context: Context, stem: String): AnimatedAsset {
-        val bytes = context.assets.open("mascots/" + stem + ".webp").use { it.readBytes() }
-        val manifest = context.assets.open("mascots/" + stem + ".json")
-            .bufferedReader().use { JSONObject(it.readText()) }
-        check(manifest.getBoolean("approved_for_runtime")) {
-            "Animated mascot is not approved for runtime: $stem"
-        }
-        check(sha256(bytes) == manifest.getString("atlas_sha256")) {
-            "Animated mascot atlas integrity failure: $stem"
-        }
-        val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
-            "Cannot decode animated mascot atlas: $stem"
-        }
-        check(bitmap.width == ANIMATED_CELL * ANIMATED_COLUMNS &&
-            bitmap.height == ANIMATED_CELL * ANIMATED_ROWS) {
-            "Incorrect animated mascot atlas geometry: $stem"
-        }
-        check(bitmap.hasAlpha()) { "Animated mascot atlas must retain transparency: $stem" }
-        return AnimatedAsset(
-            image = bitmap.asImageBitmap(),
-            framing = manifest.optDouble("framing", DEFAULT_FRAMING.toDouble()).toFloat(),
-            compressedBytes = bytes.size,
-            decodedBytes = bitmap.allocationByteCount
-        )
-    }
+    internal fun residentDecodedBytesForTest(): Int = trioDecodedBytes
+    internal fun runtimeTextureCountForTest(): Int = if (trioAtlas == null) 0 else 1
 
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes)
@@ -111,7 +110,8 @@ object SpriteMascotRenderer {
     /** False only for isolated vector preview tests which did not create MainActivity. */
     fun draw(scope: DrawScope, creature: Creature, center: Offset, visualTime: Float = 0f): Boolean {
         val animated = animatedAssets[creature.id]
-        if (animated != null) {
+        val shared = trioAtlas
+        if (animated != null && shared != null) {
             drawShadow(scope, creature, center)
             val clip = selectClip(creature)
             val safeTime = if (visualTime.isFinite() && visualTime >= 0f) visualTime else 0f
@@ -119,8 +119,8 @@ object SpriteMascotRenderer {
             val side = (creature.radius * animated.framing).roundToInt().coerceAtLeast(1)
             with(scope) {
                 drawImage(
-                    image = animated.image,
-                    srcOffset = IntOffset(frame * ANIMATED_CELL, clip.row * ANIMATED_CELL),
+                    image = shared,
+                    srcOffset = IntOffset(frame * ANIMATED_CELL, (animated.baseRow + clip.row) * ANIMATED_CELL),
                     srcSize = IntSize(ANIMATED_CELL, ANIMATED_CELL),
                     dstOffset = IntOffset(
                         (center.x - side / 2f).roundToInt(),
@@ -138,15 +138,16 @@ object SpriteMascotRenderer {
     /** Portraits use the reviewed new designs but freeze motion to avoid a twitchy HUD. */
     fun drawPortrait(scope: DrawScope, creature: Creature, center: Offset): Boolean {
         val animated = animatedAssets[creature.id]
-        if (animated != null) {
+        val shared = trioAtlas
+        if (animated != null && shared != null) {
             drawShadow(scope, creature, center)
             val clip = selectClip(creature)
             val frame = clip.fixedFrame ?: 0
             val side = (creature.radius * animated.framing).roundToInt().coerceAtLeast(1)
             with(scope) {
                 drawImage(
-                    image = animated.image,
-                    srcOffset = IntOffset(frame * ANIMATED_CELL, clip.row * ANIMATED_CELL),
+                    image = shared,
+                    srcOffset = IntOffset(frame * ANIMATED_CELL, (animated.baseRow + clip.row) * ANIMATED_CELL),
                     srcSize = IntSize(ANIMATED_CELL, ANIMATED_CELL),
                     dstOffset = IntOffset(
                         (center.x - side / 2f).roundToInt(),
