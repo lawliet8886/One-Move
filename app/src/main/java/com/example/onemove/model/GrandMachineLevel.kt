@@ -33,11 +33,12 @@ object GrandMachineLevel {
             // Heavy-key shaft.
             rail(80f,470f,80f,965f), rail(290f,470f,290f,965f),
             // Rolling-key ramp and a harmless parking floor when its catcher is removed.
-            rail(330f,570f,680f,820f), rail(790f,1050f,1080f,1050f),
-            // Creature approach and a real funnel that lands INSIDE the sanctuary walls.
-            rail(1080f,770f,1080f,1000f),
-            rail(690f,1015f,755f,1220f),
-            rail(1135f,1015f,1045f,1220f),
+            rail(330f,570f,680f,820f), rail(790f,1050f,860f,1050f),
+            // Creature lane is physically separate from the rolling-key ramp. The
+            // rescue bridge exits on the RIGHT; wrong removal drops straight into danger.
+            // The lane widens only after y=900, below the wrong-drop basin.
+            rail(980f,760f,755f,1220f),
+            rail(1180f,760f,1045f,1220f),
             rail(755f,1220f,755f,1465f), rail(1045f,1220f,1045f,1465f)
         ),
         heavyBalls=listOf(HeavyBall(Vector2D(180f,350f))),
@@ -51,6 +52,9 @@ object GrandMachineLevel {
                 requiredPlateIds=listOf("heavy-key","rolling-key"))
         ),
         dangerPits=listOf(
+            // Pulling the rescue bridge makes the trio fall here before reaching the
+            // right-hand lane. The key bodies ignore danger volumes; creatures do not.
+            DangerPit(Rect2D(700f,760f,950f,900f)),
             DangerPit(Rect2D(40f,1100f,700f,1540f))
         ),
         goalZone=GoalZone(Vector2D(900f,1360f),170f),
