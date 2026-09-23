@@ -71,7 +71,7 @@ object LevelCatalog {
     fun createLevel04() = GatewayKeyLevel.create()
     fun createLevel05() = PuzzlePrototypes.springGap()
     fun createLevel06() = CounterweightLevel.create()
-    fun createLevel07() = board(7, "Iron Wrecker", PinId.PIN_A, 3, 650f, 480f, heavy = true)
+    fun createLevel07() = WreckerBumperLevel.create()
     fun createLevel08() = PuzzlePrototypes.shield()
     fun createLevel09() = WeightSwitchLevel.create()
     fun createLevel10() = ReturnFlightLevel.create()
