@@ -48,7 +48,7 @@ private fun RescuePortraits(state: GameUiState, size: Dp) {
             Canvas(Modifier.size(size).semantics {
                 contentDescription = "${creature.id}: " + if (creature.isInsideGoal) "rescued" else "waiting for rescue"
             }) {
-                HeroCreatureRenderer.drawCreature(this, creature.copy(radius = this.size.minDimension * 0.34f), center)
+                HeroCreatureRenderer.drawPortrait(this, creature.copy(radius = this.size.minDimension * 0.34f), center)
             }
         }
     }

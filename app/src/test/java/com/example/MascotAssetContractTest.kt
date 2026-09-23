@@ -21,7 +21,7 @@ class MascotAssetContractTest {
     @Test
     fun animatedMascotAtlasesAreVerifiedTransparentBoundedAndPrepared() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        for (stem in listOf("pip_animated", "blobbo_animated")) {
+        for (stem in listOf("pip_animated", "mochi_animated", "blobbo_animated")) {
             val bytes = context.assets.open("mascots/$stem.webp").use { it.readBytes() }
             val manifest = context.assets.open("mascots/$stem.json")
                 .bufferedReader().use { JSONObject(it.readText()) }

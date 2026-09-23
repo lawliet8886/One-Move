@@ -29,6 +29,7 @@ object SpriteMascotRenderer {
 
     private val animatedSpecs = linkedMapOf(
         CreatureId.PIP to "pip_animated",
+        CreatureId.MOCHI to "mochi_animated",
         CreatureId.BLOBBO to "blobbo_animated"
     )
 
@@ -150,8 +151,30 @@ object SpriteMascotRenderer {
         return drawPortrait(scope, creature, center)
     }
 
-    /** UI portrait mode deliberately stays visually uniform while gameplay sprites animate. */
+    /** Portraits use the reviewed new designs but freeze motion to avoid a twitchy HUD. */
     fun drawPortrait(scope: DrawScope, creature: Creature, center: Offset): Boolean {
+        val animated = animatedAssets[creature.id]
+        if (animated != null) {
+            drawShadow(scope, creature, center)
+            val clip = selectClip(creature)
+            val frame = clip.fixedFrame ?: 0
+            val side = (creature.radius * animated.framing).roundToInt().coerceAtLeast(1)
+            with(scope) {
+                drawImage(
+                    image = animated.image,
+                    srcOffset = IntOffset(frame * ANIMATED_CELL, clip.row * ANIMATED_CELL),
+                    srcSize = IntSize(ANIMATED_CELL, ANIMATED_CELL),
+                    dstOffset = IntOffset(
+                        (center.x - side / 2f).roundToInt(),
+                        (center.y - side / 2f).roundToInt()
+                    ),
+                    dstSize = IntSize(side, side),
+                    filterQuality = FilterQuality.Medium
+                )
+            }
+            return true
+        }
+
         val image = staticAtlas ?: return false
         drawShadow(scope, creature, center)
         val column = when (creature.expression) {
