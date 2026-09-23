@@ -27,7 +27,7 @@ class WreckerBumperLevelContractTest {
         return world
     }
 
-    @Test fun wreckerMustBecomeThePhysicalBumperAcrossSchedulesAndOffsets() {
+    @Test fun wreckerMustStageTheHeavySwitchAcrossSchedulesAndOffsets() {
         val level = WreckerBumperLevel.create()
         var reference: String? = null
         for (schedule in schedules) {
@@ -40,6 +40,12 @@ class WreckerBumperLevelContractTest {
                         SimulationState.SUCCESS, world.state
                     )
                     assertTrue(world.creatures.all { it.isInsideGoal })
+                    assertTrue(world.pressurePlates.single().isLatched)
+                    assertTrue(world.creatureGates.single().isOpen)
+                    val latch = world.events.first { it.kind == "plate_latched" }.time
+                    val gate = world.events.first { it.kind == "gate_opened" }.time
+                    val rescue = world.events.first { it.kind == "rescued" }.time
+                    assertTrue("wrecker sequence must be key -> gate -> rescue", latch <= gate && gate < rescue)
                     val signature = "${world.simulationTime}/${world.creatures.map { it.position }}/${world.heavyBalls.map { it.position }}"
                     if (reference == null) reference = signature
                     assertEquals("frame schedule changed the wrecker route", reference, signature)
@@ -59,19 +65,23 @@ class WreckerBumperLevelContractTest {
 
             val broken = listOf(
                 "no_weight" to level.copy(heavyBalls = emptyList()),
+                "no_switch" to level.copy(pressurePlates = emptyList()),
                 "no_guide" to level.copy(pins = level.pins.filter { it.id != PinId.PIN_B }),
-                "no_floor" to level.copy(pins = level.pins.filter { it.id != PinId.PIN_C }),
-                "no_pocket" to level.copy(platforms = level.platforms.filterNot { p ->
-                    (p.start == Vector2D(680f, 920f) && p.end == Vector2D(850f, 950f)) ||
-                    (p.start == Vector2D(850f, 820f) && p.end == Vector2D(850f, 950f))
-                })
+                "no_floor" to level.copy(pins = level.pins.filter { it.id != PinId.PIN_C })
             )
             for ((label, candidate) in broken) {
                 assertEquals("decorative mechanism: $label", SimulationState.FAILED,
                     run(candidate, PinId.PIN_A, schedule).state)
             }
 
+            // A gate is intentionally an obstacle: deleting it should make the route easier,
+            // not fail. Its causal job is to delay the trio until the heavy switch latches.
+            val ungated = run(level.copy(creatureGates = emptyList()), PinId.PIN_A, schedule)
+            assertEquals(SimulationState.SUCCESS, ungated.state)
+            assertTrue(ungated.events.none { it.kind == "gate_opened" })
+
             val actual = run(level, PinId.PIN_A, schedule)
+            assertTrue("gate must stage the rescue", ungated.simulationTime < actual.simulationTime)
             val relabelled = run(level.copy(solutionPinId = PinId.PIN_C), PinId.PIN_A, schedule)
             assertEquals(actual.state, relabelled.state)
             assertEquals(actual.events, relabelled.events)
