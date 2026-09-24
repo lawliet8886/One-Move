@@ -97,7 +97,7 @@ class OneMoveDeviceJourneyTest {
         node("failure_overlay",12_000L)
         capture("wrong_pin_failure")
         node("retry_button").click()
-        assertTrue(device.wait(Until.hasObject(By.text("1 MOVE LEFT")),5_000L))
+        waitForRetryReady(1)
         node("game_board_canvas")
         assertFalse("Retry retained the old failure card",device.hasObject(By.res("failure_overlay")))
         capture("retry_ready")
@@ -136,7 +136,7 @@ class OneMoveDeviceJourneyTest {
             }
             capture("level_${number.toString().padStart(2,'0')}_wrong_${pinId.name}_01_failure")
             node("retry_button").click()
-            assertTrue("Retry did not restore the move", device.wait(Until.hasObject(By.text("1 MOVE LEFT")), 5_000L))
+            waitForRetryReady(number)
             node("game_board_canvas")
             instrumentation.runOnMainSync {
                 assertEquals(SimulationState.READY, model.physicsWorld.state)
@@ -205,6 +205,28 @@ class OneMoveDeviceJourneyTest {
         node("success_overlay",12_000L)
         capture("resume_success")
         Log.i("OneMoveQA","Lifecycle: resumed and visibly completed")
+    }
+
+    private fun waitForRetryReady(expectedLevel: Int, timeout: Long = 5_000L) {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val deadline = SystemClock.uptimeMillis() + timeout
+        var ready = false
+        while (!ready && SystemClock.uptimeMillis() < deadline) {
+            instrumentation.runOnMainSync {
+                ready = model.physicsWorld.state == SimulationState.READY &&
+                    model.uiState.value.currentLevelNumber == expectedLevel &&
+                    model.uiState.value.moveCountLeft == 1 &&
+                    model.physicsWorld.failureReason.isEmpty()
+            }
+            if (!ready) SystemClock.sleep(20L)
+        }
+        assertTrue("Retry did not restore READY state for level $expectedLevel", ready)
+        assertTrue("Retry retained the failure overlay", device.wait(Until.gone(By.res("failure_overlay")), timeout))
+        val counter = device.wait(Until.findObject(By.res("move_counter_pill")), timeout)
+        assertNotNull("Retry did not restore the move counter", counter)
+        val labels = listOf("1 MOVE LEFT", "1 MOVE", "1 PULL")
+        val visibleOneMove = counter!!.text in labels || labels.any { counter.findObject(By.text(it)) != null }
+        assertTrue("Retry READY state was not reflected by the adaptive HUD; counter='${counter.text}'", visibleOneMove)
     }
 
     private fun tapPin(number: Int, id: PinId) {

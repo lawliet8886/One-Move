@@ -66,7 +66,7 @@ class OneMoveFlyingKeyTest {
                     }
                     capture("flying_key_${id}_01_failed")
                     node("retry_button").click()
-                    assertTrue(device.wait(Until.hasObject(By.text("1 MOVE LEFT")),5_000L))
+                    waitForRetryReady(model, 11)
                     SystemClock.sleep(300)
                     instrumentation.runOnMainSync {
                         assertEquals(SimulationState.READY,model.physicsWorld.state)
@@ -81,6 +81,29 @@ class OneMoveFlyingKeyTest {
             File(out,"flying-key-native.txt").writeText("PASS: real screen-coordinate touches; one spring-to-switch success and three locked-route failures with physical retry assertions. NOT free exploration.\n")
         }
     }
+    private fun waitForRetryReady(model: OneMoveViewModel, expectedLevel: Int, timeout: Long = 5_000L) {
+        val deadline = SystemClock.uptimeMillis() + timeout
+        var ready = false
+        while (!ready && SystemClock.uptimeMillis() < deadline) {
+            instrumentation.runOnMainSync {
+                ready = model.physicsWorld.state == SimulationState.READY &&
+                    model.uiState.value.currentLevelNumber == expectedLevel &&
+                    model.uiState.value.moveCountLeft == 1 &&
+                    model.physicsWorld.failureReason.isEmpty()
+            }
+            if (!ready) SystemClock.sleep(20L)
+        }
+        assertTrue("Retry did not restore READY state for level $expectedLevel", ready)
+        assertTrue("Retry retained the failure overlay", device.wait(Until.gone(By.res("failure_overlay")), timeout))
+        val counter = device.wait(Until.findObject(By.res("move_counter_pill")), timeout)
+        assertNotNull("Retry did not restore the move counter", counter)
+        val labels = listOf("1 MOVE LEFT", "1 MOVE", "1 PULL")
+        assertTrue(
+            "Retry READY state was not reflected by the adaptive HUD; counter='${counter!!.text}'",
+            counter.text in labels || labels.any { counter.findObject(By.text(it)) != null }
+        )
+    }
+
     private fun node(tag:String,timeout:Long=5_000L):UiObject2 {
         val found=device.wait(Until.findObject(By.res(tag)),timeout)
         if(found==null) {
