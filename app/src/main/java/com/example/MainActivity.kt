@@ -15,6 +15,7 @@ class MainActivity : ComponentActivity() {
         // One small bundled atlas, decoded once per process before the first frame.
         SpriteMascotRenderer.prepare(applicationContext)
         com.example.onemove.ui.render.HardwareSpriteRenderer.prepare(applicationContext)
+        com.example.onemove.ui.render.SpringBumperRenderer.prepare(applicationContext)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)

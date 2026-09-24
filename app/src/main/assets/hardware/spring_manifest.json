@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "asset_id": "spring-cartridge-v2",
+  "version": "1.0.0",
+  "cell_size": 128,
+  "columns": 4,
+  "rows": 1,
+  "atlas_width": 512,
+  "atlas_height": 128,
+  "decoded_bytes_rgba": 262144,
+  "pivot_cell": [
+    64,
+    89
+  ],
+  "physical_width_pixels": 94,
+  "physical_anchor": "bumper.position maps to copper deck center",
+  "compressions": [
+    0.0,
+    0.33,
+    0.66,
+    1.0
+  ],
+  "frames": [
+    {
+      "index": 0,
+      "compression": 0.0,
+      "rect": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "alpha_bounds": [
+        17,
+        21,
+        111,
+        105
+      ],
+      "source_file": "spring_0.png"
+    },
+    {
+      "index": 1,
+      "compression": 0.33,
+      "rect": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "alpha_bounds": [
+        17,
+        32,
+        111,
+        105
+      ],
+      "source_file": "spring_1.png"
+    },
+    {
+      "index": 2,
+      "compression": 0.66,
+      "rect": [
+        256,
+        0,
+        128,
+        128
+      ],
+      "alpha_bounds": [
+        17,
+        44,
+        111,
+        105
+      ],
+      "source_file": "spring_2.png"
+    },
+    {
+      "index": 3,
+      "compression": 1.0,
+      "rect": [
+        384,
+        0,
+        128,
+        128
+      ],
+      "alpha_bounds": [
+        17,
+        56,
+        111,
+        105
+      ],
+      "source_file": "spring_3.png"
+    }
+  ],
+  "atlas_sha256": "5b707cd6d96d864c7d739de67415f3393d06dc51acae26673e04aa1c9071b150",
+  "approved_for_runtime": true,
+  "provenance": {
+    "source": "Original local Blender concept; no prior spring geometry reused",
+    "source_blend": "spring_cartridge_v2.blend",
+    "tripo_credits_spent": 0,
+    "note": "Paid Tripo generation prepared but not executed because the tool security layer blocked the paid action."
+  }
+}
