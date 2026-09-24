@@ -85,6 +85,34 @@ object SpringBumperRenderer {
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes)
             .joinToString("") { "%02x".format(it) }
+    internal data class VisualMetrics(
+        val frame: Int,
+        val destinationWidth: Int,
+        val destinationHeight: Int,
+        val offsetX: Int,
+        val offsetY: Int,
+        val machineTopY: Float,
+        val visibleSpringHeight: Float
+    )
+
+    internal fun visualMetricsForTest(width: Float, restHeight: Float, compression: Float): VisualMetrics {
+        val c = compression.coerceIn(0f, 1f)
+        val frame = (c * (FRAME_COUNT - 1)).roundToInt().coerceIn(0, FRAME_COUNT - 1)
+        val xScale = width / physicalWidthPixels
+        val targetSpringHeight = restHeight * (1f - 0.70f * c)
+        val sourceSpringHeight = (pivotY - frameTops[frame]).coerceAtLeast(1f)
+        val yScale = targetSpringHeight / sourceSpringHeight
+        return VisualMetrics(
+            frame = frame,
+            destinationWidth = (CELL * xScale).roundToInt().coerceAtLeast(1),
+            destinationHeight = (CELL * yScale).roundToInt().coerceAtLeast(1),
+            offsetX = (-pivotX * xScale).roundToInt(),
+            offsetY = (-pivotY * yScale).roundToInt(),
+            machineTopY = (frameTops[frame] - pivotY) * yScale,
+            visibleSpringHeight = targetSpringHeight
+        )
+    }
+
     fun drawSpringBumper(drawScope: DrawScope, bumper: SpringBumper) = with(drawScope) {
         val n = bumper.direction.normalized()
         val angle = Math.toDegrees(atan2(n.y.toDouble(), n.x.toDouble())).toFloat() + 90f
@@ -96,23 +124,16 @@ object SpringBumperRenderer {
             rotate(angle, pivot = Offset.Zero)
         }) {
             if (image != null) {
-                val frame = (compression * (FRAME_COUNT - 1)).roundToInt().coerceIn(0, FRAME_COUNT - 1)
-                val sideF = bumper.width * CELL / physicalWidthPixels
-                val side = sideF.roundToInt().coerceAtLeast(1)
-                val scale = sideF / CELL
+                val metrics = visualMetricsForTest(bumper.width, bumper.restHeight, compression)
                 drawImage(
                     image = image,
-                    srcOffset = IntOffset(frame * CELL, 0),
+                    srcOffset = IntOffset(metrics.frame * CELL, 0),
                     srcSize = IntSize(CELL, CELL),
-                    dstOffset = IntOffset(
-                        (-pivotX * scale).roundToInt(),
-                        (-pivotY * scale).roundToInt()
-                    ),
-                    dstSize = IntSize(side, side),
+                    dstOffset = IntOffset(metrics.offsetX, metrics.offsetY),
+                    dstSize = IntSize(metrics.destinationWidth, metrics.destinationHeight),
                     filterQuality = FilterQuality.Medium
                 )
-                val topY = (frameTops[frame] - pivotY) * scale
-                drawDirectionOverlay(bumper, topY)
+                drawDirectionOverlay(bumper, metrics.machineTopY)
             } else {
                 drawVectorFallback(bumper, compression)
             }

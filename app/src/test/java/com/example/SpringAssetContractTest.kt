@@ -62,5 +62,16 @@ class SpringAssetContractTest {
         SpringBumperRenderer.prepare(context)
         assertTrue(SpringBumperRenderer.isPrepared)
         assertEquals(262_144, SpringBumperRenderer.DECODED_BYTES)
+
+        val rest = SpringBumperRenderer.visualMetricsForTest(360f, 35f, 0f)
+        assertEquals(-35f, rest.machineTopY, 0.01f)
+        assertEquals(35f, rest.visibleSpringHeight, 0.01f)
+        assertTrue("Wide bumper art must not be rendered as a square", rest.destinationWidth > rest.destinationHeight * 5)
+        assertEquals(360f, rest.destinationWidth * 94f / 128f, 1.0f)
+
+        val compressed = SpringBumperRenderer.visualMetricsForTest(360f, 35f, 1f)
+        assertEquals(-10.5f, compressed.machineTopY, 0.01f)
+        assertEquals(10.5f, compressed.visibleSpringHeight, 0.01f)
+        assertTrue(compressed.destinationHeight < rest.destinationHeight)
     }
 }
