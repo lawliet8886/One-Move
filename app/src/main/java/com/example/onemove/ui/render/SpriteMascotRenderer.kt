@@ -22,9 +22,8 @@ import kotlin.math.roundToInt
 /** Reviewed sprite art. Animation is visual-only and never feeds positions back into physics. */
 object SpriteMascotRenderer {
     private const val DEFAULT_FRAMING = 3.6f
-    private const val ANIMATED_CELL = 128
-    private const val ANIMATED_COLUMNS = 5
-    private const val ANIMATED_ROWS = 4
+    private const val REVIEWED_COLUMNS = 5
+    private const val REVIEWED_ROWS_PER_MASCOT = 4
 
     private data class AnimatedAsset(
         val baseRow: Int,
@@ -34,6 +33,8 @@ object SpriteMascotRenderer {
     @Volatile private var trioAtlas: ImageBitmap? = null
     @Volatile private var trioDecodedBytes: Int = 0
     @Volatile private var trioCompressedBytes: Int = 0
+    @Volatile private var trioCellSize: Int = 128
+    @Volatile private var trioColumns: Int = REVIEWED_COLUMNS
     @Volatile private var animatedAssets: Map<CreatureId, AnimatedAsset> = emptyMap()
 
     @Synchronized
@@ -52,8 +53,16 @@ object SpriteMascotRenderer {
         val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size)) {
             "Cannot decode trio runtime atlas"
         }
-        check(bitmap.width == ANIMATED_CELL * ANIMATED_COLUMNS &&
-            bitmap.height == ANIMATED_CELL * ANIMATED_ROWS * 3) {
+        val cellSize = manifest.getInt("cell_size")
+        val columns = manifest.getInt("columns")
+        val rows = manifest.getInt("rows")
+        check(cellSize in 64..128) { "Unsupported trio runtime cell size: $cellSize" }
+        check(columns == REVIEWED_COLUMNS && rows == REVIEWED_ROWS_PER_MASCOT * 3) {
+            "Unexpected trio runtime grid: ${columns}x$rows"
+        }
+        check(bitmap.width == manifest.getInt("atlas_width") &&
+            bitmap.height == manifest.getInt("atlas_height") &&
+            bitmap.width == cellSize * columns && bitmap.height == cellSize * rows) {
             "Incorrect trio runtime atlas geometry"
         }
         check(bitmap.hasAlpha()) { "Trio runtime atlas must retain transparency" }
@@ -73,6 +82,8 @@ object SpriteMascotRenderer {
         trioAtlas = bitmap.asImageBitmap()
         trioDecodedBytes = bitmap.allocationByteCount
         trioCompressedBytes = bytes.size
+        trioCellSize = cellSize
+        trioColumns = columns
         animatedAssets = loaded
 
         Log.i(
@@ -115,13 +126,14 @@ object SpriteMascotRenderer {
             drawShadow(scope, creature, center)
             val clip = selectClip(creature)
             val safeTime = if (visualTime.isFinite() && visualTime >= 0f) visualTime else 0f
-            val frame = clip.fixedFrame ?: ((safeTime / clip.frameSeconds).toInt() % ANIMATED_COLUMNS)
+            val cell = trioCellSize
+            val frame = clip.fixedFrame ?: ((safeTime / clip.frameSeconds).toInt() % trioColumns)
             val side = (creature.radius * animated.framing).roundToInt().coerceAtLeast(1)
             with(scope) {
                 drawImage(
                     image = shared,
-                    srcOffset = IntOffset(frame * ANIMATED_CELL, (animated.baseRow + clip.row) * ANIMATED_CELL),
-                    srcSize = IntSize(ANIMATED_CELL, ANIMATED_CELL),
+                    srcOffset = IntOffset(frame * cell, (animated.baseRow + clip.row) * cell),
+                    srcSize = IntSize(cell, cell),
                     dstOffset = IntOffset(
                         (center.x - side / 2f).roundToInt(),
                         (center.y - side / 2f).roundToInt()
@@ -142,13 +154,14 @@ object SpriteMascotRenderer {
         if (animated != null && shared != null) {
             drawShadow(scope, creature, center)
             val clip = selectClip(creature)
+            val cell = trioCellSize
             val frame = clip.fixedFrame ?: 0
             val side = (creature.radius * animated.framing).roundToInt().coerceAtLeast(1)
             with(scope) {
                 drawImage(
                     image = shared,
-                    srcOffset = IntOffset(frame * ANIMATED_CELL, (animated.baseRow + clip.row) * ANIMATED_CELL),
-                    srcSize = IntSize(ANIMATED_CELL, ANIMATED_CELL),
+                    srcOffset = IntOffset(frame * cell, (animated.baseRow + clip.row) * cell),
+                    srcSize = IntSize(cell, cell),
                     dstOffset = IntOffset(
                         (center.x - side / 2f).roundToInt(),
                         (center.y - side / 2f).roundToInt()

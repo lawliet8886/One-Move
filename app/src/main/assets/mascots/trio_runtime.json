@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "asset_id": "one-move-trio-runtime",
-  "version": "1.0.0",
-  "cell_size": 128,
+  "version": "1.1.0",
+  "cell_size": 96,
   "columns": 5,
   "rows": 12,
-  "atlas_width": 640,
-  "atlas_height": 1536,
-  "decoded_bytes_rgba": 3932160,
-  "compressed_bytes": 424078,
-  "atlas_sha256": "fa1e7c612c23c3acd15d03635aa902fdca1e472205b433cf5e31bf8715793586",
+  "atlas_width": 480,
+  "atlas_height": 1152,
+  "decoded_bytes_rgba": 2211840,
+  "compressed_bytes": 303214,
+  "atlas_sha256": "e415593fa2273c8ce007aa041be6a7a9886cf75c7fb444a1103d14ca81773074",
   "approved_for_runtime": true,
   "characters": {
     "PIP": {
@@ -26,83 +26,83 @@
             "rect": [
               0,
               0,
-              128,
-              128
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              22,
-              87,
-              106
+              29,
+              15,
+              67,
+              81
             ],
             "source_file": "final_idle_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
+              96,
               0,
-              128,
-              128
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              22,
-              87,
-              106
+              29,
+              15,
+              67,
+              81
             ],
             "source_file": "final_idle_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
+              192,
               0,
-              128,
-              128
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              21,
-              87,
-              105
+              29,
+              14,
+              67,
+              80
             ],
             "source_file": "final_idle_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
+              288,
               0,
-              128,
-              128
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              22,
-              87,
-              106
+              29,
+              14,
+              67,
+              81
             ],
             "source_file": "final_idle_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
+              384,
               0,
-              128,
-              128
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              22,
-              87,
-              106
+              29,
+              15,
+              67,
+              81
             ],
             "source_file": "final_idle_04.png"
           }
@@ -112,84 +112,84 @@
             "index": 0,
             "rect": [
               0,
-              128,
-              128,
-              128
+              96,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              41,
-              22,
-              90,
-              105
+              29,
+              15,
+              69,
+              80
             ],
             "source_file": "final_jump_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              128,
-              128,
-              128
+              96,
+              96,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              43,
-              22,
-              87,
-              106
+              30,
+              15,
+              67,
+              81
             ],
             "source_file": "final_jump_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              128,
-              128,
-              128
+              192,
+              96,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              42,
-              18,
-              86,
-              105
+              30,
+              12,
+              66,
+              80
             ],
             "source_file": "final_jump_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              128,
-              128,
-              128
+              288,
+              96,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              42,
-              18,
-              87,
-              106
+              30,
+              12,
+              67,
+              81
             ],
             "source_file": "final_jump_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              128,
-              128,
-              128
+              384,
+              96,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              41,
-              22,
-              89,
-              105
+              29,
+              15,
+              69,
+              81
             ],
             "source_file": "final_jump_04.png"
           }
@@ -199,84 +199,84 @@
             "index": 0,
             "rect": [
               0,
-              256,
-              128,
-              128
+              192,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              40,
-              27,
-              94,
-              106
+              28,
+              19,
+              72,
+              81
             ],
             "source_file": "final_fall_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              256,
-              128,
-              128
+              96,
+              192,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              37,
-              22,
-              95,
-              105
+              26,
+              14,
+              74,
+              81
             ],
             "source_file": "final_fall_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              256,
-              128,
-              128
+              192,
+              192,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              23,
-              33,
-              98,
-              106
+              16,
+              22,
+              75,
+              81
             ],
             "source_file": "final_fall_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              256,
-              128,
-              128
+              288,
+              192,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              36,
-              24,
-              100,
-              107
+              25,
+              16,
+              77,
+              82
             ],
             "source_file": "final_fall_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              256,
-              128,
-              128
+              384,
+              192,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              37,
-              34,
-              98,
-              108
+              26,
+              23,
+              75,
+              83
             ],
             "source_file": "final_fall_04.png"
           }
@@ -286,84 +286,84 @@
             "index": 0,
             "rect": [
               0,
-              384,
-              128,
-              128
+              288,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              48,
-              22,
-              94,
-              105
+              34,
+              15,
+              73,
+              81
             ],
             "source_file": "final_happy_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              384,
-              128,
-              128
+              96,
+              288,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              45,
-              21,
-              90,
-              105
+              31,
+              14,
+              70,
+              80
             ],
             "source_file": "final_happy_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              384,
-              128,
-              128
+              192,
+              288,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              26,
-              24,
-              99,
-              105
+              17,
+              16,
+              76,
+              80
             ],
             "source_file": "final_happy_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              384,
-              128,
-              128
+              288,
+              288,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              41,
-              21,
-              98,
-              105
+              29,
+              14,
+              75,
+              80
             ],
             "source_file": "final_happy_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
               384,
-              128,
-              128
+              288,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              48,
-              22,
-              93,
-              105
+              34,
+              15,
+              72,
+              81
             ],
             "source_file": "final_happy_04.png"
           }
@@ -407,84 +407,84 @@
             "index": 0,
             "rect": [
               0,
-              512,
-              128,
-              128
+              384,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              14,
-              87,
-              114
+              29,
+              9,
+              67,
+              87
             ],
             "source_file": "final_idle_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              512,
-              128,
-              128
+              96,
+              384,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              42,
-              14,
-              88,
-              114
+              29,
+              9,
+              68,
+              87
             ],
             "source_file": "final_idle_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              512,
-              128,
-              128
+              192,
+              384,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              42,
-              13,
-              87,
-              112
+              30,
+              8,
+              68,
+              86
             ],
             "source_file": "final_idle_02.png"
           },
           {
             "index": 3,
             "rect": [
+              288,
               384,
-              512,
-              128,
-              128
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              14,
-              86,
-              114
+              28,
+              9,
+              67,
+              87
             ],
             "source_file": "final_idle_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              512,
-              128,
-              128
+              384,
+              384,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              41,
-              14,
-              87,
-              114
+              29,
+              9,
+              67,
+              87
             ],
             "source_file": "final_idle_04.png"
           }
@@ -494,84 +494,84 @@
             "index": 0,
             "rect": [
               0,
-              640,
-              128,
-              128
+              480,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              40,
-              15,
-              88,
-              112
+              28,
+              9,
+              68,
+              86
             ],
             "source_file": "final_jump_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              640,
-              128,
-              128
+              96,
+              480,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              42,
-              15,
-              87,
-              113
+              29,
+              9,
+              67,
+              87
             ],
             "source_file": "final_jump_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              640,
-              128,
-              128
+              192,
+              480,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              42,
-              11,
-              86,
-              114
+              29,
+              6,
+              67,
+              87
             ],
             "source_file": "final_jump_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              640,
-              128,
-              128
+              288,
+              480,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              42,
-              11,
-              87,
-              115
+              30,
+              6,
+              67,
+              88
             ],
             "source_file": "final_jump_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              640,
-              128,
-              128
+              384,
+              480,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              41,
-              15,
-              88,
-              112
+              28,
+              9,
+              68,
+              86
             ],
             "source_file": "final_jump_04.png"
           }
@@ -581,84 +581,84 @@
             "index": 0,
             "rect": [
               0,
-              768,
-              128,
-              128
+              576,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              36,
-              20,
-              83,
-              113
+              25,
+              13,
+              64,
+              87
             ],
             "source_file": "final_fall_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              768,
-              128,
-              128
+              96,
+              576,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              34,
-              15,
-              84,
-              113
+              23,
+              9,
+              65,
+              86
             ],
             "source_file": "final_fall_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              768,
-              128,
-              128
+              192,
+              576,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              19,
-              33,
-              85,
-              113
+              12,
+              23,
+              65,
+              86
             ],
             "source_file": "final_fall_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              768,
-              128,
-              128
+              288,
+              576,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              37,
-              16,
-              86,
-              114
+              25,
+              10,
+              66,
+              87
             ],
             "source_file": "final_fall_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              768,
-              128,
-              128
+              384,
+              576,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              37,
-              28,
-              89,
-              116
+              26,
+              19,
+              68,
+              89
             ],
             "source_file": "final_fall_04.png"
           }
@@ -668,84 +668,84 @@
             "index": 0,
             "rect": [
               0,
-              896,
-              128,
-              128
+              672,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              44,
-              18,
-              96,
-              112
+              31,
+              11,
+              74,
+              86
             ],
             "source_file": "final_happy_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              896,
-              128,
-              128
+              96,
+              672,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              44,
-              15,
-              91,
-              112
+              31,
+              10,
+              70,
+              86
             ],
             "source_file": "final_happy_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              896,
-              128,
-              128
+              192,
+              672,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              21,
-              22,
-              84,
-              112
+              14,
+              15,
+              65,
+              86
             ],
             "source_file": "final_happy_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              896,
-              128,
-              128
+              288,
+              672,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              38,
-              17,
-              83,
-              112
+              26,
+              10,
+              64,
+              86
             ],
             "source_file": "final_happy_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              896,
-              128,
-              128
+              384,
+              672,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              44,
-              17,
-              95,
-              112
+              31,
+              11,
+              73,
+              86
             ],
             "source_file": "final_happy_04.png"
           }
@@ -783,84 +783,84 @@
             "index": 0,
             "rect": [
               0,
-              1024,
-              128,
-              128
+              768,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              32,
-              16,
-              96,
-              112
+              22,
+              10,
+              74,
+              86
             ],
             "source_file": "final_idle_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              1024,
-              128,
-              128
+              96,
+              768,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              33,
-              16,
-              96,
-              112
+              23,
+              10,
+              74,
+              86
             ],
             "source_file": "final_idle_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              1024,
-              128,
-              128
+              192,
+              768,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              32,
-              14,
-              96,
-              110
+              22,
+              9,
+              74,
+              85
             ],
             "source_file": "final_idle_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              1024,
-              128,
-              128
+              288,
+              768,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              32,
-              16,
-              95,
-              112
+              22,
+              10,
+              73,
+              86
             ],
             "source_file": "final_idle_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              1024,
-              128,
-              128
+              384,
+              768,
+              96,
+              96
             ],
             "duration_ms": 400,
             "alpha_bounds": [
-              32,
-              16,
-              96,
-              112
+              22,
+              10,
+              74,
+              86
             ],
             "source_file": "final_idle_04.png"
           }
@@ -870,84 +870,84 @@
             "index": 0,
             "rect": [
               0,
-              1152,
-              128,
-              128
+              864,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              32,
-              16,
-              95,
-              111
+              22,
+              10,
+              73,
+              85
             ],
             "source_file": "final_jump_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              1152,
-              128,
-              128
+              96,
+              864,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              32,
-              16,
-              95,
-              111
+              22,
+              10,
+              73,
+              86
             ],
             "source_file": "final_jump_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              1152,
-              128,
-              128
+              192,
+              864,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              31,
-              11,
-              95,
-              112
+              22,
+              7,
+              73,
+              86
             ],
             "source_file": "final_jump_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              1152,
-              128,
-              128
+              288,
+              864,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              31,
-              12,
-              96,
-              113
+              22,
+              7,
+              74,
+              87
             ],
             "source_file": "final_jump_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              1152,
-              128,
-              128
+              384,
+              864,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              32,
-              16,
-              95,
-              111
+              22,
+              10,
+              73,
+              85
             ],
             "source_file": "final_jump_04.png"
           }
@@ -957,84 +957,84 @@
             "index": 0,
             "rect": [
               0,
-              1280,
-              128,
-              128
+              960,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              29,
-              21,
-              98,
-              112
+              19,
+              14,
+              75,
+              86
             ],
             "source_file": "final_fall_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              1280,
-              128,
-              128
+              96,
+              960,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              22,
-              14,
-              98,
-              111
+              15,
+              9,
+              75,
+              85
             ],
             "source_file": "final_fall_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              1280,
-              128,
-              128
+              192,
+              960,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
+              9,
               14,
-              22,
-              97,
-              111
+              74,
+              86
             ],
             "source_file": "final_fall_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              1280,
-              128,
-              128
+              288,
+              960,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              27,
-              17,
-              101,
-              113
+              19,
+              11,
+              78,
+              86
             ],
             "source_file": "final_fall_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              1280,
-              128,
-              128
+              384,
+              960,
+              96,
+              96
             ],
             "duration_ms": 110,
             "alpha_bounds": [
-              26,
-              28,
-              101,
-              117
+              18,
+              19,
+              77,
+              89
             ],
             "source_file": "final_fall_04.png"
           }
@@ -1044,84 +1044,84 @@
             "index": 0,
             "rect": [
               0,
-              1408,
-              128,
-              128
+              1056,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              40,
-              17,
-              109,
-              111
+              28,
+              11,
+              84,
+              85
             ],
             "source_file": "final_happy_00.png"
           },
           {
             "index": 1,
             "rect": [
-              128,
-              1408,
-              128,
-              128
+              96,
+              1056,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              36,
-              17,
-              97,
-              110
+              25,
+              11,
+              74,
+              85
             ],
             "source_file": "final_happy_01.png"
           },
           {
             "index": 2,
             "rect": [
-              256,
-              1408,
-              128,
-              128
+              192,
+              1056,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              13,
-              15,
-              93,
-              111
+              8,
+              10,
+              72,
+              85
             ],
             "source_file": "final_happy_02.png"
           },
           {
             "index": 3,
             "rect": [
-              384,
-              1408,
-              128,
-              128
+              288,
+              1056,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              31,
-              15,
-              96,
-              110
+              21,
+              9,
+              74,
+              85
             ],
             "source_file": "final_happy_03.png"
           },
           {
             "index": 4,
             "rect": [
-              512,
-              1408,
-              128,
-              128
+              384,
+              1056,
+              96,
+              96
             ],
             "duration_ms": 180,
             "alpha_bounds": [
-              39,
-              17,
-              107,
-              111
+              28,
+              11,
+              83,
+              85
             ],
             "source_file": "final_happy_04.png"
           }
@@ -1140,5 +1140,11 @@
       }
     }
   },
-  "runtime_note": "Lossless vertical stack of the three reviewed per-character atlases; shared texture only."
+  "runtime_note": "Lossless vertical stack of the three reviewed per-character atlases; shared texture only.",
+  "runtime_downsample": {
+    "source_cell_size": 128,
+    "runtime_cell_size": 96,
+    "filter": "Lanczos",
+    "review_basis": "128-vs-96 comparison at 48px gameplay-scale showed no perceptible loss before Android validation"
+  }
 }

@@ -46,11 +46,18 @@ class MascotAssetContractTest {
         assertTrue(manifest.getBoolean("approved_for_runtime"))
 
         val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
-        assertEquals(640, bitmap.width)
-        assertEquals(1536, bitmap.height)
+        assertEquals(96, manifest.getInt("cell_size"))
+        assertEquals(5, manifest.getInt("columns"))
+        assertEquals(12, manifest.getInt("rows"))
+        assertEquals(480, bitmap.width)
+        assertEquals(1152, bitmap.height)
         assertTrue(bitmap.hasAlpha())
-        assertEquals(3 * 640 * 512 * 4, bitmap.allocationByteCount)
-        assertTrue("Shared trio atlas unexpectedly large", bytes.size < 450_000)
+        assertEquals(2_211_840, bitmap.allocationByteCount)
+        assertTrue("Shared trio atlas unexpectedly large", bytes.size < 320_000)
+        val downsample = manifest.getJSONObject("runtime_downsample")
+        assertEquals(128, downsample.getInt("source_cell_size"))
+        assertEquals(96, downsample.getInt("runtime_cell_size"))
+        assertEquals("Lanczos", downsample.getString("filter"))
 
         val characters = manifest.getJSONObject("characters")
         val expected = listOf("PIP" to 0, "MOCHI" to 4, "BLOBBO" to 8)
@@ -68,21 +75,21 @@ class MascotAssetContractTest {
                 repeat(frames.length()) { frameIndex ->
                     val frame = frames.getJSONObject(frameIndex)
                     val rect = frame.getJSONArray("rect")
-                    assertEquals(128, rect.getInt(2))
-                    assertEquals(128, rect.getInt(3))
+                    assertEquals(96, rect.getInt(2))
+                    assertEquals(96, rect.getInt(3))
                     val bounds = frame.getJSONArray("alpha_bounds")
-                    assertTrue(bounds.getInt(0) >= 2)
-                    assertTrue(bounds.getInt(1) >= 2)
-                    assertTrue(bounds.getInt(2) <= 126)
-                    assertTrue(bounds.getInt(3) <= 126)
+                    assertTrue(bounds.getInt(0) >= 1)
+                    assertTrue(bounds.getInt(1) >= 1)
+                    assertTrue(bounds.getInt(2) <= 95)
+                    assertTrue(bounds.getInt(3) <= 95)
                 }
             }
         }
 
         SpriteMascotRenderer.prepare(context)
         assertEquals(
-            "Shared trio texture must retain the reviewed RGBA memory budget",
-            3 * 640 * 512 * 4,
+            "96px runtime atlas must reduce the reviewed RGBA memory budget",
+            2_211_840,
             SpriteMascotRenderer.residentDecodedBytesForTest()
         )
         assertEquals("All three mascots must share one runtime texture", 1, SpriteMascotRenderer.runtimeTextureCountForTest())
