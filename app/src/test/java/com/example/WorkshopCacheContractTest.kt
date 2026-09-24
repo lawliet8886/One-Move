@@ -44,13 +44,15 @@ class WorkshopCacheContractTest {
     }
     @Test fun rasterTracksVisibleSizeReusesCacheAndPreservesThePaperAndHazards() {
         val out=File("build/reports/backdrop-contract").apply{mkdirs()}
-        val rows=mutableListOf("width,height,cached_bytes,legacy_bytes,mean_channel_error,generation")
+        val rows=mutableListOf("display_width,display_height,raster_width,raster_height,cached_bytes,legacy_bytes,mean_channel_error,generation")
         for(width in listOf(250,578,1056)) {
             val world=PhysicsWorld(LevelCatalog.getLevel(11))
             val expected=render(width,world,false)
             val actual=render(width,world,true)
             val height=ceil(width*4.0/3.0).toInt()
-            assertEquals(width*height*4,WorkshopBackdropCache.cachedPixelBytes)
+            val rasterWidth=ceil(width*WorkshopBackdropCache.RASTER_SCALE).toInt().coerceAtLeast(1)
+            val rasterHeight=ceil(rasterWidth*4.0/3.0).toInt()
+            assertEquals(rasterWidth*rasterHeight*4,WorkshopBackdropCache.cachedPixelBytes)
             val generation=WorkshopBackdropCache.generationCount
             render(width,world,true)
             assertEquals("Same scene rerasterized",generation,WorkshopBackdropCache.generationCount)
@@ -61,7 +63,7 @@ class WorkshopCacheContractTest {
             for(i in 0 until count)for(shift in listOf(0,8,16,24))error+=abs(((a[i] ushr shift)and 255)-((b[i] ushr shift)and 255))
             val mean=error.toDouble()/(count*4.0)
             assertTrue("Raster changed paper/hazard pixels too much: $mean",mean<2.0)
-            rows+="$width,$height,${WorkshopBackdropCache.cachedPixelBytes},7680000,$mean,$generation"
+            rows+="$width,$height,$rasterWidth,$rasterHeight,${WorkshopBackdropCache.cachedPixelBytes},7680000,$mean,$generation"
             File(out,"native-render-$width.png").outputStream().use {
                 actual.asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG,100,it)
             }

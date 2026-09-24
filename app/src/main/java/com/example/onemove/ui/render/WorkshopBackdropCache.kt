@@ -1,4 +1,4 @@
-package com.example.onemove.ui.render
+﻿package com.example.onemove.ui.render
 
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
@@ -20,6 +20,7 @@ import kotlin.math.ceil
 
 /** One immutable background raster at displayed resolution, never the gameplay state. */
 object WorkshopBackdropCache {
+    internal const val RASTER_SCALE = 0.875f
     private data class Key(val number:Int,val pits:List<DangerPit>,val width:Int,val height:Int,
         val density:Float,val fontScale:Float,val direction:LayoutDirection)
     private var key:Key?=null
@@ -30,7 +31,8 @@ object WorkshopBackdropCache {
 
     fun draw(scope:DrawScope,world:PhysicsWorld) {
         // DrawScope.size stays in display pixels when the outer world transform scales.
-        val width=ceil(scope.size.width.toDouble()).toInt().coerceIn(1,LevelDefinition.WORLD_WIDTH.toInt())
+        val displayWidth=ceil(scope.size.width.toDouble()).toInt().coerceIn(1,LevelDefinition.WORLD_WIDTH.toInt())
+        val width=ceil(displayWidth*RASTER_SCALE).toInt().coerceAtLeast(1)
         val height=ceil(width*LevelDefinition.WORLD_HEIGHT.toDouble()/LevelDefinition.WORLD_WIDTH).toInt()
         val wanted=Key(world.currentLevel.number,world.dangerPits.toList(),width,height,
             scope.density,scope.fontScale,scope.layoutDirection)
@@ -47,12 +49,13 @@ object WorkshopBackdropCache {
             }
             // Old rasters are released by GC after render-thread references finish.
             bitmap=next;key=wanted;image=next;generation++
-            Log.i("OneMoveRender","Static backdrop generation=$generation level=${wanted.number} ${width}x$height bytes=${width*height*4} buildMs=${(System.nanoTime()-start)/1_000_000.0}")
+            Log.i("OneMoveRender","Static backdrop generation=$generation level=${wanted.number} raster=${width}x$height displayWidth=$displayWidth bytes=${width*height*4} buildMs=${(System.nanoTime()-start)/1_000_000.0}")
         }
         with(scope) {
             drawImage(image,srcOffset=IntOffset.Zero,srcSize=IntSize(image.width,image.height),
                 dstOffset=IntOffset.Zero,dstSize=IntSize(LevelDefinition.WORLD_WIDTH.toInt(),LevelDefinition.WORLD_HEIGHT.toInt()),
-                filterQuality=FilterQuality.Low)
+                filterQuality=FilterQuality.Medium)
         }
     }
 }
+
