@@ -1,12 +1,10 @@
 package com.example
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.core.app.ApplicationProvider
 import com.example.onemove.ui.render.SpriteMascotRenderer
 import org.json.JSONObject
-import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -24,61 +22,44 @@ class MascotAssetContractTest {
         MessageDigest.getInstance("SHA-256").digest(bytes)
             .joinToString("") { "%02x".format(it) }
 
-    private fun pixels(bitmap: Bitmap): IntArray =
-        IntArray(bitmap.width * bitmap.height).also {
-            bitmap.getPixels(it, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-        }
-
     @GraphicsMode(GraphicsMode.Mode.NATIVE)
     @Test
-    fun sharedTrioAtlasIsPixelIdenticalApprovedAndSingleTexture() {
+    fun sharedTrioAtlasIsApprovedBoundedAndTheOnlyPackagedMascotTexture() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val mascotAssets = context.assets.list("mascots")?.toSet().orEmpty()
-        assertFalse("Legacy atlas must not ship once every mascot has a reviewed replacement", "atlas.webp" in mascotAssets)
-        assertFalse("Legacy atlas manifest must not ship without its runtime atlas", "manifest.json" in mascotAssets)
 
-        val trioBytes = context.assets.open("mascots/trio_runtime.webp").use { it.readBytes() }
-        val trioManifest = context.assets.open("mascots/trio_runtime.json")
+        assertTrue("Shared runtime atlas missing", "trio_runtime.webp" in mascotAssets)
+        assertTrue("Shared runtime manifest missing", "trio_runtime.json" in mascotAssets)
+        for (legacy in listOf(
+            "atlas.webp", "manifest.json",
+            "pip_animated.webp", "pip_animated.json",
+            "mochi_animated.webp", "mochi_animated.json",
+            "blobbo_animated.webp", "blobbo_animated.json"
+        )) {
+            assertFalse("$legacy must not be packaged in the APK", legacy in mascotAssets)
+        }
+
+        val bytes = context.assets.open("mascots/trio_runtime.webp").use { it.readBytes() }
+        val manifest = context.assets.open("mascots/trio_runtime.json")
             .bufferedReader().use { JSONObject(it.readText()) }
-        assertEquals(trioManifest.getString("atlas_sha256"), sha256(trioBytes))
-        assertTrue(trioManifest.getBoolean("approved_for_runtime"))
+        assertEquals(manifest.getString("atlas_sha256"), sha256(bytes))
+        assertTrue(manifest.getBoolean("approved_for_runtime"))
 
-        val trio = checkNotNull(BitmapFactory.decodeByteArray(trioBytes, 0, trioBytes.size))
-        assertEquals(640, trio.width)
-        assertEquals(1536, trio.height)
-        assertTrue(trio.hasAlpha())
-        assertEquals(3 * 640 * 512 * 4, trio.allocationByteCount)
+        val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
+        assertEquals(640, bitmap.width)
+        assertEquals(1536, bitmap.height)
+        assertTrue(bitmap.hasAlpha())
+        assertEquals(3 * 640 * 512 * 4, bitmap.allocationByteCount)
+        assertTrue("Shared trio atlas unexpectedly large", bytes.size < 450_000)
 
-        val trioPixels = pixels(trio)
-        val characters = trioManifest.getJSONObject("characters")
-        val sources = listOf(
-            "PIP" to "pip_animated",
-            "MOCHI" to "mochi_animated",
-            "BLOBBO" to "blobbo_animated"
-        )
-        for ((index, pair) in sources.withIndex()) {
-            val (id, stem) = pair
-            val bytes = context.assets.open("mascots/$stem.webp").use { it.readBytes() }
-            val manifest = context.assets.open("mascots/$stem.json")
-                .bufferedReader().use { JSONObject(it.readText()) }
-            assertEquals("$stem hash", manifest.getString("atlas_sha256"), sha256(bytes))
-            assertTrue("$stem must be explicitly approved", manifest.getBoolean("approved_for_runtime"))
-
-            val bitmap = checkNotNull(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
-            assertEquals("$stem width", 640, bitmap.width)
-            assertEquals("$stem height", 512, bitmap.height)
-            assertTrue("$stem alpha", bitmap.hasAlpha())
-
-            val sourcePixels = pixels(bitmap)
-            val trioOffset = index * 640 * 512
-            val sharedSlice = trioPixels.copyOfRange(trioOffset, trioOffset + sourcePixels.size)
-            assertArrayEquals("$stem pixels differ from shared atlas", sourcePixels, sharedSlice)
-
+        val characters = manifest.getJSONObject("characters")
+        val expected = listOf("PIP" to 0, "MOCHI" to 4, "BLOBBO" to 8)
+        for ((id, baseRow) in expected) {
             val spec = characters.getJSONObject(id)
-            assertEquals(index * 4, spec.getInt("base_row"))
-            assertEquals(manifest.getDouble("framing"), spec.getDouble("framing"), 0.0001)
-            assertEquals(manifest.getString("atlas_sha256"), spec.getString("source_atlas_sha256"))
+            assertEquals(baseRow, spec.getInt("base_row"))
             assertTrue(spec.getBoolean("approved_for_runtime"))
+            assertTrue(spec.getDouble("framing") in 3.0..4.0)
+            assertTrue(spec.getString("source_atlas_sha256").matches(Regex("[0-9a-f]{64}")))
 
             val clips = spec.getJSONObject("clips")
             for (name in listOf("idle", "jump", "fall", "happy")) {
@@ -100,7 +81,7 @@ class MascotAssetContractTest {
 
         SpriteMascotRenderer.prepare(context)
         assertEquals(
-            "Shared atlas must preserve the same decoded RGBA budget",
+            "Shared trio texture must retain the reviewed RGBA memory budget",
             3 * 640 * 512 * 4,
             SpriteMascotRenderer.residentDecodedBytesForTest()
         )
