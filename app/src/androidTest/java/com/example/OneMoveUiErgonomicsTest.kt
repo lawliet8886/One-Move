@@ -72,7 +72,11 @@ class OneMoveUiErgonomicsTest {
         assertTrue("This case must actually use a narrow screen", device.displayWidth / metrics.density <= 321f)
         File(output, "large-font-configuration.txt").writeText("${device.displayWidth}x${device.displayHeight}; density=${metrics.density}; fontScale=$font; scripted Android UI regression")
         instrumentation.runOnMainSync { model.loadLevel(2) }
-        node("level_title")
+        val largeTitle = node("level_title").visibleBounds
+        assertTrue(
+            "Large-font title still has only one-line room: $largeTitle",
+            largeTitle.height() / metrics.density >= 60f
+        )
         assertTarget("reset_button")
         assertTarget("level_select_button")
         assertPlayableBoard()
@@ -81,6 +85,11 @@ class OneMoveUiErgonomicsTest {
         node("level_select_sheet")
         assertTarget("close_levels_button")
         assertTarget("level_1")
+        val largeCard = node("level_1").visibleBounds
+        assertTrue(
+            "Large-font level card cannot fit three title lines: $largeCard",
+            largeCard.height() / metrics.density >= 125f
+        )
         capture("large_font_01_named_levels")
         pressSystemBack()
         assertTrue(device.wait(Until.gone(By.res("level_select_sheet")), 5_000L))

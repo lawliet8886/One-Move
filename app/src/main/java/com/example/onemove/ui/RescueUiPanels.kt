@@ -198,7 +198,7 @@ internal fun RescueLevelSelect(state: GameUiState, select: (Int) -> Unit, close:
                         val top = if (current) Color(0xFF91663F) else if (complete) Color(0xFF24584B) else Color(0xFF34514A)
                         val bottom = if (current) Color(0xFF604126) else Color(0xFF153930)
                         val status = if (complete) "CLEAR" else if (unlocked) "READY" else "LOCKED"
-                        Column(Modifier.heightIn(min = 102.dp).clip(RoundedCornerShape(14.dp))
+                        Column(Modifier.heightIn(min = if (largeFont) 132.dp else 102.dp).clip(RoundedCornerShape(14.dp))
                             .background(Brush.verticalGradient(listOf(top, bottom)))
                             .border(if (current) 2.dp else 1.dp, if (current) Color(0xFFE9BD79) else Color(0xFF54756A), RoundedCornerShape(14.dp))
                             .clickable(enabled = unlocked, onClickLabel = "Open ${level.name}") { select(level.number) }
@@ -206,7 +206,9 @@ internal fun RescueLevelSelect(state: GameUiState, select: (Int) -> Unit, close:
                             .padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(level.number.toString().padStart(2, '0'), color = if (unlocked) Color(0xFFFFEDCB) else Color(0xFFABC3B8),
                                 fontSize = 21.sp, lineHeight = 25.sp, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold)
-                            Text(level.name, color = Color(0xFFE1EADB), fontSize = 11.sp, lineHeight = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(level.name, color = Color(0xFFE1EADB), fontSize = 11.sp, lineHeight = 14.sp,
+                                maxLines = if (largeFont) 3 else 2,
+                                overflow = if (largeFont) TextOverflow.Clip else TextOverflow.Ellipsis)
                             Text(status, color = if (complete) Color(0xFF89EAC5) else Color(0xFFCBD5E1), fontSize = 10.sp, lineHeight = 13.sp)
                         }
                     }

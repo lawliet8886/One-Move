@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -21,10 +22,12 @@ import androidx.compose.ui.unit.sp
 /** Remove secondary chrome, never the user's font scaling or the playable area. */
 @Composable
 internal fun CompactRescueHud(state: GameUiState, levels: () -> Unit, reset: () -> Unit) {
+    val largeFont = LocalDensity.current.fontScale >= 1.6f
     Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(state.currentLevel.name, fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                color = Color(0xFFFFEDCB), maxLines = 1, overflow = TextOverflow.Ellipsis,
+        Row(Modifier.fillMaxWidth().heightIn(min = if (largeFont) 72.dp else 48.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(state.currentLevel.name, fontSize = 16.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold,
+                color = Color(0xFFFFEDCB), maxLines = if (largeFont) 2 else 1,
+                overflow = if (largeFont) TextOverflow.Clip else TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).testTag("level_title").semantics {
                     contentDescription = "Level ${state.currentLevelNumber}: ${state.currentLevel.name}"
                 })
