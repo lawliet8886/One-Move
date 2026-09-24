@@ -13,7 +13,7 @@ object ToyBoxRenderer {
         WeightSwitchRenderer.draw(drawScope, world)
         val rescuedCount = world.creatures.count { it.isInsideGoal }
         RescueSanctuaryRenderer.draw(drawScope, world.goalZone, rescuedCount)
-        for (platform in world.platforms) WorkshopRenderer.platform(drawScope, platform)
+        WorkshopRailPictureCache.draw(drawScope, world)
         for (bumper in world.springBumpers) SpringBumperRenderer.drawSpringBumper(drawScope, bumper)
         for (seesaw in world.seesaws) MechanicalJointRenderer.drawSeesawAssembly(drawScope, seesaw)
         for (gate in world.creatureGates) if (gate.requiredPlateIds.isEmpty())
