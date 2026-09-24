@@ -149,6 +149,7 @@ internal fun RescueLevelSelect(state: GameUiState, select: (Int) -> Unit, close:
     val largeFont = LocalDensity.current.fontScale >= 1.6f
     val columns = if (largeFont) 2 else 3
     BoxWithConstraints(Modifier.fillMaxSize().background(Color(0xEE0A0F1D)).clickable(onClick = close), contentAlignment = Alignment.Center) {
+        val availableHeight = maxHeight
         Surface(color = Color(0xFF1B3E37), shape = RoundedCornerShape(24.dp),
             modifier = Modifier.padding(16.dp).widthIn(max = 480.dp).fillMaxWidth()
                 .heightIn(max = (maxHeight - 32.dp).coerceAtLeast(160.dp)).clickable { }.testTag("level_select_sheet")) {
@@ -158,9 +159,37 @@ internal fun RescueLevelSelect(state: GameUiState, select: (Int) -> Unit, close:
                         maxLines = 2, modifier = Modifier.weight(1f))
                     IconButton(close, Modifier.testTag("close_levels_button")) { Icon(Icons.Default.Close, "Close levels", tint = Color.White) }
                 }
-                Text(if (largeFont) "${state.completedLevels.size}/${state.totalLevels} rescued" else "${state.completedLevels.size} of ${state.totalLevels} sanctuaries reached", color = Color(0xFFABC3B8), fontSize = 13.sp, lineHeight = 18.sp)
+                val allHome = state.completedLevels.size >= state.totalLevels
+                if (allHome) {
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFF24584B))
+                            .border(1.dp, Color(0xFF5E8B7D), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 10.dp, vertical = 7.dp)
+                            .testTag("campaign_complete_banner"),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            if (largeFont) "${state.totalLevels}/${state.totalLevels} HOME" else "ALL ${state.totalLevels} HOME",
+                            color = Color(0xFF89EAC5), fontSize = 11.sp, lineHeight = 14.sp,
+                            fontWeight = FontWeight.Bold, maxLines = 1
+                        )
+                        if (!largeFont) {
+                            Spacer(Modifier.weight(1f))
+                            Text("CAMPAIGN COMPLETE", color = Color(0xFFFFEDCB), fontSize = 10.sp,
+                                lineHeight = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        }
+                    }
+                } else {
+                    Text(
+                        if (largeFont) "${state.completedLevels.size}/${state.totalLevels} rescued"
+                        else "${state.completedLevels.size} of ${state.totalLevels} sanctuaries reached",
+                        color = Color(0xFFABC3B8), fontSize = 13.sp, lineHeight = 18.sp
+                    )
+                }
                 Spacer(Modifier.height(14.dp))
-                LazyVerticalGrid(GridCells.Fixed(columns), modifier = Modifier.weight(1f, fill = false).heightIn(max = 400.dp).testTag("level_grid"),
+                val gridMaxHeight = (availableHeight - if (largeFont) 160.dp else 150.dp).coerceAtLeast(180.dp)
+                LazyVerticalGrid(GridCells.Fixed(columns), modifier = Modifier.heightIn(max = gridMaxHeight).testTag("level_grid"),
                     horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(LevelCatalog.ALL_LEVELS, key = { it.number }) { level ->
                         val unlocked = level.number <= state.highestUnlockedLevel

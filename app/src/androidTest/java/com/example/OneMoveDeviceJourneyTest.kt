@@ -83,6 +83,12 @@ class OneMoveDeviceJourneyTest {
         assertTrue(device.hasObject(By.text("ALL 12 LEVELS RESCUED!")))
         node("next_level_button").click()
         node("level_select_sheet")
+        node("campaign_complete_banner")
+        val finalCard = node("level_12").visibleBounds
+        assertTrue("Level 12 is clipped in the completed campaign sheet: $finalCard",
+            finalCard.width() > 0 && finalCard.height() > 0 &&
+                finalCard.left >= 0 && finalCard.top >= 0 &&
+                finalCard.right <= device.displayWidth && finalCard.bottom <= device.displayHeight)
         capture("campaign_complete")
     }
 
