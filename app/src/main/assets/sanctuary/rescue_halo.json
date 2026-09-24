@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "asset_id": "rescue-halo-dock",
+  "version": "1.0.0",
+  "width": 256,
+  "height": 256,
+  "decoded_bytes_rgba": 262144,
+  "atlas_sha256": "5a7daf2f70bf0f33b6e9c7e3c27485ba4a7428429b23aaca0999d4a155cefcb1",
+  "approved_for_runtime": true,
+  "source_model_id": "c0db6f29-86eb-430a-84ec-481a1a46405e",
+  "tripo_generation_credits": 55,
+  "export_credits": 0,
+  "note": "Tripo shell + darkened portal bake; status lamps remain dynamic in Compose.",
+  "framing": 2.18,
+  "alpha_bounds": [
+    10,
+    16,
+    246,
+    239
+  ],
+  "lamp_offsets_radius": [
+    -0.23,
+    0.0,
+    0.23
+  ],
+  "lamp_y_radius": -0.32,
+  "source_glb_sha256": "b55bb03b7c8147310249587e0c9cfbfdec5260a63bad8fee438b837a22f9fb27",
+  "approval_basis": "Reviewed Tripo shell, transparent Blender bake, and 128/64px runtime contact sheet; dark portal bake chosen over raw cyan panel.",
+  "runtime_note": "Presentation only. GoalZone center/radius and all colliders remain authoritative in Compose/physics."
+}

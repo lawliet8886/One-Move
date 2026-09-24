@@ -16,6 +16,7 @@ class MainActivity : ComponentActivity() {
         SpriteMascotRenderer.prepare(applicationContext)
         com.example.onemove.ui.render.HardwareSpriteRenderer.prepare(applicationContext)
         com.example.onemove.ui.render.SpringBumperRenderer.prepare(applicationContext)
+        com.example.onemove.ui.render.RescueSanctuaryRenderer.prepare(applicationContext)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
