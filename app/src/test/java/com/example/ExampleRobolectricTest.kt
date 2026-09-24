@@ -1,6 +1,9 @@
 package com.example
 
 import android.content.Context
+import java.security.MessageDigest
+import org.json.JSONObject
+import android.graphics.BitmapFactory
 import android.app.Application
 import com.example.onemove.ui.OneMoveViewModel
 import org.junit.Assert.assertFalse
@@ -51,9 +54,34 @@ class ExampleRobolectricTest {
   @org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
   @Test fun bundledHardwareAtlasLoadsWithVerifiedHashAndBoundedMemory() {
     val context=ApplicationProvider.getApplicationContext<Context>()
+    val bytes=context.assets.open("hardware/atlas.webp").use { it.readBytes() }
+    val manifest=context.assets.open("hardware/manifest.json").bufferedReader().use { JSONObject(it.readText()) }
+    val digest=MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+    assertEquals(manifest.getString("atlas_sha256"),digest)
+    assertEquals(160,manifest.getInt("cell_size"))
+    assertEquals(480,manifest.getInt("atlas_width"))
+    assertEquals(160,manifest.getInt("atlas_height"))
+    assertEquals(307200,manifest.getInt("decoded_bytes_rgba"))
+    assertEquals(2.4,manifest.getDouble("framing"),0.0001)
+    assertTrue(manifest.has("runtime_downsample"))
+    val bitmap=checkNotNull(BitmapFactory.decodeByteArray(bytes,0,bytes.size))
+    assertEquals(480,bitmap.width)
+    assertEquals(160,bitmap.height)
+    assertTrue(bitmap.hasAlpha())
+    assertEquals(307200,bitmap.allocationByteCount)
+    val sprites=manifest.getJSONArray("sprites")
+    assertEquals(3,sprites.length())
+    repeat(sprites.length()) { index ->
+      val sprite=sprites.getJSONObject(index)
+      val bounds=sprite.getJSONArray("alpha_bounds")
+      assertTrue(bounds.getInt(0) >= 1)
+      assertTrue(bounds.getInt(1) >= 1)
+      assertTrue(bounds.getInt(2) <= 159)
+      assertTrue(bounds.getInt(3) <= 159)
+    }
     com.example.onemove.ui.render.HardwareSpriteRenderer.prepare(context)
     assertTrue(com.example.onemove.ui.render.HardwareSpriteRenderer.isPrepared)
-    assertEquals(786432,com.example.onemove.ui.render.HardwareSpriteRenderer.DECODED_BYTES)
+    assertEquals(307200,com.example.onemove.ui.render.HardwareSpriteRenderer.residentDecodedBytesForTest())
   }
 
   @Test fun activeFramesInvalidateDrawingWithoutPublishingEveryHudFrame() {
