@@ -48,3 +48,27 @@ Report:
 - why the fix cannot hide a real gameplay regression.
 
 Stop after this task. Do not start audio or any other feature.
+
+## Direct file hints
+Start here instead of broad repository searches:
+- pp/src/androidTest/java/com/example/OneMoveDeviceJourneyTest.kt
+  - failing method around line 106;
+  - retry click around line 138;
+  - READY/adaptive-HUD assertion around lines 223-229.
+- pp/src/androidTest/java/com/example/OneMoveFlyingKeyTest.kt
+  - contains a similar retry/adaptive-HUD assertion around lines 96-102.
+- pp/src/main/java/com/example/onemove/ui/RescueUiPanels.kt
+  - owns the retry button test tag.
+- pp/src/main/java/com/example/onemove/ui/OneMoveGameScreen.kt
+- pp/src/main/java/com/example/onemove/ui/OneMoveViewModel.kt
+- 	ools/ci/device-journey.sh
+  - invokes the failing instrumentation method.
+
+Repository hygiene has already been fixed: Gradle state is ignored and no longer tracked.
+Do not add another .gitignore.
+If a generated file appears, inspect git status --short and discard only generated/ignored noise; do not reset source changes.
+
+## Autonomy rule
+Do not pause to ask the user for routine repository-navigation hints.
+If an exploration command produces too much output, switch to targeted g, sed, git grep, or direct file reads using the paths above.
+Only request user feedback if a decision would be destructive, paid, secret-dependent, or genuinely ambiguous after targeted inspection.
